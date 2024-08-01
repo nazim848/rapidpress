@@ -1,0 +1,31 @@
+.rapidpress-admin-content {
+	margin-top: 20px;
+}
+
+.nav-tab-wrapper {
+	margin-bottom: 20px;
+}
+
+.tab-content > .tab-pane {
+	display: none;
+}
+
+.tab-content > .active {
+	display: block;
+}
+
+.rapidpress-card {
+	background: #fff;
+	border: 1px solid #ccd0d4;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	margin-bottom: 20px;
+	padding: 20px;
+}
+
+.performance-score {
+	font-size: 48px;
+	font-weight: bold;
+	color: #46b450;
+	text-align: center;
+	margin: 20px 0;
+}
