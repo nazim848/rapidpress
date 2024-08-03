@@ -61,6 +61,15 @@
 									</label>
 								</td>
 							</tr>
+							<tr valign="top">
+								<th scope="row">Combine CSS Files</th>
+								<td>
+									<label>
+										<input type="checkbox" name="rapidpress_combine_css" value="1" <?php checked(1, get_option('rapidpress_combine_css'), true); ?> />
+										Enable CSS file combination
+									</label>
+								</td>
+							</tr>
 						</table>
 					</div>
 					<?php submit_button(); ?>

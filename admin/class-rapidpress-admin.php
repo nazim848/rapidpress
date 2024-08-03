@@ -56,11 +56,13 @@ class RapidPress_Admin {
 	public function register_settings() {
 		register_setting('rapidpress_options', 'rapidpress_html_minify');
 		register_setting('rapidpress_options', 'rapidpress_css_minify');
+		register_setting('rapidpress_options', 'rapidpress_combine_css');
 		// Add more settings here as we add features
 
-		// Add a custom sanitization callback
+		// Add custom sanitization callbacks
 		add_filter('pre_update_option_rapidpress_html_minify', array($this, 'save_settings_with_tab'), 10, 3);
 		add_filter('pre_update_option_rapidpress_css_minify', array($this, 'save_settings_with_tab'), 10, 3);
+		add_filter('pre_update_option_rapidpress_combine_css', array($this, 'save_settings_with_tab'), 10, 3);
 	}
 
 	public function save_settings_with_tab($value, $old_value, $option) {

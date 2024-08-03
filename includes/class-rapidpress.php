@@ -17,9 +17,11 @@ class RapidPress {
 
 	private function load_dependencies() {
 		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-loader.php';
+		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-html-minifier.php';
+		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-css-minifier.php';
+		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-css-combiner.php';
 		require_once RAPIDPRESS_PLUGIN_DIR . 'admin/class-rapidpress-admin.php';
 		require_once RAPIDPRESS_PLUGIN_DIR . 'public/class-rapidpress-public.php';
-		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-html-minifier.php';
 
 		$this->loader = new RapidPress_Loader();
 	}
@@ -51,6 +53,9 @@ class RapidPress {
 
 		// Initialize HTML Minifier
 		new RapidPress_HTML_Minifier();
+
+		// Initialize CSS Combiner
+		new RapidPress_CSS_Combiner();
 	}
 
 	public function run() {
