@@ -6,7 +6,7 @@
 	<div class="rapidpress-admin-content">
 		<nav class="nav-tab-wrapper">
 			<a href="#dashboard" class="nav-tab nav-tab-active">Dashboard</a>
-			<a href="#minification" class="nav-tab">Minification</a>
+			<a href="#file-optimization" class="nav-tab">File Optimization</a>
 			<a href="#caching" class="nav-tab">Caching</a>
 			<a href="#cdn" class="nav-tab">CDN</a>
 			<a href="#advanced" class="nav-tab">Advanced</a>
@@ -28,13 +28,13 @@
 					<h3>Active Optimizations</h3>
 					<ul>
 						<li>HTML Minification: <?php echo get_option('rapidpress_html_minify') ? 'Enabled' : 'Disabled'; ?></li>
+						<li>CSS Minification: <?php echo get_option('rapidpress_css_minify') ? 'Enabled' : 'Disabled'; ?></li>
 						<!-- Add more optimizations here as we implement them -->
 					</ul>
 				</div>
 			</div>
-			<div id="minification" class="tab-pane">
-				<h2>Minification Settings</h2>
-
+			<div id="file-optimization" class="tab-pane">
+				<h2>File Optimization Settings</h2>
 				<form method="post" action="options.php">
 					<?php
 					settings_fields('rapidpress_options');
