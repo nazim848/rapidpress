@@ -52,7 +52,15 @@
 									</label>
 								</td>
 							</tr>
-							<!-- Add more minification options here -->
+							<tr valign="top">
+								<th scope="row">CSS Minification</th>
+								<td>
+									<label>
+										<input type="checkbox" name="rapidpress_css_minify" value="1" <?php checked(1, get_option('rapidpress_css_minify'), true); ?> />
+										Enable CSS minification (inline styles)
+									</label>
+								</td>
+							</tr>
 						</table>
 					</div>
 					<?php submit_button(); ?>
