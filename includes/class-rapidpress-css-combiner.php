@@ -5,6 +5,8 @@ class RapidPress_CSS_Combiner {
 	private $combined_css = '';
 	private $combined_filename = '';
 	private $debug_log = array();
+	private $cache_expiration = 86400; // 24 hours in seconds
+	private $last_modified = 0;
 
 	public function __construct() {
 		add_action('wp_print_styles', array($this, 'combine_css'), 100);
@@ -25,6 +27,7 @@ class RapidPress_CSS_Combiner {
 		}
 
 		$styles_to_combine = array();
+		$styles_hash = '';
 
 		foreach ($wp_styles->queue as $handle) {
 			$style = $wp_styles->registered[$handle];
@@ -36,11 +39,21 @@ class RapidPress_CSS_Combiner {
 
 			if ($this->is_same_domain($style->src)) {
 				$styles_to_combine[] = $style;
+				$styles_hash .= $style->src . (isset($style->ver) ? $style->ver : '');
+				$this->update_last_modified($style->src);
 				$wp_styles->dequeue($handle);
 				$this->debug_log[] = "Added to combine: {$style->src}";
 			} else {
 				$this->debug_log[] = "Skipped {$handle}: Not same domain.";
 			}
+		}
+
+		$styles_hash = md5($styles_hash . $this->last_modified);
+		$this->combined_filename = 'combined-' . $styles_hash . '.css';
+
+		if ($this->is_cached_file_valid($styles_hash)) {
+			$this->debug_log[] = "Using cached combined CSS file.";
+			return;
 		}
 
 		if (!empty($styles_to_combine)) {
@@ -61,10 +74,33 @@ class RapidPress_CSS_Combiner {
 			}
 
 			$this->combined_css = $this->minify_css($this->combined_css);
-			$this->save_combined_css();
+			$this->save_combined_css($styles_hash);
 		} else {
 			$this->debug_log[] = "No styles to combine.";
 		}
+	}
+
+	private function update_last_modified($src) {
+		$file_path = $this->url_to_path($src);
+		if (file_exists($file_path)) {
+			$file_modified = filemtime($file_path);
+			$this->last_modified = max($this->last_modified, $file_modified);
+		}
+	}
+
+	private function is_cached_file_valid($styles_hash) {
+		$upload_dir = wp_upload_dir();
+		$combined_dir = $upload_dir['basedir'] . '/rapidpress-combined';
+		$combined_file = $combined_dir . '/' . $this->combined_filename;
+
+		if (file_exists($combined_file)) {
+			$cache_meta = get_option('rapidpress_css_cache_meta', array());
+			if (isset($cache_meta['hash']) && $cache_meta['hash'] === $styles_hash) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private function get_css_content($src) {
@@ -129,7 +165,7 @@ class RapidPress_CSS_Combiner {
 		return trim($css);
 	}
 
-	private function save_combined_css() {
+	private function save_combined_css($styles_hash) {
 		$upload_dir = wp_upload_dir();
 		$combined_dir = $upload_dir['basedir'] . '/rapidpress-combined';
 
@@ -137,10 +173,16 @@ class RapidPress_CSS_Combiner {
 			mkdir($combined_dir, 0755, true);
 		}
 
-		$this->combined_filename = 'combined-' . md5($this->combined_css) . '.css';
 		$combined_file = $combined_dir . '/' . $this->combined_filename;
 
 		file_put_contents($combined_file, $this->combined_css);
+
+		// Save cache metadata
+		$cache_meta = array(
+			'hash' => $styles_hash,
+			'last_modified' => $this->last_modified
+		);
+		update_option('rapidpress_css_cache_meta', $cache_meta);
 	}
 
 	public function print_combined_css() {

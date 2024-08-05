@@ -66,6 +66,12 @@ class RapidPress_Admin {
 	}
 
 	public function save_settings_with_tab($value, $old_value, $option) {
+
+		// Clear the CSS cache after saving settings
+		$this->clear_css_cache();
+
+
+
 		if (isset($_POST['rapidpress_active_tab'])) {
 			$tab = ltrim($_POST['rapidpress_active_tab'], '#');
 			add_filter('wp_redirect', function ($location) use ($tab) {
@@ -73,6 +79,22 @@ class RapidPress_Admin {
 			});
 		}
 		return $value;
+	}
+
+	public function clear_css_cache() {
+		$upload_dir = wp_upload_dir();
+		$combined_dir = $upload_dir['basedir'] . '/rapidpress-combined';
+
+		if (is_dir($combined_dir)) {
+			$files = glob($combined_dir . '/*');
+			foreach ($files as $file) {
+				if (is_file($file)) {
+					unlink($file);
+				}
+			}
+		}
+
+		delete_option('rapidpress_css_cache_meta');
 	}
 
 	public function get_plugin_name() {
