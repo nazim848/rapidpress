@@ -26,6 +26,10 @@ class RapidPress_Admin {
 			return;
 		}
 		wp_enqueue_script('rapidpress-admin', plugin_dir_url(__FILE__) . 'js/rapidpress-admin.js', array('jquery'), $this->version, false);
+		wp_localize_script('rapidpress-admin', 'rapidpress_admin', array(
+			'ajax_url' => admin_url('admin-ajax.php'),
+			'nonce' => wp_create_nonce('rapidpress_admin_nonce')
+		));
 	}
 
 	public function add_plugin_admin_menu() {
@@ -40,7 +44,6 @@ class RapidPress_Admin {
 		);
 	}
 
-
 	public function display_plugin_setup_page() {
 		$active_tab = '#dashboard'; // Default to dashboard
 
@@ -54,26 +57,25 @@ class RapidPress_Admin {
 	}
 
 	public function register_settings() {
-		register_setting('rapidpress_options', 'rapidpress_html_minify');
-		register_setting('rapidpress_options', 'rapidpress_css_minify');
-		register_setting('rapidpress_options', 'rapidpress_combine_css');
-		// Add more settings here as we add features
+		$settings = array(
+			'rapidpress_html_minify',
+			'rapidpress_css_minify',
+			'rapidpress_combine_css',
+			// Add new settings here
+		);
 
-		// Add custom sanitization callbacks
-		add_filter('pre_update_option_rapidpress_html_minify', array($this, 'save_settings_with_tab'), 10, 3);
-		add_filter('pre_update_option_rapidpress_css_minify', array($this, 'save_settings_with_tab'), 10, 3);
-		add_filter('pre_update_option_rapidpress_combine_css', array($this, 'save_settings_with_tab'), 10, 3);
+		foreach ($settings as $setting) {
+			register_setting('rapidpress_options', $setting);
+			add_filter("pre_update_option_{$setting}", array($this, 'save_settings_with_tab'), 10, 3);
+		}
 	}
 
 	public function save_settings_with_tab($value, $old_value, $option) {
-
 		// Clear the CSS cache after saving settings
 		$this->clear_css_cache();
 
-
-
-		if (isset($_POST['rapidpress_active_tab'])) {
-			$tab = ltrim($_POST['rapidpress_active_tab'], '#');
+		if (isset($_POST['rapidpress_active_tab']) && wp_verify_nonce($_POST['rapidpress_nonce'], 'rapidpress_settings')) {
+			$tab = sanitize_key(ltrim($_POST['rapidpress_active_tab'], '#'));
 			add_filter('wp_redirect', function ($location) use ($tab) {
 				return add_query_arg('tab', $tab, $location);
 			});
@@ -83,15 +85,10 @@ class RapidPress_Admin {
 
 	public function clear_css_cache() {
 		$upload_dir = wp_upload_dir();
-		$combined_dir = $upload_dir['basedir'] . '/rapidpress-combined';
+		$combined_dir = trailingslashit($upload_dir['basedir']) . 'rapidpress-combined';
 
 		if (is_dir($combined_dir)) {
-			$files = glob($combined_dir . '/*');
-			foreach ($files as $file) {
-				if (is_file($file)) {
-					unlink($file);
-				}
-			}
+			array_map('unlink', glob("$combined_dir/*.*"));
 		}
 
 		delete_option('rapidpress_css_cache_meta');
