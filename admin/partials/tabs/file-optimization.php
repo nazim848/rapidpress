@@ -1,3 +1,9 @@
+<?php
+// Ensure this file is being included by a parent file
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+
+?>
+
 <div id="file-optimization" class="tab-pane">
 	<h2>File Optimization Settings</h2>
 	<form method="post" action="options.php">
@@ -39,5 +45,4 @@
 		</div>
 		<?php submit_button(); ?>
 	</form>
-
 </div>
