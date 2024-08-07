@@ -20,6 +20,9 @@ class RapidPress {
 		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-html-minifier.php';
 		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-css-minifier.php';
 		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-css-combiner.php';
+		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-js-minifier.php';
+		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-js-defer.php';
+		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-js-delay.php';
 		require_once RAPIDPRESS_PLUGIN_DIR . 'admin/class-rapidpress-admin.php';
 		require_once RAPIDPRESS_PLUGIN_DIR . 'public/class-rapidpress-public.php';
 
@@ -62,7 +65,7 @@ class RapidPress {
 		new RapidPress_JS_Defer();
 
 		// Initialize JS Delay
-		new RapidPress_JS_Delay();
+		//new RapidPress_JS_Delay();
 	}
 
 	public function run() {

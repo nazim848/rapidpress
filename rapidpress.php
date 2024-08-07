@@ -22,57 +22,33 @@ define('RAPIDPRESS_VERSION', '1.0.0');
 define('RAPIDPRESS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('RAPIDPRESS_PLUGIN_URL', plugin_dir_url(__FILE__));
 
-/**
- * The core plugin class that is used to define internationalization,
- * admin-specific hooks, and public-facing site hooks.
- */
+// Load the main plugin class
 require plugin_dir_path(__FILE__) . 'includes/class-rapidpress.php';
 
-// The CSS minifier class
-require plugin_dir_path(__FILE__) . 'includes/class-rapidpress-css-minifier.php';
-
-// The JS minifier class
-require plugin_dir_path(__FILE__) . 'includes/class-rapidpress-js-minifier.php';
-
-// The JS defer class
-require plugin_dir_path(__FILE__) . 'includes/class-rapidpress-js-defer.php';
-
-// The JS delay class.
-require plugin_dir_path(__FILE__) . 'includes/class-rapidpress-js-delay.php';
-
-/**
- * Begins execution of the plugin.
- *
- * Since everything within the plugin is registered via hooks,
- * then kicking off the plugin from this point in the file does
- * not affect the page life cycle.
- */
+// Run the plugin
 function run_rapidpress() {
 	$plugin = new RapidPress();
 	$plugin->run();
 }
 run_rapidpress();
 
-/**
- * Activation hook.
- */
+// Activation hook
 register_activation_hook(__FILE__, 'rapidpress_activate');
 
-/**
- * Deactivation hook.
- */
+// Deactivation hook
 register_deactivation_hook(__FILE__, 'rapidpress_deactivate');
 
-/**
- * The code that runs during plugin activation.
- */
+// Activation code
 function rapidpress_activate() {
 	// Activation code here
 }
 
-/**
- * The code that runs during plugin deactivation.
- */
+// Deactivation code
 function rapidpress_deactivate() {
 	// Deactivation code here
+}
+
+// Uninstall code
+function rapidpress_uninstall() {
+	// Uninstall code here
 }

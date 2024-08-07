@@ -4,11 +4,13 @@ class RapidPress_HTML_Minifier {
 
 	private $css_minifier;
 	private $js_minifier;
+	private $js_delay;
 
 	public function __construct() {
 		add_action('init', array($this, 'start_output_buffering'));
 		$this->css_minifier = new RapidPress_CSS_Minifier();
 		$this->js_minifier = new RapidPress_JS_Minifier();
+		$this->js_delay = new RapidPress_JS_Delay();
 	}
 
 	public function start_output_buffering() {
@@ -34,6 +36,11 @@ class RapidPress_HTML_Minifier {
 		// Minify inline JavaScript
 		if (get_option('rapidpress_js_minify')) {
 			$html = $this->js_minifier->minify_inline_js($html);
+		}
+
+		// Apply JS delay after minification
+		if (get_option('rapidpress_js_delay')) {
+			$html = $this->js_delay->apply_js_delay($html);
 		}
 
 		return $html;

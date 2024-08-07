@@ -2,32 +2,46 @@
 
 class RapidPress_JS_Delay {
 	public function __construct() {
-		add_filter('script_loader_tag', array($this, 'delay_js'), 10, 3);
+		// Remove the filter hook as we're now applying delay directly in the HTML minifier
 	}
 
-	public function delay_js($tag, $handle, $src) {
-		// Only apply delay to frontend scripts
-		if (is_admin()) {
-			return $tag;
-		}
-
+	public function apply_js_delay($html) {
 		if (!get_option('rapidpress_js_delay')) {
-			return $tag;
+			return $html;
 		}
 
 		$exclusions = $this->get_exclusions();
-
-		if ($this->is_excluded($src, $exclusions)) {
-			return $tag;
-		}
-
 		$delay_duration = get_option('rapidpress_js_delay_duration', '1');
 
-		if ($delay_duration === 'interaction') {
-			return $this->delay_until_interaction($tag, $src);
-		} else {
-			return $this->delay_by_timeout($tag, $src, intval($delay_duration));
+		// Use DOMDocument to parse and modify the HTML
+		$dom = new DOMDocument();
+		@$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+		$scripts = $dom->getElementsByTagName('script');
+		$scripts_to_delay = array();
+
+		foreach ($scripts as $script) {
+			$src = $script->getAttribute('src');
+			if ($src && !$this->is_excluded($src, $exclusions)) {
+				$scripts_to_delay[] = $script;
+			}
 		}
+
+		foreach ($scripts_to_delay as $script) {
+			$new_script = $dom->createElement('script');
+			$src = $script->getAttribute('src');
+
+			if ($delay_duration === 'interaction') {
+				$new_script->textContent = $this->get_interaction_delay_script($src);
+			} else {
+				$new_script->textContent = $this->get_timeout_delay_script($src, intval($delay_duration));
+			}
+
+			$script->parentNode->replaceChild($new_script, $script);
+		}
+
+		$html = $dom->saveHTML();
+		return $html;
 	}
 
 	private function get_exclusions() {
@@ -44,40 +58,27 @@ class RapidPress_JS_Delay {
 		return false;
 	}
 
-	private function delay_until_interaction($tag, $src) {
-		$delayed_script = sprintf(
-			'<script type="text/javascript">
-                document.addEventListener("DOMContentLoaded", function() {
-                    var loadScript = function() {
-                        var script = document.createElement("script");
-                        script.src = "%s";
-                        document.body.appendChild(script);
-                        ["keydown", "mouseover", "touchmove", "touchstart", "wheel"].forEach(function(event) {
-                            document.removeEventListener(event, loadScript, {passive: true});
-                        });
-                    };
-                    ["keydown", "mouseover", "touchmove", "touchstart", "wheel"].forEach(function(event) {
-                        document.addEventListener(event, loadScript, {passive: true});
-                    });
-                });
-            </script>',
-			esc_url($src)
-		);
-		return str_replace($tag, $delayed_script, $tag);
+	private function get_interaction_delay_script($src) {
+		return "document.addEventListener('DOMContentLoaded', function() {
+			var loadScript = function() {
+				var script = document.createElement('script');
+				script.src = '$src';
+				document.body.appendChild(script);
+				['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {
+					document.removeEventListener(event, loadScript, {passive: true});
+				});
+			};
+			['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {
+				document.addEventListener(event, loadScript, {passive: true});
+			});
+		});";
 	}
 
-	private function delay_by_timeout($tag, $src, $delay) {
-		$delayed_script = sprintf(
-			'<script type="text/javascript">
-                setTimeout(function() {
-                    var script = document.createElement("script");
-                    script.src = "%s";
-                    document.body.appendChild(script);
-                }, %d);
-            </script>',
-			esc_url($src),
-			$delay * 1000
-		);
-		return str_replace($tag, $delayed_script, $tag);
+	private function get_timeout_delay_script($src, $delay) {
+		return "setTimeout(function() {
+			var script = document.createElement('script');
+			script.src = '$src';
+			document.body.appendChild(script);
+		}, " . ($delay * 1000) . ");";
 	}
 }
