@@ -34,6 +34,11 @@ require plugin_dir_path(__FILE__) . 'includes/class-rapidpress.php';
 require plugin_dir_path(__FILE__) . 'includes/class-rapidpress-css-minifier.php';
 
 /**
+ * The JS minifier class.
+ */
+require plugin_dir_path(__FILE__) . 'includes/class-rapidpress-js-minifier.php';
+
+/**
  * Begins execution of the plugin.
  *
  * Since everything within the plugin is registered via hooks,

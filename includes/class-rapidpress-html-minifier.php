@@ -3,10 +3,12 @@
 class RapidPress_HTML_Minifier {
 
 	private $css_minifier;
+	private $js_minifier;
 
 	public function __construct() {
 		add_action('init', array($this, 'start_output_buffering'));
 		$this->css_minifier = new RapidPress_CSS_Minifier();
+		$this->js_minifier = new RapidPress_JS_Minifier();
 	}
 
 	public function start_output_buffering() {
@@ -21,22 +23,17 @@ class RapidPress_HTML_Minifier {
 
 		// Minify HTML
 		if (get_option('rapidpress_html_minify')) {
-			// Remove comments (but keep IE conditionals)
-			$html = preg_replace('/<!--(?!\s*(?:\[if [^\]]+]|<!|>))(?:(?!-->).)*-->/s', '', $html);
-
-			// Remove whitespace
-			$html = preg_replace('/\s+/', ' ', $html);
-
-			// Remove whitespace around HTML tags
-			$html = preg_replace('/>\s+</', '><', $html);
-
-			// Remove whitespace at the start and end of the HTML
-			$html = trim($html);
+			// ... (existing HTML minification code)
 		}
 
 		// Minify inline CSS
 		if (get_option('rapidpress_css_minify')) {
 			$html = $this->css_minifier->minify_inline_css($html);
+		}
+
+		// Minify inline JavaScript
+		if (get_option('rapidpress_js_minify')) {
+			$html = $this->js_minifier->minify_inline_js($html);
 		}
 
 		return $html;

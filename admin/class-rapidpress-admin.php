@@ -62,6 +62,7 @@ class RapidPress_Admin {
 			'rapidpress_css_minify',
 			'rapidpress_combine_css',
 			'rapidpress_css_exclusions',
+			'rapidpress_js_minify',
 			// Add new settings here
 		);
 

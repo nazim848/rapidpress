@@ -21,6 +21,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 			<li>HTML Minification: <?php echo get_option('rapidpress_html_minify') ? 'Enabled' : 'Disabled'; ?></li>
 			<li>CSS Minification: <?php echo get_option('rapidpress_css_minify') ? 'Enabled' : 'Disabled'; ?></li>
 			<li>CSS Combination: <?php echo get_option('rapidpress_combine_css') ? 'Enabled' : 'Disabled'; ?></li>
+			<li>JavaScript Minification: <?php echo get_option('rapidpress_js_minify') ? 'Enabled' : 'Disabled'; ?></li>
 			<!-- Add more optimizations here as we implement them -->
 		</ul>
 	</div>

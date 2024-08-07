@@ -48,6 +48,15 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 						<p class="description">Enter the URLs of CSS files you want to exclude from combination, one per line.</p>
 					</td>
 				</tr>
+				<tr valign="top">
+					<th scope="row">Minify JavaScript</th>
+					<td>
+						<label>
+							<input type="checkbox" name="rapidpress_js_minify" value="1" <?php checked(1, get_option('rapidpress_js_minify'), true); ?> />
+							Enable JavaScript minification
+						</label>
+					</td>
+				</tr>
 			</table>
 		</div>
 		<?php submit_button(); ?>
