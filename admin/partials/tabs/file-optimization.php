@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 ?>
 
 <div id="file-optimization" class="tab-pane">
-	<h2>File Optimization Settings</h2>
+	<h2 class="content-title">File Optimization</h2>
 	<form method="post" action="options.php">
 		<?php
 		settings_fields('rapidpress_options');

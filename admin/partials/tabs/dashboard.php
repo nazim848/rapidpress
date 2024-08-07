@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 ?>
 
 <div id="dashboard" class="tab-pane active">
-	<h2>Dashboard</h2>
+	<h2 class="content-title">Dashboard</h2>
 	<div class="rapidpress-card">
 		<h3>Performance Score</h3>
 		<div class="performance-score">85</div>

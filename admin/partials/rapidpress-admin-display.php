@@ -34,6 +34,7 @@ $settings_updated = isset($_GET['settings-updated']) && $_GET['settings-updated'
 $tabs = array(
 	'dashboard' => 'Dashboard',
 	'file-optimization' => 'File Optimization',
+	'asset-management' => 'Asset Management',
 	'caching' => 'Caching',
 	'advanced' => 'Advanced'
 );
