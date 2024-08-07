@@ -90,4 +90,20 @@ jQuery(document).ready(function ($) {
 
 	// On change
 	$("#rapidpress_js_defer").change(toggleJsDeferExclusions);
+
+	function toggleJsDelayOptions() {
+		if ($("#rapidpress_js_delay").is(":checked")) {
+			$("#rapidpress_js_delay_options").show();
+			$("#rapidpress_js_delay_exclusions_row").show();
+		} else {
+			$("#rapidpress_js_delay_options").hide();
+			$("#rapidpress_js_delay_exclusions_row").hide();
+		}
+	}
+
+	// Initial state
+	toggleJsDelayOptions();
+
+	// On change
+	$("#rapidpress_js_delay").change(toggleJsDelayOptions);
 });

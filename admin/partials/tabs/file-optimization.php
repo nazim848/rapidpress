@@ -74,6 +74,33 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 						<p class="description">Enter the URLs of JavaScript files you want to exclude from deferring, one per line.</p>
 					</td>
 				</tr>
+				<tr valign="top">
+					<th scope="row">Delay JavaScript Execution</th>
+					<td>
+						<label>
+							<input type="checkbox" name="rapidpress_js_delay" id="rapidpress_js_delay" value="1" <?php checked(1, get_option('rapidpress_js_delay'), true); ?> />
+							Enable JavaScript delay
+						</label>
+					</td>
+				</tr>
+				<tr valign="top" id="rapidpress_js_delay_options" style="display: none;">
+					<th scope="row">Delay Duration</th>
+					<td>
+						<select name="rapidpress_js_delay_duration">
+							<option value="1" <?php selected(get_option('rapidpress_js_delay_duration'), '1'); ?>>1 second</option>
+							<option value="2" <?php selected(get_option('rapidpress_js_delay_duration'), '2'); ?>>2 seconds</option>
+							<option value="3" <?php selected(get_option('rapidpress_js_delay_duration'), '3'); ?>>3 seconds</option>
+							<option value="interaction" <?php selected(get_option('rapidpress_js_delay_duration'), 'interaction'); ?>>Until user interaction</option>
+						</select>
+					</td>
+				</tr>
+				<tr valign="top" id="rapidpress_js_delay_exclusions_row" style="display: none;">
+					<th scope="row">JS Delay Exclusions</th>
+					<td>
+						<textarea name="rapidpress_js_delay_exclusions" rows="4" cols="50" placeholder="Enter one JavaScript file URL per line"><?php echo esc_textarea(get_option('rapidpress_js_delay_exclusions', '')); ?></textarea>
+						<p class="description">Enter the URLs of JavaScript files you want to exclude from delay, one per line.</p>
+					</td>
+				</tr>
 			</table>
 		</div>
 		<?php submit_button(); ?>

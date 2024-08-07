@@ -28,20 +28,17 @@ define('RAPIDPRESS_PLUGIN_URL', plugin_dir_url(__FILE__));
  */
 require plugin_dir_path(__FILE__) . 'includes/class-rapidpress.php';
 
-/**
- * The CSS minifier class.
- */
+// The CSS minifier class
 require plugin_dir_path(__FILE__) . 'includes/class-rapidpress-css-minifier.php';
 
-/**
- * The JS minifier class.
- */
+// The JS minifier class
 require plugin_dir_path(__FILE__) . 'includes/class-rapidpress-js-minifier.php';
 
-/**
- * The JS defer class.
- */
+// The JS defer class
 require plugin_dir_path(__FILE__) . 'includes/class-rapidpress-js-defer.php';
+
+// The JS delay class.
+require plugin_dir_path(__FILE__) . 'includes/class-rapidpress-js-delay.php';
 
 /**
  * Begins execution of the plugin.

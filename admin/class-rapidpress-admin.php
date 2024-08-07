@@ -69,6 +69,15 @@ class RapidPress_Admin {
 			'rapidpress_js_defer_exclusions' => array(
 				'sanitize_callback' => array($this, 'sanitize_js_defer_exclusions'),
 			),
+			'rapidpress_js_delay' => 'boolean',
+			'rapidpress_js_delay_duration' => array(
+				'type' => 'string',
+				'sanitize_callback' => array($this, 'sanitize_js_delay_duration'),
+			),
+			'rapidpress_js_delay_exclusions' => array(
+				'sanitize_callback' => array($this, 'sanitize_js_delay_exclusions'),
+			),
+
 			// Add new settings here
 		);
 
@@ -95,6 +104,23 @@ class RapidPress_Admin {
 	}
 
 	public function sanitize_js_defer_exclusions($input) {
+		if (!is_string($input)) {
+			return '';
+		}
+		$exclusions = explode("\n", $input);
+		$sanitized = array();
+		foreach ($exclusions as $exclusion) {
+			$sanitized[] = esc_url_raw(trim($exclusion));
+		}
+		return implode("\n", array_filter($sanitized));
+	}
+
+	public function sanitize_js_delay_duration($input) {
+		$valid_options = array('1', '2', 'interaction');
+		return in_array($input, $valid_options) ? $input : '1';
+	}
+
+	public function sanitize_js_delay_exclusions($input) {
 		if (!is_string($input)) {
 			return '';
 		}

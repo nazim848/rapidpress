@@ -60,6 +60,9 @@ class RapidPress {
 
 		// Initialize JS Defer
 		new RapidPress_JS_Defer();
+
+		// Initialize JS Delay
+		new RapidPress_JS_Delay();
 	}
 
 	public function run() {
