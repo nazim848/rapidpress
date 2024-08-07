@@ -57,6 +57,9 @@ class RapidPress {
 
 		// Initialize CSS Combiner
 		new RapidPress_CSS_Combiner();
+
+		// Initialize JS Defer
+		new RapidPress_JS_Defer();
 	}
 
 	public function run() {

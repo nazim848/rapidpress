@@ -23,7 +23,7 @@ class RapidPress_HTML_Minifier {
 
 		// Minify HTML
 		if (get_option('rapidpress_html_minify')) {
-			// ... (existing HTML minification code)
+			$html = $this->perform_html_minification($html);
 		}
 
 		// Minify inline CSS
@@ -37,5 +37,21 @@ class RapidPress_HTML_Minifier {
 		}
 
 		return $html;
+	}
+
+	private function perform_html_minification($html) {
+		// Remove comments (not containing IE conditional statements)
+		$html = preg_replace('/<!--(?!\s*(?:\[if [^\]]+]|<!|>))(?:(?!-->).)*-->/s', '', $html);
+
+		// Remove whitespace
+		$html = preg_replace('/\s+/', ' ', $html);
+
+		// Remove whitespace around HTML tags
+		$html = preg_replace('/\s*(<\/?[^>]+>)\s*/', '$1', $html);
+
+		// Remove extra spaces
+		$html = preg_replace('/ +/', ' ', $html);
+
+		return trim($html);
 	}
 }

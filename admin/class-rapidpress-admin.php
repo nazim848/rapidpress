@@ -58,25 +58,34 @@ class RapidPress_Admin {
 
 	public function register_settings() {
 		$settings = array(
-			'rapidpress_html_minify',
-			'rapidpress_css_minify',
-			'rapidpress_combine_css',
-			'rapidpress_css_exclusions',
-			'rapidpress_js_minify',
+			'rapidpress_html_minify' => 'boolean',
+			'rapidpress_css_minify' => 'boolean',
+			'rapidpress_combine_css' => 'boolean',
+			'rapidpress_js_minify' => 'boolean',
+			'rapidpress_js_defer' => 'boolean',
+			'rapidpress_css_exclusions' => array(
+				'sanitize_callback' => array($this, 'sanitize_css_combine_exclusions'),
+			),
+			'rapidpress_js_defer_exclusions' => array(
+				'sanitize_callback' => array($this, 'sanitize_js_defer_exclusions'),
+			),
 			// Add new settings here
 		);
 
-		foreach ($settings as $setting) {
-			register_setting('rapidpress_options', $setting);
+		foreach ($settings as $setting => $options) {
+			$args = is_array($options) ? $options : array();
+
+			if ($options === 'boolean') {
+				$args['type'] = 'boolean';
+				$args['sanitize_callback'] = 'rest_sanitize_boolean';
+			}
+
+			register_setting('rapidpress_options', $setting, $args);
 			add_filter("pre_update_option_{$setting}", array($this, 'save_settings_with_tab'), 10, 3);
 		}
-
-		register_setting('rapidpress_options', 'rapidpress_css_exclusions', array(
-			'sanitize_callback' => array($this, 'sanitize_css_exclusions'),
-		));
 	}
 
-	public function sanitize_css_exclusions($input) {
+	public function sanitize_css_combine_exclusions($input) {
 		$sanitized = array();
 		$lines = explode("\n", $input);
 		foreach ($lines as $line) {
@@ -85,11 +94,23 @@ class RapidPress_Admin {
 		return implode("\n", array_filter($sanitized));
 	}
 
+	public function sanitize_js_defer_exclusions($input) {
+		if (!is_string($input)) {
+			return '';
+		}
+		$exclusions = explode("\n", $input);
+		$sanitized = array();
+		foreach ($exclusions as $exclusion) {
+			$sanitized[] = esc_url_raw(trim($exclusion));
+		}
+		return implode("\n", array_filter($sanitized));
+	}
+
 	public function save_settings_with_tab($value, $old_value, $option) {
 		// Clear the CSS cache after saving settings
 		$this->clear_css_cache();
 
-		if (isset($_POST['rapidpress_active_tab']) && wp_verify_nonce($_POST['rapidpress_nonce'], 'rapidpress_settings')) {
+		if (isset($_POST['rapidpress_active_tab']) && isset($_POST['rapidpress_nonce']) && wp_verify_nonce($_POST['rapidpress_nonce'], 'rapidpress_settings')) {
 			$tab = sanitize_key(ltrim($_POST['rapidpress_active_tab'], '#'));
 			add_filter('wp_redirect', function ($location) use ($tab) {
 				return add_query_arg('tab', $tab, $location);
