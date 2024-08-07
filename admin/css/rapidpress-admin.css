@@ -29,3 +29,15 @@
 	text-align: center;
 	margin: 20px 0;
 }
+
+.rapidpress-card td label {
+	padding: 10px;
+	cursor: pointer;
+	-webkit-user-select: none; /* Safari */
+	-ms-user-select: none; /* IE 10 and IE 11 */
+	user-select: none; /* Standard syntax */
+}
+
+.rapidpress-card td label:hover input[type="checkbox"] {
+	border-color: #3582c4;
+}
