@@ -36,9 +36,16 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 					<th scope="row">Combine CSS Files</th>
 					<td>
 						<label>
-							<input type="checkbox" name="rapidpress_combine_css" value="1" <?php checked(1, get_option('rapidpress_combine_css'), true); ?> />
+							<input type="checkbox" name="rapidpress_combine_css" id="rapidpress_combine_css" value="1" <?php checked(1, get_option('rapidpress_combine_css'), true); ?> />
 							Enable CSS file combination
 						</label>
+					</td>
+				</tr>
+				<tr valign="top" id="rapidpress_css_exclusions_row">
+					<th scope="row">CSS Exclusions</th>
+					<td>
+						<textarea name="rapidpress_css_exclusions" rows="4" cols="50" placeholder="Enter one CSS file URL per line"><?php echo esc_textarea(get_option('rapidpress_css_exclusions', '')); ?></textarea>
+						<p class="description">Enter the URLs of CSS files you want to exclude from combination, one per line.</p>
 					</td>
 				</tr>
 			</table>

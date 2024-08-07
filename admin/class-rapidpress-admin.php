@@ -61,6 +61,7 @@ class RapidPress_Admin {
 			'rapidpress_html_minify',
 			'rapidpress_css_minify',
 			'rapidpress_combine_css',
+			'rapidpress_css_exclusions',
 			// Add new settings here
 		);
 
@@ -68,6 +69,19 @@ class RapidPress_Admin {
 			register_setting('rapidpress_options', $setting);
 			add_filter("pre_update_option_{$setting}", array($this, 'save_settings_with_tab'), 10, 3);
 		}
+
+		register_setting('rapidpress_options', 'rapidpress_css_exclusions', array(
+			'sanitize_callback' => array($this, 'sanitize_css_exclusions'),
+		));
+	}
+
+	public function sanitize_css_exclusions($input) {
+		$sanitized = array();
+		$lines = explode("\n", $input);
+		foreach ($lines as $line) {
+			$sanitized[] = esc_url_raw(trim($line));
+		}
+		return implode("\n", array_filter($sanitized));
 	}
 
 	public function save_settings_with_tab($value, $old_value, $option) {

@@ -60,4 +60,19 @@ jQuery(document).ready(function ($) {
 			return uri + separator + key + "=" + value;
 		}
 	}
+
+	// New function for CSS exclusions toggle
+	function toggleCssExclusions() {
+		if ($("#rapidpress_combine_css").is(":checked")) {
+			$("#rapidpress_css_exclusions_row").show();
+		} else {
+			$("#rapidpress_css_exclusions_row").hide();
+		}
+	}
+
+	// Initial state
+	toggleCssExclusions();
+
+	// On change
+	$("#rapidpress_combine_css").change(toggleCssExclusions);
 });
