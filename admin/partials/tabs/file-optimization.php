@@ -57,6 +57,23 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 						</label>
 					</td>
 				</tr>
+				<!-- Add this after the JavaScript minification option -->
+				<tr valign="top">
+					<th scope="row">Defer JavaScript</th>
+					<td>
+						<label>
+							<input type="checkbox" name="rapidpress_js_defer" id="rapidpress_js_defer" value="1" <?php checked(1, get_option('rapidpress_js_defer'), true); ?> />
+							Enable JavaScript deferring
+						</label>
+					</td>
+				</tr>
+				<tr valign="top" id="rapidpress_js_defer_exclusions_row">
+					<th scope="row">JavaScript Defer Exclusions</th>
+					<td>
+						<textarea name="rapidpress_js_defer_exclusions" rows="4" cols="50" placeholder="Enter one JavaScript file URL per line"><?php echo esc_textarea(get_option('rapidpress_js_defer_exclusions', '')); ?></textarea>
+						<p class="description">Enter the URLs of JavaScript files you want to exclude from deferring, one per line.</p>
+					</td>
+				</tr>
 			</table>
 		</div>
 		<?php submit_button(); ?>

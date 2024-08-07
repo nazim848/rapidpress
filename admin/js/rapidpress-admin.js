@@ -75,4 +75,19 @@ jQuery(document).ready(function ($) {
 
 	// On change
 	$("#rapidpress_combine_css").change(toggleCssExclusions);
+
+	// Add this to the existing jQuery document ready function
+	function toggleJsDeferExclusions() {
+		if ($("#rapidpress_js_defer").is(":checked")) {
+			$("#rapidpress_js_defer_exclusions_row").show();
+		} else {
+			$("#rapidpress_js_defer_exclusions_row").hide();
+		}
+	}
+
+	// Initial state
+	toggleJsDeferExclusions();
+
+	// On change
+	$("#rapidpress_js_defer").change(toggleJsDeferExclusions);
 });
