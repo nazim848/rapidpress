@@ -92,8 +92,10 @@ class RapidPress_Admin {
 			'rapidpress_js_delay_exclusions' => array(
 				'sanitize_callback' => array($this, 'sanitize_js_delay_exclusions'),
 			),
-
-			// Add new settings here
+			'rapidpress_js_disable_rules' => array(
+				'type' => 'array',
+				'sanitize_callback' => array($this, 'sanitize_js_disable_rules'),
+			),
 		);
 
 		foreach ($settings as $setting => $options) {
@@ -145,6 +147,22 @@ class RapidPress_Admin {
 			$sanitized[] = esc_url_raw(trim($exclusion));
 		}
 		return implode("\n", array_filter($sanitized));
+	}
+
+	public function sanitize_js_disable_rules($input) {
+		$sanitized_rules = array();
+		if (is_array($input)) {
+			foreach ($input as $rule) {
+				if (!empty($rule['handle'])) {
+					$sanitized_rules[] = array(
+						'handle' => sanitize_text_field($rule['handle']),
+						'pages' => implode("\n", array_map('trailingslashit', array_map('trim', explode("\n", sanitize_textarea_field($rule['pages']))))),
+					);
+				}
+			}
+		}
+
+		return $sanitized_rules;
 	}
 
 	public function save_settings_with_tab($value, $old_value, $option) {

@@ -25,6 +25,7 @@ class RapidPress {
 		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-js-delay.php';
 		require_once RAPIDPRESS_PLUGIN_DIR . 'admin/class-rapidpress-admin.php';
 		require_once RAPIDPRESS_PLUGIN_DIR . 'public/class-rapidpress-public.php';
+		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-asset-manager.php';
 
 		$this->loader = new RapidPress_Loader();
 	}
@@ -66,6 +67,9 @@ class RapidPress {
 
 		// Initialize JS Delay
 		//new RapidPress_JS_Delay();
+
+		// Initialize Asset Manager
+		new RapidPress_Asset_Manager();
 	}
 
 	public function run() {

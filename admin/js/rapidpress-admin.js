@@ -129,4 +129,24 @@ jQuery(document).ready(function ($) {
 			}
 		});
 	});
+
+	// Handle adding new JS rule
+	$("#add-js-rule").on("click", function () {
+		var newRow =
+			"<tr>" +
+			'<td><input type="text" name="rapidpress_js_disable_rules[new_' +
+			Date.now() +
+			'][handle]" value="" /></td>' +
+			'<td><textarea name="rapidpress_js_disable_rules[new_' +
+			Date.now() +
+			'][pages]"></textarea></td>' +
+			'<td><button type="button" class="button remove-js-rule">Remove</button></td>' +
+			"</tr>";
+		$("#js-asset-management").append(newRow);
+	});
+
+	// Handle removing JS rule
+	$(document).on("click", ".remove-js-rule", function () {
+		$(this).closest("tr").remove();
+	});
 });
