@@ -68,6 +68,7 @@ class RapidPress {
 		//new RapidPress_JS_Delay();
 
 		// disbale js branch
+		// Test
 	}
 
 	public function run() {
