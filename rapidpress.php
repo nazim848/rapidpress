@@ -41,6 +41,7 @@ register_deactivation_hook(__FILE__, 'rapidpress_deactivate');
 // Activation code
 function rapidpress_activate() {
 	// Activation code here
+	set_transient('rapidpress_activation_notice', true, 5);
 }
 
 // Deactivation code
