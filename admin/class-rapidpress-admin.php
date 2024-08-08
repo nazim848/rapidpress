@@ -8,6 +8,7 @@ class RapidPress_Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
+		add_action('admin_notices', array($this, 'activation_notice'));
 		add_action('admin_menu', array($this, 'add_plugin_admin_menu'));
 		add_action('admin_init', array($this, 'register_settings'));
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_styles'));
@@ -30,6 +31,20 @@ class RapidPress_Admin {
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('rapidpress_admin_nonce')
 		));
+	}
+
+	public function activation_notice() {
+		if (get_transient('rapidpress_activation_notice')) {
+?>
+			<div class="updated notice is-dismissible">
+				<p><?php _e('Thank you for installing RapidPress! Please visit the ', 'rapidpress'); ?>
+					<a href="<?php echo admin_url('admin.php?page=rapidpress'); ?>"><?php _e('settings page', 'rapidpress'); ?></a>
+					<?php _e('to configure the plugin.', 'rapidpress'); ?>
+				</p>
+			</div>
+<?php
+			delete_transient('rapidpress_activation_notice');
+		}
 	}
 
 	public function add_plugin_admin_menu() {
