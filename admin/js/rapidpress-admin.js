@@ -11,7 +11,7 @@ jQuery(document).ready(function ($) {
 	// Tab switching
 	$(".nav-tab-wrapper a").on("click", function (e) {
 		e.preventDefault();
-		var target = $(this).attr("href").substr(1);
+		let target = $(this).attr("href").substr(1);
 		setActiveTab(target);
 		// Update URL without page reload
 		history.pushState(
@@ -22,19 +22,19 @@ jQuery(document).ready(function ($) {
 	});
 
 	// Set active tab based on URL parameter or default to dashboard
-	var urlParams = new URLSearchParams(window.location.search);
-	var activeTab = urlParams.get("tab") || "dashboard";
+	let urlParams = new URLSearchParams(window.location.search);
+	let activeTab = urlParams.get("tab") || "dashboard";
 	setActiveTab(activeTab);
 
 	// Handle form submission
 	$("form").on("submit", function (e) {
 		e.preventDefault();
-		var form = $(this);
-		var activeTab = $("#rapidpress_active_tab").val();
+		let form = $(this);
+		let activeTab = $("#rapidpress_active_tab").val();
 
 		$.post(form.attr("action"), form.serialize(), function (response) {
 			// Update the URL with the active tab and settings-updated parameter
-			var newUrl = updateQueryStringParameter(
+			let newUrl = updateQueryStringParameter(
 				window.location.href,
 				"tab",
 				activeTab
@@ -52,8 +52,8 @@ jQuery(document).ready(function ($) {
 
 	// Helper function to update URL parameter
 	function updateQueryStringParameter(uri, key, value) {
-		var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
-		var separator = uri.indexOf("?") !== -1 ? "&" : "?";
+		let re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+		let separator = uri.indexOf("?") !== -1 ? "&" : "?";
 		if (uri.match(re)) {
 			return uri.replace(re, "$1" + key + "=" + value + "$2");
 		} else {
@@ -106,4 +106,27 @@ jQuery(document).ready(function ($) {
 
 	// On change
 	$("#rapidpress_js_delay").change(toggleJsDelayOptions);
+
+	// Accordion
+	let accordionHeaders = document.querySelectorAll(".accordion-header");
+
+	accordionHeaders.forEach(function (header) {
+		header.addEventListener("click", function (e) {
+			e.preventDefault();
+			// Check if the clicked header is already active
+			let isActive = this.classList.contains("active");
+
+			// Close all accordions
+			accordionHeaders.forEach(function (h) {
+				h.classList.remove("active");
+				h.nextElementSibling.classList.remove("active");
+			});
+
+			// If the clicked header wasn't active, open it
+			if (!isActive) {
+				this.classList.add("active");
+				this.nextElementSibling.classList.add("active");
+			}
+		});
+	});
 });
