@@ -150,7 +150,6 @@ class RapidPress_Admin {
 	}
 
 	public function sanitize_js_disable_rules($input) {
-		error_log('Sanitizing JS disable rules. Input: ' . print_r($input, true));
 		$sanitized_rules = array();
 		if (is_array($input)) {
 			foreach ($input as $rule) {
