@@ -89,6 +89,9 @@ if (!array_key_exists($active_tab, $tabs)) {
 				}
 				?>
 			</div>
+			<?php if ($active_tab !== 'dashboard') : ?>
+				<?php submit_button(); ?>
+			<?php endif; ?>
 		</form>
 	</div>
 </div>
