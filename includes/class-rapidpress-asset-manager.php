@@ -8,20 +8,23 @@ class RapidPress_Asset_Manager {
 		add_filter('script_loader_tag', array($this, 'remove_script_tag'), 10, 2);
 	}
 
-	// Add this new method
 	public function remove_script_tag($tag, $handle) {
 		$js_rules = get_option('rapidpress_js_disable_rules', array());
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($js_rules as $rule) {
 			$pages = array_map('trailingslashit', array_map('trim', explode("\n", $rule['pages'])));
-			if (in_array($current_url, $pages) && $handle === $rule['handle']) {
-				return '';
+			if (in_array($current_url, $pages)) {
+				if ($handle === $rule['handle'] || (isset($rule['url']) && strpos($tag, $rule['url']) !== false)) {
+					return '';
+				}
 			}
 		}
 
 		return $tag;
 	}
+
+
 
 	// Add this new method
 	public function final_js_cleanup() {

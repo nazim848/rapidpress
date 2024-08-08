@@ -153,9 +153,10 @@ class RapidPress_Admin {
 		$sanitized_rules = array();
 		if (is_array($input)) {
 			foreach ($input as $rule) {
-				if (!empty($rule['handle'])) {
+				if (!empty($rule['handle']) || !empty($rule['url'])) {
 					$sanitized_rules[] = array(
 						'handle' => sanitize_text_field($rule['handle']),
+						'url' => esc_url_raw($rule['url']),
 						'pages' => implode("\n", array_map('trailingslashit', array_map('trim', explode("\n", sanitize_textarea_field($rule['pages']))))),
 					);
 				}
