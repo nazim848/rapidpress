@@ -148,4 +148,16 @@ jQuery(document).ready(function ($) {
 	$(document).on("click", ".remove-js-rule", function () {
 		$(this).closest("tr").remove();
 	});
+
+	// Hide submit button based on current tab
+	const tabLinks = document.querySelectorAll(".nav-tab-wrapper .nav-tab");
+	const submitButton = document.getElementById("submit-button");
+
+	tabLinks.forEach(function (tab) {
+		tab.addEventListener("click", function (e) {
+			e.preventDefault();
+			const tabId = this.getAttribute("href").substring(1);
+			submitButton.style.display = tabId === "dashboard" ? "none" : "block";
+		});
+	});
 });
