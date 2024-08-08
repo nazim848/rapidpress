@@ -25,30 +25,57 @@ jQuery(document).ready(function ($) {
 	let urlParams = new URLSearchParams(window.location.search);
 	let activeTab = urlParams.get("tab") || "dashboard";
 	setActiveTab(activeTab);
-
 	// Handle form submission
-	$("form").on("submit", function (e) {
+	$(".rapidpress-form").on("submit", function (e) {
 		e.preventDefault();
 		let form = $(this);
-		let activeTab = $("#rapidpress_active_tab").val();
+		let formData = form.serialize();
+		let tabId = form.attr("id").replace("rapidpress-form-", "");
 
-		$.post(form.attr("action"), form.serialize(), function (response) {
-			// Update the URL with the active tab and settings-updated parameter
-			let newUrl = updateQueryStringParameter(
-				window.location.href,
-				"tab",
-				activeTab
-			);
-			newUrl = updateQueryStringParameter(
-				newUrl,
-				"settings-updated",
-				"true"
-			);
-
-			// Reload the page with the new URL
-			window.location.href = newUrl;
+		$.ajax({
+			url: ajaxurl,
+			type: "POST",
+			data: {
+				action: "save_rapidpress_settings",
+				nonce: rapidpress_admin.nonce,
+				form_data: formData,
+				tab: tabId
+			},
+			success: function (response) {
+				if (response.success) {
+					showNotice("Settings saved successfully.", "success");
+				} else {
+					showNotice("Error saving settings.", "error");
+				}
+				// Scroll to the top of the page
+				$("html, body").animate({ scrollTop: 0 }, "medium");
+			},
+			error: function () {
+				showNotice("Error saving settings.", "error");
+				// Scroll to the top of the page
+				$("html, body").animate({ scrollTop: 0 }, "medium");
+			}
 		});
 	});
+
+	function showNotice(message, type) {
+		let noticeClass = type === "success" ? "notice-success" : "notice-error";
+		let notice = $(
+			'<div class="notice ' +
+				noticeClass +
+				' is-dismissible"><p><strong>' +
+				message +
+				"</strong></p></div>"
+		);
+		$(".wrap h1").after(notice);
+
+		// Dismiss the notice after 5 seconds
+		setTimeout(function () {
+			notice.fadeOut(function () {
+				$(this).remove();
+			});
+		}, 5000);
+	}
 
 	// Helper function to update URL parameter
 	function updateQueryStringParameter(uri, key, value) {

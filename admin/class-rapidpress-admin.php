@@ -8,11 +8,13 @@ class RapidPress_Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
+
 		add_action('admin_notices', array($this, 'activation_notice'));
 		add_action('admin_menu', array($this, 'add_plugin_admin_menu'));
 		add_action('admin_init', array($this, 'register_settings'));
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_styles'));
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
+		add_action('wp_ajax_save_rapidpress_settings', array($this, 'save_settings_ajax'));
 	}
 
 	public function enqueue_styles($hook) {
@@ -31,6 +33,63 @@ class RapidPress_Admin {
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('rapidpress_admin_nonce')
 		));
+	}
+
+	public function save_settings_ajax() {
+		check_ajax_referer('rapidpress_admin_nonce', 'nonce');
+
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error('Insufficient permissions');
+		}
+
+		parse_str($_POST['form_data'], $form_data);
+		$tab = sanitize_key($_POST['tab']);
+
+		// Process and save the settings
+		$updated = $this->process_settings($form_data, $tab);
+
+		if ($updated) {
+			wp_send_json_success();
+		} else {
+			wp_send_json_error();
+		}
+	}
+
+	private function process_settings($form_data, $tab) {
+		$updated = false;
+
+		// Process settings based on the tab
+		switch ($tab) {
+			case 'file-optimization':
+				$options = array(
+					'rapidpress_html_minify',
+					'rapidpress_css_minify',
+					'rapidpress_combine_css',
+					'rapidpress_css_exclusions',
+					'rapidpress_js_minify',
+					'rapidpress_js_defer',
+					'rapidpress_js_defer_exclusions',
+					'rapidpress_js_delay',
+					'rapidpress_js_delay_duration',
+					'rapidpress_js_delay_exclusions'
+				);
+				break;
+				// Add cases for other tabs here
+			default:
+				$options = array();
+		}
+
+		foreach ($options as $option) {
+			if (isset($form_data[$option])) {
+				update_option($option, $form_data[$option]);
+				$updated = true;
+			} else {
+				delete_option($option);
+				$updated = true;
+			}
+		}
+
+		return $updated;
 	}
 
 	public function activation_notice() {

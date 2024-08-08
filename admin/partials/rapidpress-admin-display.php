@@ -51,44 +51,30 @@ if (!array_key_exists($active_tab, $tabs)) {
 <div class="wrap">
 	<h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 
-	<?php if ($settings_updated) : ?>
-		<div id="setting-error-settings_updated" class="notice notice-success settings-error is-dismissible">
-			<p><strong>Settings saved.</strong></p>
-		</div>
-	<?php endif; ?>
 
-	<?php settings_errors(); ?>
 
-	<div class="rapidpress-admin-content">
-		<h2 class="nav-tab-wrapper">
-			<?php
-			foreach ($tabs as $tab_id => $tab_name) {
-				$class = ($tab_id === $active_tab) ? ' nav-tab-active' : '';
-				echo '<a href="#' . esc_attr($tab_id) . '" class="nav-tab' . $class . '">' . esc_html($tab_name) . '</a>';
-			}
-			?>
-		</h2>
+	<div class="nav-tab-wrapper">
+		<?php foreach ($tabs as $tab_key => $tab_name) : ?>
+			<a href="#<?php echo esc_attr($tab_key); ?>" class="nav-tab <?php echo $active_tab === $tab_key ? 'nav-tab-active' : ''; ?>"><?php echo esc_html($tab_name); ?></a>
+		<?php endforeach; ?>
+	</div>
 
-		<form method="post" action="options.php">
-			<?php settings_fields('rapidpress_options'); ?>
-			<?php wp_nonce_field('rapidpress_settings', 'rapidpress_nonce'); ?>
-			<input type="hidden" id="rapidpress_active_tab" name="rapidpress_active_tab" value="<?php echo esc_attr($active_tab); ?>">
+	<div class="tab-content">
+		<?php foreach ($tabs as $tab_key => $tab_name) : ?>
+			<div id="<?php echo esc_attr($tab_key); ?>" class="tab-pane <?php echo $active_tab === $tab_key ? 'active' : ''; ?>">
+				<form id="rapidpress-form-<?php echo esc_attr($tab_key); ?>" class="rapidpress-form" method="post" action="options.php">
+					<?php
+					settings_fields('rapidpress_options');
+					do_settings_sections('rapidpress');
+					include RAPIDPRESS_PLUGIN_DIR . 'admin/partials/tabs/' . $tab_key . '.php';
 
-			<div class="tab-content">
-				<?php
-				foreach ($tabs as $tab_id => $tab_name) {
-					$style = ($tab_id === $active_tab) ? '' : 'style="display:none;"';
-					echo '<div id="' . esc_attr($tab_id) . '" class="tab-pane" ' . $style . '>';
-					$tab_file = plugin_dir_path(__FILE__) . 'tabs/' . $tab_id . '.php';
-					if (file_exists($tab_file)) {
-						include $tab_file;
-					} else {
-						echo '<p>Tab content not found.</p>';
+					if ($tab_key !== 'dashboard') {
+						submit_button();
 					}
-					echo '</div>';
-				}
-				?>
+
+					?>
+				</form>
 			</div>
-		</form>
+		<?php endforeach; ?>
 	</div>
 </div>
