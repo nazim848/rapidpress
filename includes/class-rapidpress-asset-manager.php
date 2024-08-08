@@ -8,33 +8,19 @@ class RapidPress_Asset_Manager {
 		add_filter('script_loader_tag', array($this, 'remove_script_tag'), 10, 2);
 	}
 
-	public function remove_script_tag($tag, $handle) {
-		$js_rules = get_option('rapidpress_js_disable_rules', array());
-		$current_url = trailingslashit($this->get_current_url());
 
-		foreach ($js_rules as $rule) {
-			$pages = array_map('trailingslashit', array_map('trim', explode("\n", $rule['pages'])));
-			if (in_array($current_url, $pages)) {
-				if ($handle === $rule['handle'] || (isset($rule['url']) && strpos($tag, $rule['url']) !== false)) {
-					return '';
-				}
-			}
-		}
-
-		return $tag;
-	}
-
-
-
-	// Add this new method
 	public function final_js_cleanup() {
 		$js_rules = get_option('rapidpress_js_disable_rules', array());
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($js_rules as $rule) {
-			$pages = array_map('trailingslashit', array_map('trim', explode("\n", $rule['pages'])));
+			$pages = $this->get_pages_from_rule($rule);
+			$scripts = $this->get_scripts_from_rule($rule);
+
 			if (in_array($current_url, $pages)) {
-				$this->disable_script($rule['handle']);
+				foreach ($scripts as $script) {
+					$this->disable_script($script);
+				}
 			}
 		}
 	}
@@ -44,9 +30,13 @@ class RapidPress_Asset_Manager {
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($js_rules as $rule) {
-			$pages = array_map('trailingslashit', array_map('trim', explode("\n", $rule['pages'])));
+			$pages = $this->get_pages_from_rule($rule);
+			$scripts = $this->get_scripts_from_rule($rule);
+
 			if (in_array($current_url, $pages)) {
-				$this->disable_script($rule['handle']);
+				foreach ($scripts as $script) {
+					$this->disable_script($script);
+				}
 			}
 		}
 	}
@@ -58,6 +48,39 @@ class RapidPress_Asset_Manager {
 		if (wp_script_is($handle, 'registered')) {
 			wp_deregister_script($handle);
 		}
+	}
+
+	public function remove_script_tag($tag, $handle) {
+		$js_rules = get_option('rapidpress_js_disable_rules', array());
+
+		if (empty($js_rules)) {
+			return $tag;
+		}
+
+		$current_url = trailingslashit($this->get_current_url());
+
+		foreach ($js_rules as $rule) {
+			$pages = $this->get_pages_from_rule($rule);
+			$scripts = $this->get_scripts_from_rule($rule);
+
+			if (in_array($current_url, $pages)) {
+				foreach ($scripts as $script) {
+					if ($handle === $script || strpos($tag, $script) !== false) {
+						return '';
+					}
+				}
+			}
+		}
+
+		return $tag;
+	}
+
+	private function get_pages_from_rule($rule) {
+		return isset($rule['pages']) ? $rule['pages'] : array();
+	}
+
+	private function get_scripts_from_rule($rule) {
+		return isset($rule['scripts']) ? $rule['scripts'] : array();
 	}
 
 	private function get_current_url() {

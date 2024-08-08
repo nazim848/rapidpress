@@ -150,22 +150,24 @@ class RapidPress_Admin {
 	}
 
 	public function sanitize_js_disable_rules($input) {
+		error_log('Sanitizing JS disable rules. Input: ' . print_r($input, true));
 		$sanitized_rules = array();
 		if (is_array($input)) {
 			foreach ($input as $rule) {
-				if (!empty($rule['handle']) || !empty($rule['url'])) {
-					$sanitized_rules[] = array(
-						'handle' => sanitize_text_field($rule['handle']),
-						'url' => esc_url_raw($rule['url']),
-						'pages' => implode("\n", array_map('trailingslashit', array_map('trim', explode("\n", sanitize_textarea_field($rule['pages']))))),
+				if (!empty($rule['scripts']) && !empty($rule['pages'])) {
+					$sanitized_rule = array(
+						'scripts' => array_filter(array_map('trim', explode("\n", sanitize_textarea_field($rule['scripts'])))),
+						'pages' => array_filter(array_map('trailingslashit', array_map('esc_url_raw', explode("\n", sanitize_textarea_field($rule['pages']))))),
 					);
+					if (!empty($sanitized_rule['scripts']) && !empty($sanitized_rule['pages'])) {
+						$sanitized_rules[] = $sanitized_rule;
+					}
 				}
 			}
 		}
-
+		error_log('Sanitized JS disable rules: ' . print_r($sanitized_rules, true));
 		return $sanitized_rules;
 	}
-
 	public function save_settings_with_tab($value, $old_value, $option) {
 		// Clear the CSS cache after saving settings
 		$this->clear_css_cache();

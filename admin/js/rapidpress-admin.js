@@ -133,13 +133,10 @@ jQuery(document).ready(function ($) {
 	$("#add-js-rule").on("click", function () {
 		var newRow =
 			"<tr>" +
-			'<td><input style="width:60%" type="text" name="rapidpress_js_disable_rules[new_' +
+			'<td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[new_' +
 			Date.now() +
-			'][url]" value="" placeholder="Script URL" /> ' +
-			'<span> or </span><input type="text" name="rapidpress_js_disable_rules[new_' +
-			Date.now() +
-			'][handle]" value="" placeholder="Handle (optional)" />   </td>' +
-			'<td><textarea cols="60" rows="3" name="rapidpress_js_disable_rules[new_' +
+			'][scripts]" placeholder="Script URL or Handle (one per line)"></textarea></td>' +
+			'<td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[new_' +
 			Date.now() +
 			'][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/"></textarea></td>' +
 			'<td><button type="button" class="button remove-js-rule">Remove</button></td>' +
