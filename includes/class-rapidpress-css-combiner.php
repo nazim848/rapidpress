@@ -14,6 +14,7 @@ class RapidPress_CSS_Combiner {
 		add_action('wp_print_styles', array($this, 'combine_css'), 100);
 		add_action('wp_head', array($this, 'print_combined_css'), 999);
 		$this->set_excluded_files();
+		$this->excluded_files[] = 'admin-bar.min.css';
 	}
 
 	private function set_excluded_files() {
