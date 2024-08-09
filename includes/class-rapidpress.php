@@ -68,7 +68,7 @@ class RapidPress {
 		// Initialize JS Delay
 		//new RapidPress_JS_Delay();
 
-		// Initialize Asset Manager
+	// Initialize Asset Manager
 		new RapidPress_Asset_Manager();
 	}
 

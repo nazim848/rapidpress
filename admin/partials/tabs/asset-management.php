@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 			<div class="rapidpress-card">
 				<table class="form-table" id="js-asset-management">
 					<tr>
-						<th style="width: 45%;">Script URL or Handle (one URL per line)</th>
+<th style="width: 45%;">Script URL or Handle (one URL per line)</th>
 						<th style="width: 45%;">Disable on Pages (one URL per line)</th>
 						<th style="width: 10%;">Action</th>
 					</tr>
@@ -31,5 +31,4 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 			</div>
 		</div>
 	</div>
-	<!-- ... (keep the existing CSS section) ... -->
 </div>
