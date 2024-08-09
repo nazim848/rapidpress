@@ -26,6 +26,13 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 					<p class="description">Enter the URLs of the pages you want to optimized, one URL per line.</p>
 				</td>
 			</tr>
+			<tr valign="top" id="rapidpress_excluded_pages_row" style="display: none;">
+				<th scope="row">Excluded Page URLs</th>
+				<td>
+					<textarea name="rapidpress_excluded_pages" id="rapidpress_excluded_pages" rows="3" cols="70" placeholder="Enter one page URL per line"><?php echo esc_textarea(get_option('rapidpress_excluded_pages', '')); ?></textarea>
+					<p class="description">Enter the URLs of the pages you want to exclude from optimization, one URL per line.</p>
+				</td>
+			</tr>
 		</table>
 		<hr>
 		<table class="form-table">

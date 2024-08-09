@@ -1,19 +1,34 @@
 <?php
 
 class RapidPress_Optimization_Scope {
+
 	public static function should_optimize() {
 		$scope = get_option('rapidpress_optimization_scope', 'entire_site');
+		$current_url = self::get_current_relative_url();
 
 		if ($scope === 'entire_site') {
+			$excluded_pages = get_option('rapidpress_excluded_pages', '');
+			$excluded_pages = array_filter(array_map('trim', explode("\n", $excluded_pages)));
+
+			// If there are no exclusions, optimize everything
+			if (empty($excluded_pages)) {
+				return true;
+			}
+
+			foreach ($excluded_pages as $page) {
+				if (!empty($page) && self::url_match($current_url, $page)) {
+					return false;
+				}
+			}
+
 			return true;
 		}
 
 		$optimized_pages = get_option('rapidpress_optimized_pages', '');
-		$pages = array_map('trim', explode("\n", $optimized_pages));
-		$current_url = self::get_current_relative_url();
+		$pages = array_filter(array_map('trim', explode("\n", $optimized_pages)));
 
 		foreach ($pages as $page) {
-			if (self::url_match($current_url, $page)) {
+			if (!empty($page) && self::url_match($current_url, $page)) {
 				return true;
 			}
 		}

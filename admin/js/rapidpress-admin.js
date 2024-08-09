@@ -6,8 +6,10 @@
 			.change(function () {
 				if ($(this).val() === "specific_pages") {
 					$("#rapidpress_specific_pages_row").show();
+					$("#rapidpress_excluded_pages_row").hide();
 				} else {
 					$("#rapidpress_specific_pages_row").hide();
+					$("#rapidpress_excluded_pages_row").show();
 				}
 			})
 			.change(); // Trigger change event on page load
