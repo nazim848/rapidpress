@@ -18,8 +18,8 @@ class RapidPress_HTML_Minifier {
 	}
 
 	public function minify_html($html) {
-		// Don't minify if it's the admin area or a POST request
-		if (is_admin() || $_SERVER['REQUEST_METHOD'] == 'POST') {
+		// Exclude admin, POST requests, and pages not in the optimization scope
+		if (is_admin() || $_SERVER['REQUEST_METHOD'] == 'POST' || !RapidPress_Optimization_Scope::should_optimize()) {
 			return $html;
 		}
 

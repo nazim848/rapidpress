@@ -8,6 +8,26 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 	<h2 class="content-title">File Optimization</h2>
 	<div class="rapidpress-card">
 		<input type="hidden" name="rapidpress_active_tab" id="rapidpress_active_tab" value="#minification">
+
+		<table class="form-table">
+			<tr valign="top">
+				<th scope="row">Optimization Scope</th>
+				<td>
+					<select name="rapidpress_optimization_scope" id="rapidpress_optimization_scope">
+						<option value="entire_site" <?php selected(get_option('rapidpress_optimization_scope'), 'entire_site'); ?>>Entire Site</option>
+						<option value="specific_pages" <?php selected(get_option('rapidpress_optimization_scope'), 'specific_pages'); ?>>Specific Pages</option>
+					</select>
+				</td>
+			</tr>
+			<tr valign="top" id="rapidpress_specific_pages_row" style="display: none;">
+				<th scope="row">Page URLs</th>
+				<td>
+					<textarea name="rapidpress_optimized_pages" id="rapidpress_optimized_pages" rows="3" cols="70" placeholder="Enter one page URL per line"><?php echo esc_textarea(get_option('rapidpress_optimized_pages', '')); ?></textarea>
+					<p class="description">Enter the URLs of the pages you want to optimized, one URL per line.</p>
+				</td>
+			</tr>
+		</table>
+		<hr>
 		<table class="form-table">
 			<tr valign="top">
 				<th scope="row">HTML Minification</th>
@@ -52,7 +72,6 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 					</label>
 				</td>
 			</tr>
-			<!-- Add this after the JavaScript minification option -->
 			<tr valign="top">
 				<th scope="row">Defer JavaScript</th>
 				<td>

@@ -6,7 +6,7 @@ class RapidPress_JS_Delay {
 	}
 
 	public function apply_js_delay($html) {
-		if (!get_option('rapidpress_js_delay')) {
+		if (is_admin() || !get_option('rapidpress_js_delay') || !RapidPress_Optimization_Scope::should_optimize()) {
 			return $html;
 		}
 

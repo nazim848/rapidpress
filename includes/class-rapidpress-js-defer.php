@@ -7,7 +7,7 @@ class RapidPress_JS_Defer {
 	}
 
 	public function defer_js($tag, $handle, $src) {
-		if (!get_option('rapidpress_js_defer')) {
+		if (is_admin() || !get_option('rapidpress_js_defer') || !RapidPress_Optimization_Scope::should_optimize()) {
 			return $tag;
 		}
 

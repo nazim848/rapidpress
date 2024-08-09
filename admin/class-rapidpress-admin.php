@@ -130,6 +130,18 @@ class RapidPress_Admin {
 				'type' => 'array',
 				'sanitize_callback' => array($this, 'sanitize_js_disable_rules'),
 			),
+			'rapidpress_css_disable_rules' => array(
+				'type' => 'array',
+				'sanitize_callback' => array($this, 'sanitize_css_disable_rules'),
+			),
+			'rapidpress_optimization_scope' => array(
+				'type' => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			),
+			'rapidpress_optimized_pages' => array(
+				'type' => 'string',
+				'sanitize_callback' => array($this, 'sanitize_optimized_pages'),
+			),
 		);
 
 		foreach ($settings as $setting => $options) {
@@ -143,6 +155,34 @@ class RapidPress_Admin {
 			register_setting('rapidpress_options', $setting, $args);
 			add_filter("pre_update_option_{$setting}", array($this, 'save_settings_with_tab'), 10, 3);
 		}
+	}
+
+	public function sanitize_optimized_pages($input) {
+		$pages = explode("\n", $input);
+		$sanitized_pages = array();
+		foreach ($pages as $page) {
+			$sanitized_pages[] = esc_url_raw(trim($page));
+		}
+		return implode("\n", array_filter($sanitized_pages));
+	}
+
+	public function sanitize_css_disable_rules($input) {
+		$sanitized_rules = array();
+		if (is_array($input)) {
+			foreach ($input as $rule) {
+				if (!empty($rule['styles']) && !empty($rule['pages'])) {
+					$sanitized_rule = array(
+						'styles' => array_filter(array_map('trim', explode("\n", sanitize_textarea_field($rule['styles'])))),
+						'pages' => array_filter(array_map('trailingslashit', array_map('esc_url_raw', explode("\n", sanitize_textarea_field($rule['pages']))))),
+					);
+					if (!empty($sanitized_rule['styles']) && !empty($sanitized_rule['pages'])) {
+						$sanitized_rules[] = $sanitized_rule;
+					}
+				}
+			}
+		}
+
+		return $sanitized_rules;
 	}
 
 	public function sanitize_css_combine_exclusions($input) {

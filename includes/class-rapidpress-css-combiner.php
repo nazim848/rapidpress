@@ -23,8 +23,10 @@ class RapidPress_CSS_Combiner {
 	}
 
 	public function combine_css() {
-		if (!get_option('rapidpress_combine_css') || is_admin()) {
-			$this->debug_log[] = "CSS combination is disabled or is admin page.";
+
+		// Exclude admin, POST requests, and pages not in the optimization scope
+		if (!get_option('rapidpress_combine_css') || is_admin() || !RapidPress_Optimization_Scope::should_optimize()) {
+			$this->debug_log[] = "CSS combination is disabled, is admin page, or not in optimization scope.";
 			return;
 		}
 

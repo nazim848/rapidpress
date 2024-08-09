@@ -7,8 +7,8 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 <div id="asset-management" class="tab-pane">
 	<h2 class="content-title">Asset Management</h2>
 	<div class="accordion-item">
-		<div class="accordion-header active">JavaScript</div>
-		<div class="accordion-content active">
+		<div class="accordion-header">JavaScript</div>
+		<div class="accordion-content">
 			<div class="rapidpress-card">
 				<table class="form-table" id="js-asset-management">
 					<tr>
@@ -31,5 +31,29 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 			</div>
 		</div>
 	</div>
-	<!-- ... (keep the existing CSS section) ... -->
+	<div class="accordion-item">
+		<div class="accordion-header">CSS</div>
+		<div class="accordion-content">
+			<div class="rapidpress-card">
+				<table class="form-table" id="css-asset-management">
+					<tr>
+						<th style="width: 45%;">CSS URL or Handle (one URL per line)</th>
+						<th style="width: 45%;">Disable on Pages (one URL per line)</th>
+						<th style="width: 10%;">Action</th>
+					</tr>
+					<?php
+					$css_rules = get_option('rapidpress_css_disable_rules', array());
+					foreach ($css_rules as $index => $rule) {
+						echo '<tr>';
+						echo '<td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[' . $index . '][styles]" placeholder="Style URL or Handle">' . esc_textarea(implode("\n", $rule['styles'])) . '</textarea></td>';
+						echo '<td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[' . $index . '][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/">' . esc_textarea(implode("\n", $rule['pages'])) . '</textarea></td>';
+						echo '<td><button type="button" class="button remove-css-rule">Remove</button></td>';
+						echo '</tr>';
+					}
+					?>
+				</table>
+				<button type="button" id="add-css-rule" class="button">Add CSS Rule</button>
+			</div>
+		</div>
+	</div>
 </div>
