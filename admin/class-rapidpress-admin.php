@@ -10,22 +10,22 @@ class RapidPress_Admin {
 
 
 		add_action('admin_notices', array($this, 'activation_notice'));
-		add_action('admin_menu', array($this, 'add_plugin_admin_menu'));
+		add_action('admin_menu', array($this, 'add_plugin_settings_menu'));
 		add_action('admin_init', array($this, 'register_settings'));
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_styles'));
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
-		add_action('wp_ajax_save_rapidpress_settings', array($this, 'save_settings_ajax'));
+    add_action('admin_bar_menu', array($this, 'add_toolbar_items'), 100);
 	}
 
 	public function enqueue_styles($hook) {
-		if ('toplevel_page_rapidpress' !== $hook) {
+		if ('settings_page_rapidpress' !== $hook) {
 			return;
 		}
 		wp_enqueue_style('rapidpress-admin', plugin_dir_url(__FILE__) . 'css/rapidpress-admin.css', array(), $this->version, 'all');
 	}
 
 	public function enqueue_scripts($hook) {
-		if ('toplevel_page_rapidpress' !== $hook) {
+		if ('settings_page_rapidpress' !== $hook) {
 			return;
 		}
 		wp_enqueue_script('rapidpress-admin', plugin_dir_url(__FILE__) . 'js/rapidpress-admin.js', array('jquery'), $this->version, false);
@@ -97,7 +97,7 @@ class RapidPress_Admin {
 ?>
 			<div class="updated notice is-dismissible">
 				<p><?php _e('Thank you for installing RapidPress! Please visit the ', 'rapidpress'); ?>
-					<a href="<?php echo admin_url('admin.php?page=rapidpress'); ?>"><?php _e('settings page', 'rapidpress'); ?></a>
+					<a href="<?php echo admin_url('options-general.php?page=rapidpress'); ?>"><?php _e('settings page', 'rapidpress'); ?></a>
 					<?php _e('to configure the plugin.', 'rapidpress'); ?>
 				</p>
 			</div>
@@ -106,16 +106,49 @@ class RapidPress_Admin {
 		}
 	}
 
-	public function add_plugin_admin_menu() {
-		add_menu_page(
-			'RapidPress Settings',
+	// Add the main RapidPress menu item to the settings menu
+	public function add_plugin_settings_menu() {
+		// Add RapidPress to the Settings menu
+		add_options_page(
+			'RapidPress',
 			'RapidPress',
 			'manage_options',
 			'rapidpress',
-			array($this, 'display_plugin_setup_page'),
-			'dashicons-performance',
-			80
+			array($this, 'display_plugin_setup_page')
 		);
+	}
+
+	// Add the main RapidPress menu item to the toolbar
+	public function add_toolbar_items($admin_bar) {
+		// Add the main RapidPress menu item
+		$admin_bar->add_menu(array(
+			'id'    => 'rapidpress',
+			'title' => 'RapidPress',
+			'href'  => admin_url('options-general.php?page=rapidpress'),
+			'meta'  => array(
+				'title' => __('RapidPress Settings', 'rapidpress'),
+			),
+		));
+
+		// Add submenu items
+		$submenu_items = array(
+			'dashboard' 			=> __('Dashboard', 'rapidpress'),
+			'file-optimization' 	=> __('File Optimization', 'rapidpress'),
+			'asset-management' => __('Asset Management', 'rapidpress'),
+		);
+
+		foreach ($submenu_items as $slug => $title) {
+			$admin_bar->add_menu(array(
+				'id'     => 'rapidpress-' . $slug,
+				'parent' => 'rapidpress',
+				'title'  => $title,
+				'href'   => admin_url('options-general.php?page=rapidpress&tab=' . $slug),
+				'meta'   => array(
+					'title' => $title,
+					'class' => 'rapidpress-toolbar-item'
+				),
+			));
+		}
 	}
 
 	public function display_plugin_setup_page() {
@@ -151,8 +184,10 @@ class RapidPress_Admin {
 			'rapidpress_js_delay_exclusions' => array(
 				'sanitize_callback' => array($this, 'sanitize_js_delay_exclusions'),
 			),
-
-			// Add new settings here
+			'rapidpress_js_disable_rules' => array(
+				'type' => 'array',
+				'sanitize_callback' => array($this, 'sanitize_js_disable_rules'),
+			),
 		);
 
 		foreach ($settings as $setting => $options) {
@@ -206,6 +241,24 @@ class RapidPress_Admin {
 		return implode("\n", array_filter($sanitized));
 	}
 
+	public function sanitize_js_disable_rules($input) {
+		$sanitized_rules = array();
+		if (is_array($input)) {
+			foreach ($input as $rule) {
+				if (!empty($rule['scripts']) && !empty($rule['pages'])) {
+					$sanitized_rule = array(
+						'scripts' => array_filter(array_map('trim', explode("\n", sanitize_textarea_field($rule['scripts'])))),
+						'pages' => array_filter(array_map('trailingslashit', array_map('esc_url_raw', explode("\n", sanitize_textarea_field($rule['pages']))))),
+					);
+					if (!empty($sanitized_rule['scripts']) && !empty($sanitized_rule['pages'])) {
+						$sanitized_rules[] = $sanitized_rule;
+					}
+				}
+			}
+		}
+
+		return $sanitized_rules;
+	}
 	public function save_settings_with_tab($value, $old_value, $option) {
 		// Clear the CSS cache after saving settings
 		$this->clear_css_cache();

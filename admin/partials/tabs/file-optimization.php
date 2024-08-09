@@ -98,5 +98,4 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 			</tr>
 		</table>
 	</div>
-
 </div>

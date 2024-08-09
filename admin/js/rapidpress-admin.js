@@ -156,4 +156,35 @@ jQuery(document).ready(function ($) {
 			}
 		});
 	});
+
+	$("#add-js-rule").on("click", function () {
+		var newRow =
+			"<tr>" +
+			'<td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[new_' +
+			Date.now() +
+			'][scripts]" placeholder="Script URL or Handle (one per line)"></textarea></td>' +
+			'<td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[new_' +
+			Date.now() +
+			'][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/"></textarea></td>' +
+			'<td><button type="button" class="button remove-js-rule">Remove</button></td>' +
+			"</tr>";
+		$("#js-asset-management").append(newRow);
+	});
+
+	// Handle removing JS rule
+	$(document).on("click", ".remove-js-rule", function () {
+		$(this).closest("tr").remove();
+	});
+
+	// Hide submit button based on current tab
+	const tabLinks = document.querySelectorAll(".nav-tab-wrapper .nav-tab");
+	const submitButton = document.getElementById("submit-button");
+
+	tabLinks.forEach(function (tab) {
+		tab.addEventListener("click", function (e) {
+			e.preventDefault();
+			const tabId = this.getAttribute("href").substring(1);
+			submitButton.style.display = tabId === "dashboard" ? "none" : "block";
+		});
+	});
 });
