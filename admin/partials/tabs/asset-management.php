@@ -7,8 +7,8 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 <div id="asset-management" class="tab-pane">
 	<h2 class="content-title">Asset Management</h2>
 	<div class="accordion-item">
-		<div class="accordion-header active">JavaScript</div>
-		<div class="accordion-content active">
+		<div class="accordion-header">JavaScript</div>
+		<div class="accordion-content">
 			<div class="rapidpress-card">
 				<table class="form-table" id="js-asset-management">
 					<tr>
