@@ -48,10 +48,9 @@ if (!array_key_exists($active_tab, $tabs)) {
 }
 ?>
 
+
 <div class="wrap">
 	<h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-
-
 
 	<div class="nav-tab-wrapper">
 		<?php foreach ($tabs as $tab_key => $tab_name) : ?>
@@ -71,28 +70,9 @@ if (!array_key_exists($active_tab, $tabs)) {
 					if ($tab_key !== 'dashboard') {
 						submit_button();
 					}
-
 					?>
 				</form>
 			</div>
-      	<p class="submit" id="submit-button" style="<?php echo $active_tab === 'dashboard' ? 'display:none;' : ''; ?>">
-				<?php submit_button(null, 'primary', 'submit', false); ?>
-			</p>
-		</form>
+		<?php endforeach; ?>
 	</div>
 </div>
-<!-- 
-<script>
-	document.addEventListener('DOMContentLoaded', function() {
-		const tabLinks = document.querySelectorAll('.nav-tab-wrapper .nav-tab');
-		const submitButton = document.getElementById('submit-button');
-
-		tabLinks.forEach(function(tab) {
-			tab.addEventListener('click', function(e) {
-				e.preventDefault();
-				const tabId = this.getAttribute('href').substring(1);
-				submitButton.style.display = tabId === 'dashboard' ? 'none' : 'block';
-			});
-		});
-	});
-</script> -->
