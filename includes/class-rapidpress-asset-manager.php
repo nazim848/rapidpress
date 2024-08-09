@@ -4,10 +4,82 @@ class RapidPress_Asset_Manager {
 
 	public function __construct() {
 		add_action('wp_enqueue_scripts', array($this, 'manage_js_assets'), 9999);
+		add_action('wp_enqueue_scripts', array($this, 'manage_css_assets'), 9999);
 		add_action('wp_print_scripts', array($this, 'final_js_cleanup'), 9999);
+		add_action('wp_print_styles', array($this, 'final_css_cleanup'), 9999);
 		add_filter('script_loader_tag', array($this, 'remove_script_tag'), 10, 2);
+		add_filter('style_loader_tag', array($this, 'remove_style_tag'), 10, 2);
 	}
 
+	public function manage_css_assets() {
+		$css_rules = get_option('rapidpress_css_disable_rules', array());
+		$current_url = trailingslashit($this->get_current_url());
+
+		foreach ($css_rules as $rule) {
+			$pages = $this->get_pages_from_rule($rule);
+			$styles = $this->get_styles_from_rule($rule);
+
+			if (in_array($current_url, $pages)) {
+				foreach ($styles as $style) {
+					$this->disable_style($style);
+				}
+			}
+		}
+	}
+
+	public function final_css_cleanup() {
+		$css_rules = get_option('rapidpress_css_disable_rules', array());
+		$current_url = trailingslashit($this->get_current_url());
+
+		foreach ($css_rules as $rule) {
+			$pages = $this->get_pages_from_rule($rule);
+			$styles = $this->get_styles_from_rule($rule);
+
+			if (in_array($current_url, $pages)) {
+				foreach ($styles as $style) {
+					$this->disable_style($style);
+				}
+			}
+		}
+	}
+
+	private function disable_style($handle) {
+		if (wp_style_is($handle, 'enqueued')) {
+			wp_dequeue_style($handle);
+		}
+		if (wp_style_is($handle, 'registered')) {
+			wp_deregister_style($handle);
+		}
+	}
+
+	public function remove_style_tag($tag, $handle) {
+		$css_rules = get_option('rapidpress_css_disable_rules', array());
+
+		if (empty($css_rules)) {
+			return $tag;
+		}
+
+		$current_url = trailingslashit($this->get_current_url());
+
+		foreach ($css_rules as $rule) {
+			$pages = $this->get_pages_from_rule($rule);
+			$styles = $this->get_styles_from_rule($rule);
+
+			if (in_array($current_url, $pages)) {
+				foreach ($styles as $style) {
+					if ($handle === $style || strpos($tag, $style) !== false) {
+						return '';
+					}
+				}
+			}
+		}
+
+		return $tag;
+	}
+
+	private function get_styles_from_rule($rule) {
+		return isset($rule['styles']) ? $rule['styles'] : array();
+	}
 
 	public function final_js_cleanup() {
 		$js_rules = get_option('rapidpress_js_disable_rules', array());

@@ -149,6 +149,25 @@ jQuery(document).ready(function ($) {
 		$(this).closest("tr").remove();
 	});
 
+	$("#add-css-rule").on("click", function () {
+		var newRow =
+			"<tr>" +
+			'<td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[new_' +
+			Date.now() +
+			'][styles]" placeholder="Style URL or Handle (one per line)"></textarea></td>' +
+			'<td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[new_' +
+			Date.now() +
+			'][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/"></textarea></td>' +
+			'<td><button type="button" class="button remove-css-rule">Remove</button></td>' +
+			"</tr>";
+		$("#css-asset-management").append(newRow);
+	});
+
+	// Handle removing CSS rule
+	$(document).on("click", ".remove-css-rule", function () {
+		$(this).closest("tr").remove();
+	});
+
 	// Hide submit button based on current tab
 	const tabLinks = document.querySelectorAll(".nav-tab-wrapper .nav-tab");
 	const submitButton = document.getElementById("submit-button");
