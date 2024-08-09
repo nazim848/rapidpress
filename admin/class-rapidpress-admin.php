@@ -146,6 +146,7 @@ class RapidPress_Admin {
 				'type' => 'string',
 				'sanitize_callback' => array($this, 'sanitize_excluded_pages'),
 			),
+			'rapidpress_enable_scope_exclusions' => 'boolean',
 		);
 
 		foreach ($settings as $setting => $options) {

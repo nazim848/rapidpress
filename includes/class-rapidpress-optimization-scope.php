@@ -19,6 +19,12 @@ class RapidPress_Optimization_Scope {
 	}
 
 	private static function should_optimize_entire_site($current_url) {
+		$enable_exclusions = get_option('rapidpress_enable_scope_exclusions', '0');
+
+		if ($enable_exclusions !== '1') {
+			return true;
+		}
+
 		$excluded_pages = get_option('rapidpress_excluded_pages', '');
 		$excluded_pages = array_filter(array_map('trim', explode("\n", $excluded_pages)));
 

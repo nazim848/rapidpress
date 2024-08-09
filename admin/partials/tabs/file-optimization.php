@@ -18,6 +18,10 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 						<option value="front_page" <?php selected(get_option('rapidpress_optimization_scope'), 'front_page'); ?>>Front Page</option>
 						<option value="specific_pages" <?php selected(get_option('rapidpress_optimization_scope'), 'specific_pages'); ?>>Specific Pages</option>
 					</select>
+					<label id="rapidpress_enable_scope_exclusions_label">
+						<input type="checkbox" name="rapidpress_enable_scope_exclusions" id="rapidpress_enable_scope_exclusions" value="1" <?php checked(get_option('rapidpress_enable_scope_exclusions'), '1'); ?> />
+						Exclude pages?
+					</label>
 				</td>
 			</tr>
 			<tr valign="top" id="rapidpress_specific_pages_row" style="display: none;">

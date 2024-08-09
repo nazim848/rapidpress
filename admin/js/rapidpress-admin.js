@@ -7,15 +7,28 @@
 				if ($(this).val() === "specific_pages") {
 					$("#rapidpress_specific_pages_row").show();
 					$("#rapidpress_excluded_pages_row").hide();
+					$("#rapidpress_enable_scope_exclusions_label").hide();
 				} else if ($(this).val() === "entire_site") {
 					$("#rapidpress_specific_pages_row").hide();
-					$("#rapidpress_excluded_pages_row").show();
+					$("#rapidpress_enable_scope_exclusions_label").show();
+					if ($("#rapidpress_enable_scope_exclusions").is(":checked")) {
+						$("#rapidpress_excluded_pages_row").show();
+					}
 				} else {
 					$("#rapidpress_specific_pages_row").hide();
+					$("#rapidpress_enable_scope_exclusions_label").hide();
 					$("#rapidpress_excluded_pages_row").hide();
 				}
 			})
 			.change(); // Trigger change event on page load
+		$("#rapidpress_enable_scope_exclusions").change(function () {
+			if ($(this).is(":checked")) {
+				$("#rapidpress_excluded_pages_row").show();
+			} else {
+				$("#rapidpress_excluded_pages_row").hide();
+			}
+		});
+		$("#rapidpress_enable_exclusions").change();
 	});
 
 	// Helper function to update URL parameter
