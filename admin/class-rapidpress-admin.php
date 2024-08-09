@@ -198,7 +198,7 @@ class RapidPress_Admin {
 				}
 			}
 		}
-		error_log('Sanitized JS disable rules: ' . print_r($sanitized_rules, true));
+
 		return $sanitized_rules;
 	}
 	public function save_settings_with_tab($value, $old_value, $option) {
