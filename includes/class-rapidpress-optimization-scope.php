@@ -10,8 +10,46 @@ class RapidPress_Optimization_Scope {
 
 		$optimized_pages = get_option('rapidpress_optimized_pages', '');
 		$pages = array_map('trim', explode("\n", $optimized_pages));
-		$current_url = trailingslashit(home_url($GLOBALS['wp']->request));
+		$current_url = self::get_current_relative_url();
 
-		return in_array($current_url, $pages);
+		foreach ($pages as $page) {
+			if (self::url_match($current_url, $page)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static function get_current_relative_url() {
+		$home_path = parse_url(home_url(), PHP_URL_PATH);
+		$home_path = trim($home_path, '/');
+
+		$current_url = trim($_SERVER['REQUEST_URI'], '/');
+
+		if ($home_path && strpos($current_url, $home_path) === 0) {
+			$current_url = substr($current_url, strlen($home_path));
+		}
+
+		return trim($current_url, '/');
+	}
+
+	private static function url_match($current_url, $page_url) {
+		$current_url = trim($current_url, '/');
+		$page_url = trim($page_url, '/');
+
+		// Convert relative URL to absolute if it's not already
+		if (strpos($page_url, 'http') !== 0) {
+			$page_url = home_url($page_url);
+		}
+
+		$current_parts = parse_url(home_url($current_url));
+		$page_parts = parse_url($page_url);
+
+		// Compare paths
+		$current_path = isset($current_parts['path']) ? trim($current_parts['path'], '/') : '';
+		$page_path = isset($page_parts['path']) ? trim($page_parts['path'], '/') : '';
+
+		return $current_path === $page_path;
 	}
 }
