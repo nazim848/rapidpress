@@ -1,19 +1,56 @@
 <?php
 
 class RapidPress_Optimization_Scope {
+
 	public static function should_optimize() {
 		$scope = get_option('rapidpress_optimization_scope', 'entire_site');
+		$current_url = self::get_current_relative_url();
 
-		if ($scope === 'entire_site') {
+		switch ($scope) {
+			case 'entire_site':
+				return self::should_optimize_entire_site($current_url);
+			case 'front_page':
+				return self::is_front_page();
+			case 'specific_pages':
+				return self::should_optimize_specific_pages($current_url);
+			default:
+				return false;
+		}
+	}
+
+	private static function should_optimize_entire_site($current_url) {
+		$enable_exclusions = get_option('rapidpress_enable_scope_exclusions', '0');
+
+		if ($enable_exclusions !== '1') {
 			return true;
 		}
 
+		$excluded_pages = get_option('rapidpress_excluded_pages', '');
+		$excluded_pages = array_filter(array_map('trim', explode("\n", $excluded_pages)));
+
+		if (empty($excluded_pages)) {
+			return true;
+		}
+
+		foreach ($excluded_pages as $page) {
+			if (!empty($page) && self::url_match($current_url, $page)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private static function is_front_page() {
+		return is_front_page() || is_home();
+	}
+
+	private static function should_optimize_specific_pages($current_url) {
 		$optimized_pages = get_option('rapidpress_optimized_pages', '');
-		$pages = array_map('trim', explode("\n", $optimized_pages));
-		$current_url = self::get_current_relative_url();
+		$pages = array_filter(array_map('trim', explode("\n", $optimized_pages)));
 
 		foreach ($pages as $page) {
-			if (self::url_match($current_url, $page)) {
+			if (!empty($page) && self::url_match($current_url, $page)) {
 				return true;
 			}
 		}

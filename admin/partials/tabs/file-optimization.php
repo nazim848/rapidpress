@@ -15,15 +15,27 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 				<td>
 					<select name="rapidpress_optimization_scope" id="rapidpress_optimization_scope">
 						<option value="entire_site" <?php selected(get_option('rapidpress_optimization_scope'), 'entire_site'); ?>>Entire Site</option>
+						<option value="front_page" <?php selected(get_option('rapidpress_optimization_scope'), 'front_page'); ?>>Front Page</option>
 						<option value="specific_pages" <?php selected(get_option('rapidpress_optimization_scope'), 'specific_pages'); ?>>Specific Pages</option>
 					</select>
+					<label id="rapidpress_enable_scope_exclusions_label">
+						<input type="checkbox" name="rapidpress_enable_scope_exclusions" id="rapidpress_enable_scope_exclusions" value="1" <?php checked(get_option('rapidpress_enable_scope_exclusions'), '1'); ?> />
+						Exclude pages?
+					</label>
 				</td>
 			</tr>
 			<tr valign="top" id="rapidpress_specific_pages_row" style="display: none;">
-				<th scope="row">Page URLs</th>
+				<th scope="row">Page Inclusions</th>
 				<td>
 					<textarea name="rapidpress_optimized_pages" id="rapidpress_optimized_pages" rows="3" cols="70" placeholder="Enter one page URL per line"><?php echo esc_textarea(get_option('rapidpress_optimized_pages', '')); ?></textarea>
-					<p class="description">Enter the URLs of the pages you want to optimized, one URL per line.</p>
+					<p class="description">Enter the URLs of the pages you want to optimize, one URL per line.</p>
+				</td>
+			</tr>
+			<tr valign="top" id="rapidpress_excluded_pages_row" style="display: none;">
+				<th scope="row">Page Exclusions</th>
+				<td>
+					<textarea name="rapidpress_excluded_pages" id="rapidpress_excluded_pages" rows="3" cols="70" placeholder="Enter one page URL per line"><?php echo esc_textarea(get_option('rapidpress_excluded_pages', '')); ?></textarea>
+					<p class="description">Enter the URLs of the pages you want to exclude from optimization, one URL per line.</p>
 				</td>
 			</tr>
 		</table>
