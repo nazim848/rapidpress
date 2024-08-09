@@ -1,6 +1,16 @@
 (function ($) {
 	"use strict";
 
+	$("#rapidpress_optimization_scope")
+		.change(function () {
+			if ($(this).val() === "specific_pages") {
+				$("#rapidpress_specific_pages_row").show();
+			} else {
+				$("#rapidpress_specific_pages_row").hide();
+			}
+		})
+		.change();
+
 	// Helper function to update URL parameter
 	function updateQueryStringParameter(uri, key, value) {
 		let re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
