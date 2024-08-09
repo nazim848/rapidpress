@@ -95,18 +95,3 @@ if (!array_key_exists($active_tab, $tabs)) {
 		</form>
 	</div>
 </div>
-<!-- 
-<script>
-	document.addEventListener('DOMContentLoaded', function() {
-		const tabLinks = document.querySelectorAll('.nav-tab-wrapper .nav-tab');
-		const submitButton = document.getElementById('submit-button');
-
-		tabLinks.forEach(function(tab) {
-			tab.addEventListener('click', function(e) {
-				e.preventDefault();
-				const tabId = this.getAttribute('href').substring(1);
-				submitButton.style.display = tabId === 'dashboard' ? 'none' : 'block';
-			});
-		});
-	});
-</script> -->
