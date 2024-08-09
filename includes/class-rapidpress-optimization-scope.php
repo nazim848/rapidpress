@@ -6,24 +6,40 @@ class RapidPress_Optimization_Scope {
 		$scope = get_option('rapidpress_optimization_scope', 'entire_site');
 		$current_url = self::get_current_relative_url();
 
-		if ($scope === 'entire_site') {
-			$excluded_pages = get_option('rapidpress_excluded_pages', '');
-			$excluded_pages = array_filter(array_map('trim', explode("\n", $excluded_pages)));
+		switch ($scope) {
+			case 'entire_site':
+				return self::should_optimize_entire_site($current_url);
+			case 'front_page':
+				return self::is_front_page();
+			case 'specific_pages':
+				return self::should_optimize_specific_pages($current_url);
+			default:
+				return false;
+		}
+	}
 
-			// If there are no exclusions, optimize everything
-			if (empty($excluded_pages)) {
-				return true;
-			}
+	private static function should_optimize_entire_site($current_url) {
+		$excluded_pages = get_option('rapidpress_excluded_pages', '');
+		$excluded_pages = array_filter(array_map('trim', explode("\n", $excluded_pages)));
 
-			foreach ($excluded_pages as $page) {
-				if (!empty($page) && self::url_match($current_url, $page)) {
-					return false;
-				}
-			}
-
+		if (empty($excluded_pages)) {
 			return true;
 		}
 
+		foreach ($excluded_pages as $page) {
+			if (!empty($page) && self::url_match($current_url, $page)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private static function is_front_page() {
+		return is_front_page() || is_home();
+	}
+
+	private static function should_optimize_specific_pages($current_url) {
 		$optimized_pages = get_option('rapidpress_optimized_pages', '');
 		$pages = array_filter(array_map('trim', explode("\n", $optimized_pages)));
 
