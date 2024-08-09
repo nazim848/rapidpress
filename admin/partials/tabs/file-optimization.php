@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 			<tr valign="top" id="rapidpress_specific_pages_row" style="display: none;">
 				<th scope="row">Page URLs</th>
 				<td>
-					<textarea name="rapidpress_optimized_pages" rows="3" cols="70" placeholder="Enter one Page URL per line"><?php echo esc_textarea(get_option('rapidpress_optimized_pages', '')); ?></textarea>
+					<textarea name="rapidpress_optimized_pages" id="rapidpress_optimized_pages" rows="3" cols="70" placeholder="Enter one page URL per line"><?php echo esc_textarea(get_option('rapidpress_optimized_pages', '')); ?></textarea>
 					<p class="description">Enter the URLs of the pages you want to optimized, one URL per line.</p>
 				</td>
 			</tr>

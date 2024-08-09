@@ -1,15 +1,17 @@
 (function ($) {
 	"use strict";
 
-	$("#rapidpress_optimization_scope")
-		.change(function () {
-			if ($(this).val() === "specific_pages") {
-				$("#rapidpress_specific_pages_row").show();
-			} else {
-				$("#rapidpress_specific_pages_row").hide();
-			}
-		})
-		.change();
+	$(document).ready(function () {
+		$("#rapidpress_optimization_scope")
+			.change(function () {
+				if ($(this).val() === "specific_pages") {
+					$("#rapidpress_specific_pages_row").show();
+				} else {
+					$("#rapidpress_specific_pages_row").hide();
+				}
+			})
+			.change(); // Trigger change event on page load
+	});
 
 	// Helper function to update URL parameter
 	function updateQueryStringParameter(uri, key, value) {
