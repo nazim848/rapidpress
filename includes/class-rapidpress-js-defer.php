@@ -11,10 +11,12 @@ class RapidPress_JS_Defer {
 			return $tag;
 		}
 
-		$exclusions = $this->get_exclusions();
-
-		if ($this->is_excluded($src, $exclusions)) {
-			return $tag;
+		$enable_exclusions = get_option('rapidpress_enable_js_defer_exclusions', '0');
+		if ($enable_exclusions === '1') {
+			$exclusions = $this->get_exclusions();
+			if ($this->is_excluded($src, $exclusions)) {
+				return $tag;
+			}
 		}
 
 		if (strpos($tag, 'defer') !== false) {
