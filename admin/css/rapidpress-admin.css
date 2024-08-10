@@ -107,6 +107,7 @@
 
 .accordion-content {
 	display: none;
+	overflow: hidden;
 }
 
 .accordion-content .form-table td {

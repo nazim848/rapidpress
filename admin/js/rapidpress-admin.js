@@ -68,42 +68,39 @@ class RapidPressAdmin {
 			updateTableHead();
 		});
 
-		this.$(document).on(
-			"click",
-			`.remove-${ruleName}-rule`,
-			function () {
-				this.$(this).closest("tr").remove();
-				updateTableHead();
-			}.bind(this)
-		);
+		// Update this event handler
+		this.$(document).on("click", `.remove-${ruleName}-rule`, event => {
+			this.$(event.target).closest("tr").remove();
+			updateTableHead();
+		});
 	}
 
 	createNewRow(ruleName) {
 		const timestamp = Date.now();
 		const commonFields = `
-			  <td>
-					<select name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][scope]" class="${ruleName}-disable-scope">
-						 <option value="entire_site">Entire Site</option>
-						 <option value="front_page">Front Page</option>
-						 <option value="specific_pages">Specific Pages</option>
-					</select>
-					<textarea cols="65" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
-			  </td>
-			  <td><button type="button" class="button remove-${ruleName}-rule">Remove</button></td>
-		 `;
+			 <td>
+				  <select name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][scope]" class="${ruleName}-disable-scope">
+						<option value="entire_site">Entire Site</option>
+						<option value="front_page">Front Page</option>
+						<option value="specific_pages">Specific Pages</option>
+				  </select>
+				  <textarea cols="65" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
+			 </td>
+			 <td><button type="button" class="button remove-${ruleName}-rule">Remove</button></td>
+		`;
 
 		if (ruleName === "js") {
 			return `
-					<tr>
-						 <td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[new_${timestamp}][scripts]" placeholder="Script URL or Handle (one per line)"></textarea></td>
-						 ${commonFields}
-					</tr>`;
+				  <tr>
+						<td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[new_${timestamp}][scripts]" placeholder="Script URL or Handle (one per line)"></textarea></td>
+						${commonFields}
+				  </tr>`;
 		} else if (ruleName === "css") {
 			return `
-					<tr>
-						 <td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[new_${timestamp}][styles]" placeholder="CSS URL or Handle (one per line)"></textarea></td>
-						 ${commonFields}
-					</tr>`;
+				  <tr>
+						<td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[new_${timestamp}][styles]" placeholder="CSS URL or Handle (one per line)"></textarea></td>
+						${commonFields}
+				  </tr>`;
 		}
 	}
 
@@ -172,11 +169,13 @@ class RapidPressAdmin {
 		this.$(document).on(
 			"change",
 			".js-disable-scope, .css-disable-scope",
-			function () {
-				this.$(this)
-					.siblings(".js-disable-pages, .css-disable-pages")
-					.toggle(this.$(this).val() === "specific_pages");
-			}.bind(this)
+			event => {
+				const $select = this.$(event.target);
+				const $pagesTextarea = $select.siblings(
+					".js-disable-pages, .css-disable-pages"
+				);
+				$pagesTextarea.toggle($select.val() === "specific_pages");
+			}
 		);
 	}
 
@@ -209,11 +208,11 @@ class RapidPressAdmin {
 
 			// Close all other accordions
 			this.$(".accordion-header").not($this).removeClass("active");
-			this.$(".accordion-content").not($content).slideUp(300);
+			this.$(".accordion-content").not($content).slideUp(200);
 
 			// Toggle the clicked accordion
 			$this.toggleClass("active", !isActive);
-			$content.slideToggle(300);
+			$content.slideToggle(200);
 
 			this.saveAccordionState();
 		});
