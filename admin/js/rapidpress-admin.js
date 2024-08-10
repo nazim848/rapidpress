@@ -1,135 +1,18 @@
-(function ($) {
-	"use strict";
+class RapidPressAdmin {
+	constructor($) {
+		this.$ = $;
+		this.init();
+	}
 
-	$(document).ready(function () {
-		// Optimization Scope
-		$("#rapidpress_optimization_scope")
-			.change(function () {
-				if ($(this).val() === "specific_pages") {
-					$("#rapidpress_specific_pages_row").show();
-					$("#rapidpress_optimization_excluded_pages_row").hide();
-					$("#rapidpress_enable_scope_exclusions_label").hide();
-				} else if ($(this).val() === "entire_site") {
-					$("#rapidpress_specific_pages_row").hide();
-					$("#rapidpress_enable_scope_exclusions_label").show();
-					if ($("#rapidpress_enable_scope_exclusions").is(":checked")) {
-						$("#rapidpress_optimization_excluded_pages_row").show();
-					}
-				} else {
-					$("#rapidpress_specific_pages_row").hide();
-					$("#rapidpress_enable_scope_exclusions_label").hide();
-					$("#rapidpress_optimization_excluded_pages_row").hide();
-				}
-			})
-			.change(); // Trigger change event on page load
+	init() {
+		this.setupEventHandlers();
+		this.initializeTabs();
+		this.restoreAccordionState();
+		this.initializeRuleManagement();
+	}
 
-		$("#rapidpress_enable_scope_exclusions").change(function () {
-			if ($(this).is(":checked")) {
-				$("#rapidpress_optimization_excluded_pages_row").show();
-			} else {
-				$("#rapidpress_optimization_excluded_pages_row").hide();
-			}
-		});
-
-		// Enable combine css
-		$("#rapidpress_combine_css")
-			.change(function () {
-				if ($(this).is(":checked")) {
-					$("#rapidpress_enable_combine_css_exclusions_btn").show();
-					if (
-						$("#rapidpress_enable_combine_css_exclusions").is(":checked")
-					) {
-						$("#rapidpress_combine_css_exclusions_row").show();
-					}
-				} else {
-					$("#rapidpress_enable_combine_css_exclusions_btn").hide();
-					$("#rapidpress_combine_css_exclusions_row").hide();
-				}
-			})
-			.change();
-
-		// enable combine css exclusions
-		$("#rapidpress_enable_combine_css_exclusions").change(function () {
-			if ($(this).is(":checked")) {
-				$("#rapidpress_combine_css_exclusions_row").show();
-			} else {
-				$("#rapidpress_combine_css_exclusions_row").hide();
-			}
-		});
-
-		// Enable js defer
-		$("#rapidpress_js_defer")
-			.change(function () {
-				if ($(this).is(":checked")) {
-					$("#rapidpress_enable_js_defer_exclusions_btn").show();
-					if ($("#rapidpress_enable_js_defer_exclusions").is(":checked")) {
-						$("#rapidpress_js_defer_exclusions_row").show();
-					}
-				} else {
-					$("#rapidpress_enable_js_defer_exclusions_btn").hide();
-					$("#rapidpress_js_defer_exclusions_row").hide();
-				}
-			})
-			.change();
-
-		// enable js defer exclusions
-		$("#rapidpress_enable_js_defer_exclusions").change(function () {
-			if ($(this).is(":checked")) {
-				$("#rapidpress_js_defer_exclusions_row").show();
-			} else {
-				$("#rapidpress_js_defer_exclusions_row").hide();
-			}
-		});
-
-		// Enable js delay
-		$("#rapidpress_js_delay")
-			.change(function () {
-				if ($(this).is(":checked")) {
-					$("#rapidpress_js_delay_options").show();
-					$("#rapidpress_enable_js_delay_exclusions_btn").show();
-					if ($("#rapidpress_enable_js_delay_exclusions").is(":checked")) {
-						$("#rapidpress_js_delay_exclusions_row").show();
-					}
-				} else {
-					$("#rapidpress_js_delay_options").hide();
-					$("#rapidpress_enable_js_delay_exclusions_btn").hide();
-					$("#rapidpress_js_delay_exclusions_row").hide();
-				}
-			})
-			.change();
-
-		//enable js delay exclusions
-		$("#rapidpress_enable_js_delay_exclusions").change(function () {
-			if ($(this).is(":checked")) {
-				$("#rapidpress_js_delay_exclusions_row").show();
-			} else {
-				$("#rapidpress_js_delay_exclusions_row").hide();
-			}
-		});
-
-		// Handle JS disable scope change
-		$(document).on("change", ".js-disable-scope", function () {
-			var $pagesTextarea = $(this).siblings(".js-disable-pages");
-			if ($(this).val() === "specific_pages") {
-				$pagesTextarea.show();
-			} else {
-				$pagesTextarea.hide();
-			}
-		});
-
-		// Handle CSS disable scope change
-		$(document).on("change", ".css-disable-scope", function () {
-			var $pagesTextarea = $(this).siblings(".css-disable-pages");
-			if ($(this).val() === "specific_pages") {
-				$pagesTextarea.show();
-			} else {
-				$pagesTextarea.hide();
-			}
-		});
-	});
-
-	// Helper function to update URL parameter
-	function updateQueryStringParameter(uri, key, value) {
+	// Helper methods
+	updateQueryStringParameter(uri, key, value) {
 		let re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
 		let separator = uri.indexOf("?") !== -1 ? "&" : "?";
 		return uri.match(re)
@@ -137,11 +20,11 @@
 			: uri + separator + key + "=" + value;
 	}
 
-	// Function to save accordion state
-	function saveAccordionState() {
+	// Accordion methods
+	saveAccordionState() {
 		let activeAccordions = [];
-		$(".accordion-item").each(function (index) {
-			if ($(this).find(".accordion-header").hasClass("active")) {
+		this.$(".accordion-item").each((index, item) => {
+			if (this.$(item).find(".accordion-header").hasClass("active")) {
 				activeAccordions.push(index);
 			}
 		});
@@ -151,13 +34,12 @@
 		);
 	}
 
-	// Function to restore accordion state
-	function restoreAccordionState() {
+	restoreAccordionState() {
 		let activeAccordions =
 			JSON.parse(localStorage.getItem("rapidpressActiveAccordions")) || [];
-		$(".accordion-item").each(function (index) {
-			let $header = $(this).find(".accordion-header");
-			let $content = $(this).find(".accordion-content");
+		this.$(".accordion-item").each((index, item) => {
+			let $header = this.$(item).find(".accordion-header");
+			let $content = this.$(item).find(".accordion-content");
 			if (activeAccordions.includes(index)) {
 				$header.addClass("active");
 				$content.show();
@@ -168,106 +50,201 @@
 		});
 	}
 
-	// Toggle visibility based on checkbox
-	function toggleVisibility(checkboxId, targetId) {
-		const $checkbox = $(checkboxId);
-		const $target = $(targetId);
-
-		function toggle() {
-			$target.toggle($checkbox.is(":checked"));
-		}
-
-		$checkbox.change(toggle);
-		toggle(); // Initial state
-	}
-
-	// Modify the addRuleRow function
-	function addRuleRow(buttonId, tableId, ruleName) {
-		const $table = $(tableId);
+	// Rule management methods
+	addRuleRow(buttonId, tableId, ruleName) {
+		const $table = this.$(tableId);
 		const $tableHead = $table.find("tr:first");
 
-		// Show table head if there are existing rows
-		if ($table.find("tr").length > 1) {
-			$tableHead.show();
-		} else {
-			$tableHead.hide();
-		}
+		const updateTableHead = () => {
+			$table.find("tr").length > 1 ? $tableHead.show() : $tableHead.hide();
+		};
 
-		$(buttonId).on("click", function () {
-			$tableHead.show(); // Show table head when adding a new rule
-			var newRow = "";
-			if (ruleName === "js") {
-				newRow = `
-						<tr>
-							 <td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[new_${Date.now()}][scripts]" placeholder="Script URL or Handle (one per line)"></textarea></td>
-							 <td>
-								  <select name="rapidpress_js_disable_rules[new_${Date.now()}][scope]" class="js-disable-scope">
-										<option value="entire_site">Entire Site</option>
-										<option value="front_page">Front Page</option>
-										<option value="specific_pages">Specific Pages</option>
-								  </select>
-								  <textarea cols="65" rows="3" name="rapidpress_js_disable_rules[new_${Date.now()}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="js-disable-pages" style="display:none;"></textarea>
-							 </td>
-							 <td><button type="button" class="button remove-js-rule">Remove</button></td>
-						</tr>`;
-			} else if (ruleName === "css") {
-				newRow = `
-						<tr>
-							 <td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[new_${Date.now()}][styles]" placeholder="CSS URL or Handle (one per line)"></textarea></td>
-							 <td>
-								  <select name="rapidpress_css_disable_rules[new_${Date.now()}][scope]" class="css-disable-scope">
-										<option value="entire_site">Entire Site</option>
-										<option value="front_page">Front Page</option>
-										<option value="specific_pages">Specific Pages</option>
-								  </select>
-								  <textarea cols="65" rows="3" name="rapidpress_css_disable_rules[new_${Date.now()}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="css-disable-pages" style="display:none;"></textarea>
-							 </td>
-							 <td><button type="button" class="button remove-css-rule">Remove</button></td>
-						</tr>`;
-			}
+		updateTableHead();
+
+		this.$(buttonId).on("click", () => {
+			$tableHead.show();
+			var newRow = this.createNewRow(ruleName);
 			$table.append(newRow);
+			updateTableHead();
 		});
 
-		$(document).on("click", `.remove-${ruleName}-rule`, function () {
-			$(this).closest("tr").remove();
-			if ($table.find("tr").length === 1) {
-				$tableHead.hide(); // Hide table head if no rules remain
-			}
+		this.$(document).on(
+			"click",
+			`.remove-${ruleName}-rule`,
+			function () {
+				this.$(this).closest("tr").remove();
+				updateTableHead();
+			}.bind(this)
+		);
+	}
+
+	createNewRow(ruleName) {
+		const timestamp = Date.now();
+		const commonFields = `
+			  <td>
+					<select name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][scope]" class="${ruleName}-disable-scope">
+						 <option value="entire_site">Entire Site</option>
+						 <option value="front_page">Front Page</option>
+						 <option value="specific_pages">Specific Pages</option>
+					</select>
+					<textarea cols="65" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
+			  </td>
+			  <td><button type="button" class="button remove-${ruleName}-rule">Remove</button></td>
+		 `;
+
+		if (ruleName === "js") {
+			return `
+					<tr>
+						 <td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[new_${timestamp}][scripts]" placeholder="Script URL or Handle (one per line)"></textarea></td>
+						 ${commonFields}
+					</tr>`;
+		} else if (ruleName === "css") {
+			return `
+					<tr>
+						 <td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[new_${timestamp}][styles]" placeholder="CSS URL or Handle (one per line)"></textarea></td>
+						 ${commonFields}
+					</tr>`;
+		}
+	}
+
+	// Event handlers
+	setupEventHandlers() {
+		this.setupOptimizationScope();
+		this.setupCssJsOptions();
+		this.setupAccordion();
+		this.setupTabSwitching();
+		this.setupFormSubmission();
+		this.setupSubmitButtonVisibility();
+	}
+
+	setupOptimizationScope() {
+		this.$("#rapidpress_optimization_scope")
+			.change(() => {
+				const val = this.$("#rapidpress_optimization_scope").val();
+				this.$("#rapidpress_specific_pages_row").toggle(
+					val === "specific_pages"
+				);
+				this.$("#rapidpress_optimization_excluded_pages_row").toggle(
+					val === "entire_site" &&
+						this.$("#rapidpress_enable_scope_exclusions").is(":checked")
+				);
+				this.$("#rapidpress_enable_scope_exclusions_label").toggle(
+					val === "entire_site"
+				);
+			})
+			.change();
+
+		this.$("#rapidpress_enable_scope_exclusions").change(() => {
+			this.$("#rapidpress_optimization_excluded_pages_row").toggle(
+				this.$("#rapidpress_enable_scope_exclusions").is(":checked") &&
+					this.$("#rapidpress_optimization_scope").val() === "entire_site"
+			);
 		});
 	}
 
-	// Main function to initialize everything
-	function init() {
-		// Tab switching
-		$(".nav-tab-wrapper a").on("click", function (e) {
+	setupCssJsOptions() {
+		this.setupToggleOption(
+			"#rapidpress_combine_css",
+			"#rapidpress_enable_combine_css_exclusions",
+			"#rapidpress_combine_css_exclusions_row"
+		);
+		this.setupToggleOption(
+			"#rapidpress_js_defer",
+			"#rapidpress_enable_js_defer_exclusions",
+			"#rapidpress_js_defer_exclusions_row"
+		);
+		this.setupToggleOption(
+			"#rapidpress_js_delay",
+			"#rapidpress_enable_js_delay_exclusions",
+			"#rapidpress_js_delay_exclusions_row"
+		);
+
+		// Additional toggle for JS delay options
+		this.$("#rapidpress_js_delay")
+			.change(() => {
+				this.$("#rapidpress_js_delay_options").toggle(
+					this.$("#rapidpress_js_delay").is(":checked")
+				);
+			})
+			.change();
+
+		// Handle JS and CSS disable scope change
+		this.$(document).on(
+			"change",
+			".js-disable-scope, .css-disable-scope",
+			function () {
+				this.$(this)
+					.siblings(".js-disable-pages, .css-disable-pages")
+					.toggle(this.$(this).val() === "specific_pages");
+			}.bind(this)
+		);
+	}
+
+	setupToggleOption(mainCheckboxId, exclusionCheckboxId, rowId) {
+		const $mainCheckbox = this.$(mainCheckboxId);
+		const $exclusionCheckbox = this.$(exclusionCheckboxId);
+		const $row = this.$(rowId);
+
+		const updateVisibility = () => {
+			const isMainChecked = $mainCheckbox.is(":checked");
+			const isExclusionChecked = $exclusionCheckbox.is(":checked");
+
+			$exclusionCheckbox.closest("label").toggle(isMainChecked);
+			$row.toggle(isMainChecked && isExclusionChecked);
+		};
+
+		$mainCheckbox.change(updateVisibility);
+		$exclusionCheckbox.change(updateVisibility);
+
+		// Initial state
+		updateVisibility();
+	}
+
+	setupAccordion() {
+		this.$(document).on("click", ".accordion-header", e => {
 			e.preventDefault();
-			let target = $(this).attr("href").substr(1);
-			window.setActiveTab(target);
+			let $this = this.$(e.currentTarget);
+			let $content = $this.next(".accordion-content");
+			let isActive = $this.hasClass("active");
+
+			// Close all other accordions
+			this.$(".accordion-header").not($this).removeClass("active");
+			this.$(".accordion-content").not($content).slideUp(300);
+
+			// Toggle the clicked accordion
+			$this.toggleClass("active", !isActive);
+			$content.slideToggle(300);
+
+			this.saveAccordionState();
+		});
+	}
+
+	setupTabSwitching() {
+		this.$(".nav-tab-wrapper a").on("click", e => {
+			e.preventDefault();
+			let target = this.$(e.currentTarget).attr("href").substr(1);
+			this.setActiveTab(target);
 			history.pushState(
 				null,
 				null,
-				updateQueryStringParameter(window.location.href, "tab", target)
+				this.updateQueryStringParameter(window.location.href, "tab", target)
 			);
 		});
+	}
 
-		// Set active tab based on URL parameter or default to dashboard
-		let urlParams = new URLSearchParams(window.location.search);
-		let activeTab = urlParams.get("tab") || "dashboard";
-		window.setActiveTab(activeTab);
-
-		// Handle form submission
-		$("form").on("submit", function (e) {
+	setupFormSubmission() {
+		this.$("form").on("submit", e => {
 			e.preventDefault();
-			let form = $(this);
-			let activeTab = $("#rapidpress_active_tab").val();
+			let form = this.$(e.currentTarget);
+			let activeTab = this.$("#rapidpress_active_tab").val();
 
-			$.post(form.attr("action"), form.serialize(), function (response) {
-				let newUrl = updateQueryStringParameter(
+			this.$.post(form.attr("action"), form.serialize(), response => {
+				let newUrl = this.updateQueryStringParameter(
 					window.location.href,
 					"tab",
 					activeTab
 				);
-				newUrl = updateQueryStringParameter(
+				newUrl = this.updateQueryStringParameter(
 					newUrl,
 					"settings-updated",
 					"true"
@@ -276,65 +253,40 @@
 			});
 		});
 
-		// Toggle visibility for various options
-		// toggleVisibility(
-		// 	"#rapidpress_combine_css",
-		// 	"#rapidpress_combine_css_exclusions_row"
-		// );
-		// toggleVisibility(
-		// 	"#rapidpress_js_defer",
-		// 	"#rapidpress_js_defer_exclusions_row"
-		// );
-		// toggleVisibility(
-		// 	"#rapidpress_js_delay",
-		// 	"#rapidpress_js_delay_options, #rapidpress_js_delay_exclusions_row"
-		// );
-
-		// Accordion functionality
-		$(document).on("click", ".accordion-header", function (e) {
-			e.preventDefault();
-			let $this = $(this);
-			let isActive = $this.hasClass("active");
-
-			$(".accordion-header").removeClass("active");
-			$(".accordion-content").slideUp(300);
-
-			if (!isActive) {
-				$this.addClass("active");
-				$this.next(".accordion-content").slideDown(300);
-			}
-
-			saveAccordionState();
-		});
-
-		restoreAccordionState();
-
-		// Add rule rows
-		addRuleRow("#add-js-rule", "#js-asset-management", "js");
-		addRuleRow("#add-css-rule", "#css-asset-management", "css");
-
-		// Hide submit button based on current tab
-		$(".nav-tab-wrapper .nav-tab").on("click", function (e) {
-			e.preventDefault();
-			const tabId = $(this).attr("href").substring(1);
-			$("#submit-button").toggle(tabId !== "dashboard");
-		});
-
 		// Save accordion state before form submission
-		$("form").on("submit", saveAccordionState);
+		this.$("form").on("submit", () => this.saveAccordionState());
 	}
 
-	// Run the init function when the DOM is fully loaded
-	$(function () {
-		init();
-	});
-})(jQuery);
+	setupSubmitButtonVisibility() {
+		this.$(".nav-tab-wrapper .nav-tab").on("click", e => {
+			e.preventDefault();
+			const tabId = this.$(e.currentTarget).attr("href").substring(1);
+			this.$("#submit-button").toggle(tabId !== "dashboard");
+		});
+	}
 
-// Define setActiveTab as a global function
-window.setActiveTab = function (tab) {
-	jQuery(".nav-tab-wrapper a").removeClass("nav-tab-active");
-	jQuery('.nav-tab-wrapper a[href="#' + tab + '"]').addClass("nav-tab-active");
-	jQuery(".tab-content > div").hide();
-	jQuery("#" + tab).show();
-	jQuery("#rapidpress_active_tab").val(tab);
-};
+	// Initialization methods
+	initializeTabs() {
+		const urlParams = new URLSearchParams(window.location.search);
+		const activeTab = urlParams.get("tab") || "dashboard";
+		this.setActiveTab(activeTab);
+	}
+
+	initializeRuleManagement() {
+		this.addRuleRow("#add-js-rule", "#js-asset-management", "js");
+		this.addRuleRow("#add-css-rule", "#css-asset-management", "css");
+	}
+
+	setActiveTab(tab) {
+		this.$(".nav-tab-wrapper a").removeClass("nav-tab-active");
+		this.$(`.nav-tab-wrapper a[href="#${tab}"]`).addClass("nav-tab-active");
+		this.$(".tab-content > div").hide();
+		this.$(`#${tab}`).show();
+		this.$("#rapidpress_active_tab").val(tab);
+	}
+}
+
+// Initialize the admin functionality
+jQuery(function ($) {
+	new RapidPressAdmin($);
+});
