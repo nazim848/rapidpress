@@ -2,6 +2,15 @@
 	margin-top: 20px;
 }
 
+.rapidpress-admin-content ::-ms-input-placeholder {
+	/* Edge 12-18 */
+	color: red !important;
+}
+
+.rapidpress-admin-content ::placeholder {
+	color: #999 !important;
+}
+
 .nav-tab-wrapper {
 	margin-bottom: 20px;
 }
@@ -106,4 +115,8 @@
 
 .accordion-content.active {
 	display: block;
+}
+
+.js-disable-scope {
+	margin-bottom: 10px;
 }

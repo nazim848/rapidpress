@@ -97,21 +97,29 @@
 	// Modify the addRuleRow function for JS
 	function addRuleRow(buttonId, tableId, ruleName) {
 		$(buttonId).on("click", function () {
-			var newRow = `
-				  <tr>
-						<td><textarea cols="65" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${Date.now()}][scripts]" placeholder="${
-				ruleName === "js" ? "Script" : "Style"
-			} URL or Handle (one per line)"></textarea></td>
-						<td>
-							 <select name="rapidpress_${ruleName}_disable_rules[new_${Date.now()}][scope]" class="js-disable-scope">
-								  <option value="entire_site">Entire Site</option>
-								  <option value="front_page">Front Page</option>
-								  <option value="specific_pages">Specific Pages</option>
-							 </select>
-							 <textarea cols="65" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${Date.now()}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="js-disable-pages" style="display:none;"></textarea>
-						</td>
-						<td><button type="button" class="button remove-${ruleName}-rule">Remove</button></td>
-				  </tr>`;
+			var newRow = "";
+			if (ruleName === "js") {
+				newRow = `
+						<tr>
+							 <td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[new_${Date.now()}][scripts]" placeholder="Script URL or Handle (one per line)"></textarea></td>
+							 <td>
+								  <select name="rapidpress_js_disable_rules[new_${Date.now()}][scope]" class="js-disable-scope">
+										<option value="entire_site">Entire Site</option>
+										<option value="front_page">Front Page</option>
+										<option value="specific_pages">Specific Pages</option>
+								  </select>
+								  <textarea cols="65" rows="3" name="rapidpress_js_disable_rules[new_${Date.now()}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="js-disable-pages" style="display:none;"></textarea>
+							 </td>
+							 <td><button type="button" class="button remove-js-rule">Remove</button></td>
+						</tr>`;
+			} else if (ruleName === "css") {
+				newRow = `
+						<tr>
+							 <td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[new_${Date.now()}][styles]" placeholder="Style URL or Handle (one per line)"></textarea></td>
+							 <td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[new_${Date.now()}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/"></textarea></td>
+							 <td><button type="button" class="button remove-css-rule">Remove</button></td>
+						</tr>`;
+			}
 			$(tableId).append(newRow);
 		});
 

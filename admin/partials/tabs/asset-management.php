@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 			<div class="rapidpress-card">
 				<table class="form-table" id="js-asset-management">
 					<tr>
-						<th style="width: 45%;">Script URL or Handle (one URL per line)</th>
+						<th style="width: 45%;">Script URL or Handle (one per line)</th>
 						<th style="width: 45%;">Disable Scope</th>
 						<th style="width: 10%;">Action</th>
 					</tr>
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 					$js_rules = get_option('rapidpress_js_disable_rules', array());
 					foreach ($js_rules as $index => $rule) {
 						echo '<tr>';
-						echo '<td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[' . $index . '][scripts]" placeholder="Script URL or Handle">' . esc_textarea(implode("\n", $rule['scripts'])) . '</textarea></td>';
+						echo '<td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[' . $index . '][scripts]" placeholder="Script URL or Handle (one per line)">' . esc_textarea(implode("\n", $rule['scripts'])) . '</textarea></td>';
 						echo '<td>';
 						echo '<select name="rapidpress_js_disable_rules[' . $index . '][scope]" class="js-disable-scope">';
 						echo '<option value="entire_site" ' . selected($rule['scope'], 'entire_site', false) . '>Entire Site</option>';

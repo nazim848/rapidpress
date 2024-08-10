@@ -130,13 +130,19 @@ class RapidPress_Asset_Manager {
 		return is_front_page() || is_home();
 	}
 
-	private function disable_script($handle) {
-		if (wp_script_is($handle, 'enqueued')) {
-			wp_dequeue_script($handle);
+	private function disable_script($script) {
+		if (wp_script_is($script, 'enqueued')) {
+			wp_dequeue_script($script);
 		}
-		if (wp_script_is($handle, 'registered')) {
-			wp_deregister_script($handle);
+		if (wp_script_is($script, 'registered')) {
+			wp_deregister_script($script);
 		}
+		add_filter('script_loader_tag', function ($tag, $handle) use ($script) {
+			if (strpos($tag, $script) !== false) {
+				return '';
+			}
+			return $tag;
+		}, 10, 2);
 	}
 
 	public function remove_script_tag($tag, $handle) {
@@ -168,8 +174,14 @@ class RapidPress_Asset_Manager {
 		return isset($rule['pages']) ? $rule['pages'] : array();
 	}
 
+
 	private function get_scripts_from_rule($rule) {
-		return isset($rule['scripts']) ? $rule['scripts'] : array();
+		if (is_array($rule['scripts'])) {
+			return array_filter(array_map('trim', $rule['scripts']));
+		} elseif (is_string($rule['scripts'])) {
+			return array_filter(array_map('trim', explode("\n", $rule['scripts'])));
+		}
+		return array();
 	}
 
 	private function get_current_url() {
