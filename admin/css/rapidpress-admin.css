@@ -137,14 +137,14 @@
 	border: 1px solid #2271b1;
 	color: #2271b1;
 	background: #fff;
-	font-size: 12px;
-	padding: 7px 8px;
+	font-size: 11px;
+	padding: 6px 8px;
 	border-radius: 3px;
 }
 
-.checkbox-btn label span:hover {
+/* .checkbox-btn label span:hover {
 	background: #f6f7f7;
-}
+} */
 
 .checkbox-btn label input {
 	position: absolute;
