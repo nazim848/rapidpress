@@ -102,15 +102,32 @@ class RapidPress_Asset_Manager {
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($js_rules as $rule) {
-			$pages = $this->get_pages_from_rule($rule);
 			$scripts = $this->get_scripts_from_rule($rule);
+			$should_disable = false;
 
-			if (in_array($current_url, $pages)) {
+			switch ($rule['scope']) {
+				case 'entire_site':
+					$should_disable = true;
+					break;
+				case 'front_page':
+					$should_disable = $this->is_front_page();
+					break;
+				case 'specific_pages':
+					$pages = $this->get_pages_from_rule($rule);
+					$should_disable = in_array($current_url, $pages);
+					break;
+			}
+
+			if ($should_disable) {
 				foreach ($scripts as $script) {
 					$this->disable_script($script);
 				}
 			}
 		}
+	}
+
+	private function is_front_page() {
+		return is_front_page() || is_home();
 	}
 
 	private function disable_script($handle) {

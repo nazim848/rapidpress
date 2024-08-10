@@ -241,20 +241,25 @@ class RapidPress_Admin {
 		$sanitized_rules = array();
 		if (is_array($input)) {
 			foreach ($input as $rule) {
-				if (!empty($rule['scripts']) && !empty($rule['pages'])) {
+				if (!empty($rule['scripts'])) {
 					$sanitized_rule = array(
 						'scripts' => array_filter(array_map('trim', explode("\n", sanitize_textarea_field($rule['scripts'])))),
-						'pages' => array_filter(array_map('trailingslashit', array_map('esc_url_raw', explode("\n", sanitize_textarea_field($rule['pages']))))),
+						'scope' => sanitize_text_field($rule['scope']),
+						'pages' => array(),
 					);
-					if (!empty($sanitized_rule['scripts']) && !empty($sanitized_rule['pages'])) {
+					if ($sanitized_rule['scope'] === 'specific_pages' && !empty($rule['pages'])) {
+						$sanitized_rule['pages'] = array_filter(array_map('trailingslashit', array_map('esc_url_raw', explode("\n", sanitize_textarea_field($rule['pages'])))));
+					}
+					if (!empty($sanitized_rule['scripts'])) {
 						$sanitized_rules[] = $sanitized_rule;
 					}
 				}
 			}
 		}
-
 		return $sanitized_rules;
 	}
+
+
 	public function save_settings_with_tab($value, $old_value, $option) {
 		// Clear the CSS cache after saving settings
 		$this->clear_css_cache();
@@ -265,6 +270,7 @@ class RapidPress_Admin {
 				return add_query_arg('tab', $tab, $location);
 			});
 		}
+
 		return $value;
 	}
 

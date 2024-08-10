@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 				<table class="form-table" id="js-asset-management">
 					<tr>
 						<th style="width: 45%;">Script URL or Handle (one URL per line)</th>
-						<th style="width: 45%;">Disable on Pages (one URL per line)</th>
+						<th style="width: 45%;">Disable Scope</th>
 						<th style="width: 10%;">Action</th>
 					</tr>
 					<?php
@@ -21,7 +21,14 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 					foreach ($js_rules as $index => $rule) {
 						echo '<tr>';
 						echo '<td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[' . $index . '][scripts]" placeholder="Script URL or Handle">' . esc_textarea(implode("\n", $rule['scripts'])) . '</textarea></td>';
-						echo '<td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[' . $index . '][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/">' . esc_textarea(implode("\n", $rule['pages'])) . '</textarea></td>';
+						echo '<td>';
+						echo '<select name="rapidpress_js_disable_rules[' . $index . '][scope]" class="js-disable-scope">';
+						echo '<option value="entire_site" ' . selected($rule['scope'], 'entire_site', false) . '>Entire Site</option>';
+						echo '<option value="front_page" ' . selected($rule['scope'], 'front_page', false) . '>Front Page</option>';
+						echo '<option value="specific_pages" ' . selected($rule['scope'], 'specific_pages', false) . '>Specific Pages</option>';
+						echo '</select>';
+						echo '<textarea cols="65" rows="3" name="rapidpress_js_disable_rules[' . $index . '][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="js-disable-pages" style="display:' . ($rule['scope'] === 'specific_pages' ? 'block' : 'none') . ';">' . esc_textarea(implode("\n", $rule['pages'])) . '</textarea>';
+						echo '</td>';
 						echo '<td><button type="button" class="button remove-js-rule">Remove</button></td>';
 						echo '</tr>';
 					}
