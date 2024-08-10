@@ -288,5 +288,15 @@ class RapidPressAdmin {
 
 // Initialize the admin functionality
 jQuery(function ($) {
-	new RapidPressAdmin($);
+	const rapidPressAdmin = new RapidPressAdmin($);
+
+	// Make setActiveTab accessible globally
+	window.setActiveTab = function (tab) {
+		rapidPressAdmin.setActiveTab(tab);
+	};
+
+	// Initialize tabs
+	const urlParams = new URLSearchParams(window.location.search);
+	const activeTab = urlParams.get("tab") || "dashboard";
+	setActiveTab(activeTab);
 });
