@@ -44,16 +44,24 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 			<div class="rapidpress-card">
 				<table class="form-table" id="css-asset-management">
 					<tr>
-						<th style="width: 45%;">CSS URL or Handle (one URL per line)</th>
-						<th style="width: 45%;">Disable on Pages (one URL per line)</th>
+						<th style="width: 45%;">CSS URL or Handle (one per line)</th>
+						<th style="width: 45%;">Disable Scope</th>
 						<th style="width: 10%;">Action</th>
 					</tr>
 					<?php
 					$css_rules = get_option('rapidpress_css_disable_rules', array());
 					foreach ($css_rules as $index => $rule) {
+						$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site'; // Default to 'entire_site' if not set
 						echo '<tr>';
-						echo '<td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[' . $index . '][styles]" placeholder="Style URL or Handle">' . esc_textarea(implode("\n", $rule['styles'])) . '</textarea></td>';
-						echo '<td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[' . $index . '][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/">' . esc_textarea(implode("\n", $rule['pages'])) . '</textarea></td>';
+						echo '<td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[' . $index . '][styles]" placeholder="CSS URL or Handle (one per line)">' . esc_textarea(implode("\n", isset($rule['styles']) ? $rule['styles'] : array())) . '</textarea></td>';
+						echo '<td>';
+						echo '<select name="rapidpress_css_disable_rules[' . $index . '][scope]" class="css-disable-scope">';
+						echo '<option value="entire_site" ' . selected($scope, 'entire_site', false) . '>Entire Site</option>';
+						echo '<option value="front_page" ' . selected($scope, 'front_page', false) . '>Front Page</option>';
+						echo '<option value="specific_pages" ' . selected($scope, 'specific_pages', false) . '>Specific Pages</option>';
+						echo '</select>';
+						echo '<textarea cols="65" rows="3" name="rapidpress_css_disable_rules[' . $index . '][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="css-disable-pages" style="display:' . ($scope === 'specific_pages' ? 'block' : 'none') . ';">' . esc_textarea(implode("\n", isset($rule['pages']) ? $rule['pages'] : array())) . '</textarea>';
+						echo '</td>';
 						echo '<td><button type="button" class="button remove-css-rule">Remove</button></td>';
 						echo '</tr>';
 					}

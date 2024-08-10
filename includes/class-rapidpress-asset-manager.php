@@ -16,26 +16,11 @@ class RapidPress_Asset_Manager {
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($css_rules as $rule) {
-			$pages = $this->get_pages_from_rule($rule);
 			$styles = $this->get_styles_from_rule($rule);
+			$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site';
+			$should_disable = $this->should_disable_for_scope($scope, $current_url, $rule);
 
-			if (in_array($current_url, $pages)) {
-				foreach ($styles as $style) {
-					$this->disable_style($style);
-				}
-			}
-		}
-	}
-
-	public function final_css_cleanup() {
-		$css_rules = get_option('rapidpress_css_disable_rules', array());
-		$current_url = trailingslashit($this->get_current_url());
-
-		foreach ($css_rules as $rule) {
-			$pages = $this->get_pages_from_rule($rule);
-			$styles = $this->get_styles_from_rule($rule);
-
-			if (in_array($current_url, $pages)) {
+			if ($should_disable) {
 				foreach ($styles as $style) {
 					$this->disable_style($style);
 				}
@@ -52,6 +37,37 @@ class RapidPress_Asset_Manager {
 		}
 	}
 
+	public function final_css_cleanup() {
+		$css_rules = get_option('rapidpress_css_disable_rules', array());
+		$current_url = trailingslashit($this->get_current_url());
+
+		foreach ($css_rules as $rule) {
+			$styles = $this->get_styles_from_rule($rule);
+			$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site';
+			$should_disable = $this->should_disable_for_scope($scope, $current_url, $rule);
+
+			if ($should_disable) {
+				foreach ($styles as $style) {
+					$this->disable_style($style);
+				}
+			}
+		}
+	}
+
+	private function should_disable_for_scope($scope, $current_url, $rule) {
+		switch ($scope) {
+			case 'entire_site':
+				return true;
+			case 'front_page':
+				return $this->is_front_page();
+			case 'specific_pages':
+				$pages = $this->get_pages_from_rule($rule);
+				return in_array($current_url, $pages);
+			default:
+				return false;
+		}
+	}
+
 	public function remove_style_tag($tag, $handle) {
 		$css_rules = get_option('rapidpress_css_disable_rules', array());
 
@@ -62,10 +78,11 @@ class RapidPress_Asset_Manager {
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($css_rules as $rule) {
-			$pages = $this->get_pages_from_rule($rule);
 			$styles = $this->get_styles_from_rule($rule);
+			$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site';
+			$should_disable = $this->should_disable_for_scope($scope, $current_url, $rule);
 
-			if (in_array($current_url, $pages)) {
+			if ($should_disable) {
 				foreach ($styles as $style) {
 					if ($handle === $style || strpos($tag, $style) !== false) {
 						return '';

@@ -162,6 +162,33 @@ class RapidPress_Admin {
 		}
 	}
 
+	public function sanitize_css_disable_rules($input) {
+		$sanitized_rules = array();
+		if (is_array($input)) {
+			foreach ($input as $rule) {
+				if (!empty($rule['styles'])) {
+					$sanitized_rule = array(
+						'styles' => is_array($rule['styles'])
+							? array_filter(array_map('trim', $rule['styles']))
+							: array_filter(array_map('trim', explode("\n", sanitize_textarea_field($rule['styles'])))),
+						'scope' => isset($rule['scope']) ? sanitize_text_field($rule['scope']) : 'entire_site',
+						'pages' => array(),
+					);
+					if ($sanitized_rule['scope'] === 'specific_pages' && !empty($rule['pages'])) {
+						$sanitized_rule['pages'] = is_array($rule['pages'])
+							? array_filter(array_map('trailingslashit', array_map('esc_url_raw', $rule['pages'])))
+							: array_filter(array_map('trailingslashit', array_map('esc_url_raw', explode("\n", sanitize_textarea_field($rule['pages'])))));
+					}
+					if (!empty($sanitized_rule['styles'])) {
+						$sanitized_rules[] = $sanitized_rule;
+					}
+				}
+			}
+		}
+		return $sanitized_rules;
+	}
+
+
 	public function sanitize_excluded_pages($input) {
 		$pages = explode("\n", $input);
 		$sanitized_pages = array();
@@ -180,24 +207,6 @@ class RapidPress_Admin {
 		return implode("\n", array_filter($sanitized_pages));
 	}
 
-	public function sanitize_css_disable_rules($input) {
-		$sanitized_rules = array();
-		if (is_array($input)) {
-			foreach ($input as $rule) {
-				if (!empty($rule['styles']) && !empty($rule['pages'])) {
-					$sanitized_rule = array(
-						'styles' => array_filter(array_map('trim', explode("\n", sanitize_textarea_field($rule['styles'])))),
-						'pages' => array_filter(array_map('trailingslashit', array_map('esc_url_raw', explode("\n", sanitize_textarea_field($rule['pages']))))),
-					);
-					if (!empty($sanitized_rule['styles']) && !empty($sanitized_rule['pages'])) {
-						$sanitized_rules[] = $sanitized_rule;
-					}
-				}
-			}
-		}
-
-		return $sanitized_rules;
-	}
 
 	public function sanitize_css_combine_exclusions($input) {
 		$sanitized = array();

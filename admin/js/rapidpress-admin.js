@@ -39,6 +39,16 @@
 				$pagesTextarea.hide();
 			}
 		});
+
+		// Handle CSS disable scope change
+		$(document).on("change", ".css-disable-scope", function () {
+			var $pagesTextarea = $(this).siblings(".css-disable-pages");
+			if ($(this).val() === "specific_pages") {
+				$pagesTextarea.show();
+			} else {
+				$pagesTextarea.hide();
+			}
+		});
 	});
 
 	// Helper function to update URL parameter
@@ -115,8 +125,15 @@
 			} else if (ruleName === "css") {
 				newRow = `
 						<tr>
-							 <td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[new_${Date.now()}][styles]" placeholder="Style URL or Handle (one per line)"></textarea></td>
-							 <td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[new_${Date.now()}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/"></textarea></td>
+							 <td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[new_${Date.now()}][styles]" placeholder="CSS URL or Handle (one per line)"></textarea></td>
+							 <td>
+								  <select name="rapidpress_css_disable_rules[new_${Date.now()}][scope]" class="css-disable-scope">
+										<option value="entire_site">Entire Site</option>
+										<option value="front_page">Front Page</option>
+										<option value="specific_pages">Specific Pages</option>
+								  </select>
+								  <textarea cols="65" rows="3" name="rapidpress_css_disable_rules[new_${Date.now()}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="css-disable-pages" style="display:none;"></textarea>
+							 </td>
 							 <td><button type="button" class="button remove-css-rule">Remove</button></td>
 						</tr>`;
 			}

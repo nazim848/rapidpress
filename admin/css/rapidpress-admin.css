@@ -117,6 +117,7 @@
 	display: block;
 }
 
-.js-disable-scope {
+.js-disable-scope,
+.css-disable-scope {
 	margin-bottom: 10px;
 }
