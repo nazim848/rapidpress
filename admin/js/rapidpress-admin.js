@@ -104,9 +104,20 @@
 		toggle(); // Initial state
 	}
 
-	// Modify the addRuleRow function for JS
+	// Modify the addRuleRow function
 	function addRuleRow(buttonId, tableId, ruleName) {
+		const $table = $(tableId);
+		const $tableHead = $table.find("tr:first");
+
+		// Show table head if there are existing rows
+		if ($table.find("tr").length > 1) {
+			$tableHead.show();
+		} else {
+			$tableHead.hide();
+		}
+
 		$(buttonId).on("click", function () {
+			$tableHead.show(); // Show table head when adding a new rule
 			var newRow = "";
 			if (ruleName === "js") {
 				newRow = `
@@ -137,11 +148,14 @@
 							 <td><button type="button" class="button remove-css-rule">Remove</button></td>
 						</tr>`;
 			}
-			$(tableId).append(newRow);
+			$table.append(newRow);
 		});
 
 		$(document).on("click", `.remove-${ruleName}-rule`, function () {
 			$(this).closest("tr").remove();
+			if ($table.find("tr").length === 1) {
+				$tableHead.hide(); // Hide table head if no rules remain
+			}
 		});
 	}
 

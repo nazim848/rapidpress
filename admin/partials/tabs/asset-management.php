@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 		<div class="accordion-content">
 			<div class="rapidpress-card">
 				<table class="form-table" id="js-asset-management">
-					<tr>
+					<tr class="table-head">
 						<th style="width: 45%;">Script URL or Handle (one per line)</th>
 						<th style="width: 45%;">Disable Scope</th>
 						<th style="width: 10%;">Action</th>
@@ -43,7 +43,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 		<div class="accordion-content">
 			<div class="rapidpress-card">
 				<table class="form-table" id="css-asset-management">
-					<tr>
+					<tr class="table-head">
 						<th style="width: 45%;">CSS URL or Handle (one per line)</th>
 						<th style="width: 45%;">Disable Scope</th>
 						<th style="width: 10%;">Action</th>
