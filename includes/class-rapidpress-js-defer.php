@@ -11,10 +11,12 @@ class RapidPress_JS_Defer {
 			return $tag;
 		}
 
-		$exclusions = $this->get_exclusions();
-
-		if ($this->is_excluded($src, $exclusions)) {
-			return $tag;
+		$enable_exclusions = get_option('rapidpress_enable_js_defer_exclusions', '0');
+		if ($enable_exclusions === '1') {
+			$exclusions = $this->get_exclusions();
+			if ($this->is_excluded($src, $exclusions)) {
+				return $tag;
+			}
 		}
 
 		if (strpos($tag, 'defer') !== false) {
@@ -25,12 +27,26 @@ class RapidPress_JS_Defer {
 	}
 
 	private function get_exclusions() {
+
+		// $enable_exclusions = get_option('rapidpress_enable_js_defer_exclusions', '0');
+		// if ($enable_exclusions !== '1') {
+		// 	return true;
+		// }
+
 		$exclusions_string = get_option('rapidpress_js_defer_exclusions', '');
 		return array_filter(array_map('trim', explode("\n", $exclusions_string)));
 	}
 
 	private function is_excluded($src, $exclusions) {
+
+
 		foreach ($exclusions as $exclusion) {
+
+			$enable_exclusions = get_option('rapidpress_enable_js_defer_exclusions', '0');
+			if ($enable_exclusions !== '1') {
+				return true;
+			}
+
 			if (strpos($src, $exclusion) !== false) {
 				return true;
 			}

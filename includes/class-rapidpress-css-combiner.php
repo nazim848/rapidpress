@@ -18,7 +18,13 @@ class RapidPress_CSS_Combiner {
 	}
 
 	private function set_excluded_files() {
-		$exclusions = get_option('rapidpress_css_exclusions', '');
+
+		$enable_exclusions = get_option('rapidpress_enable_combine_css_exclusions', '0');
+		if ($enable_exclusions !== '1') {
+			return true;
+		}
+
+		$exclusions = get_option('rapidpress_combine_css_exclusions', '');
 		$this->excluded_files = array_filter(array_map('trim', explode("\n", $exclusions)));
 	}
 

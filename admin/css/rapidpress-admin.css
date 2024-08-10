@@ -2,6 +2,15 @@
 	margin-top: 20px;
 }
 
+.rapidpress-admin-content ::-ms-input-placeholder {
+	/* Edge 12-18 */
+	color: red !important;
+}
+
+.rapidpress-admin-content ::placeholder {
+	color: #999 !important;
+}
+
 .nav-tab-wrapper {
 	margin-bottom: 20px;
 }
@@ -38,7 +47,7 @@
 }
 
 .rapidpress-card td label {
-	padding: 10px;
+	padding: 10px 0;
 	cursor: pointer;
 	-webkit-user-select: none; /* Safari */
 	-ms-user-select: none; /* IE 10 and IE 11 */
@@ -98,6 +107,7 @@
 
 .accordion-content {
 	display: none;
+	overflow: hidden;
 }
 
 .accordion-content .form-table td {
@@ -106,4 +116,42 @@
 
 .accordion-content.active {
 	display: block;
+}
+
+.js-disable-scope,
+.css-disable-scope {
+	margin-bottom: 10px;
+}
+
+.checkbox-btn {
+	overflow: hidden;
+	margin-top: 15px;
+}
+
+.hidden {
+	display: none;
+}
+
+.checkbox-btn label span {
+	text-align: center;
+	display: inline-block;
+	border: 1px solid #2271b1;
+	color: #2271b1;
+	background: #fff;
+	font-size: 11px;
+	padding: 6px 8px;
+	border-radius: 3px;
+}
+
+/* .checkbox-btn label span:hover {
+	background: #f6f7f7;
+} */
+
+.checkbox-btn label input {
+	position: absolute;
+	display: none;
+}
+
+.checkbox-btn input:checked + span {
+	background-color: #edf7ff;
 }
