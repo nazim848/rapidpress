@@ -25,16 +25,16 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 				</td>
 			</tr>
 			<tr valign="top" id="rapidpress_specific_pages_row" style="display: none;">
-				<th scope="row">Page Inclusions</th>
+				<th scope="row">Specific Pages</th>
 				<td>
 					<textarea name="rapidpress_optimized_pages" id="rapidpress_optimized_pages" rows="3" cols="70" placeholder="Enter one page URL per line"><?php echo esc_textarea(get_option('rapidpress_optimized_pages', '')); ?></textarea>
 					<p class="description">Enter the URLs of the pages you want to optimize, one URL per line.</p>
 				</td>
 			</tr>
-			<tr valign="top" id="rapidpress_excluded_pages_row" style="display: none;">
+			<tr valign="top" id="rapidpress_optimization_excluded_pages_row" style="display: none;">
 				<th scope="row">Page Exclusions</th>
 				<td>
-					<textarea name="rapidpress_excluded_pages" id="rapidpress_excluded_pages" rows="3" cols="70" placeholder="Enter one page URL per line"><?php echo esc_textarea(get_option('rapidpress_excluded_pages', '')); ?></textarea>
+					<textarea name="rapidpress_optimization_excluded_pages" id="rapidpress_optimization_excluded_pages" rows="3" cols="70" placeholder="Enter one page URL per line"><?php echo esc_textarea(get_option('rapidpress_optimization_excluded_pages', '')); ?></textarea>
 					<p class="description">Enter the URLs of the pages you want to exclude from optimization, one URL per line.</p>
 				</td>
 			</tr>
@@ -75,10 +75,10 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 				</td>
 				</td>
 			</tr>
-			<tr valign="top" id="rapidpress_css_exclusions_row" style="display: none;">
+			<tr valign="top" id="rapidpress_combine_css_exclusions_row" style="display: none;">
 				<th scope="row">CSS Exclusions</th>
 				<td>
-					<textarea name="rapidpress_css_exclusions" rows="3" cols="70" placeholder="Enter one CSS file URL per line"><?php echo esc_textarea(get_option('rapidpress_css_exclusions', '')); ?></textarea>
+					<textarea name="rapidpress_combine_css_exclusions" rows="3" cols="70" placeholder="Enter one CSS file URL per line"><?php echo esc_textarea(get_option('rapidpress_combine_css_exclusions', '')); ?></textarea>
 					<p class="description">Enter the URLs of CSS files you want to exclude from combination, one per line.</p>
 				</td>
 			</tr>
@@ -106,7 +106,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 					</div>
 				</td>
 			</tr>
-			<tr valign="top" id="rapidpress_js_defer_exclusions_row">
+			<tr valign="top" id="rapidpress_js_defer_exclusions_row" style="display: none;">
 				<th scope="row">JavaScript Defer Exclusions</th>
 				<td>
 					<textarea name="rapidpress_js_defer_exclusions" rows="3" cols="70" placeholder="Enter one JavaScript file URL per line"><?php echo esc_textarea(get_option('rapidpress_js_defer_exclusions', '')); ?></textarea>
@@ -114,18 +114,12 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 				</td>
 			</tr>
 			<tr valign="top">
-				<th scope="row">Delay JavaScript Execution</th>
+				<th scope="row">Delay JavaScript Loading</th>
 				<td>
 					<label>
 						<input type="checkbox" name="rapidpress_js_delay" id="rapidpress_js_delay" value="1" <?php checked(1, get_option('rapidpress_js_delay'), true); ?> />
 						Enable JavaScript delay
 					</label>
-					<div class="checkbox-btn" id="rapidpress_enable_js_delay_exclusions_btn">
-						<label>
-							<input type="checkbox" name="rapidpress_enable_js_delay_exclusions" id="rapidpress_enable_js_delay_exclusions" value="1" <?php checked(1, get_option('rapidpress_enable_js_delay_exclusions'), true); ?> />
-							<span>Enable JS Delay Exclusions</span>
-						</label>
-					</div>
 				</td>
 			</tr>
 			<tr valign="top" id="rapidpress_js_delay_options" style="display: none;">
@@ -137,6 +131,12 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 						<option value="3" <?php selected(get_option('rapidpress_js_delay_duration'), '3'); ?>>3 seconds</option>
 						<option value="interaction" <?php selected(get_option('rapidpress_js_delay_duration'), 'interaction'); ?>>Until user interaction</option>
 					</select>
+					<div class="checkbox-btn" id="rapidpress_enable_js_delay_exclusions_btn">
+						<label>
+							<input type="checkbox" name="rapidpress_enable_js_delay_exclusions" id="rapidpress_enable_js_delay_exclusions" value="1" <?php checked(1, get_option('rapidpress_enable_js_delay_exclusions'), true); ?> />
+							<span>Enable JS Delay Exclusions</span>
+						</label>
+					</div>
 				</td>
 			</tr>
 			<tr valign="top" id="rapidpress_js_delay_exclusions_row" style="display: none;">

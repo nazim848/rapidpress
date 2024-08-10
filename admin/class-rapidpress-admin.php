@@ -107,14 +107,29 @@ class RapidPress_Admin {
 
 	public function register_settings() {
 		$settings = array(
+			'rapidpress_optimization_scope' => array(
+				'type' => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			),
+			'rapidpress_optimized_pages' => array(
+				'type' => 'string',
+				'sanitize_callback' => array($this, 'sanitize_optimized_pages'),
+			),
+			'rapidpress_enable_scope_exclusions' => 'boolean',
+			'rapidpress_optimization_excluded_pages' => array(
+				'type' => 'string',
+				'sanitize_callback' => array($this, 'sanitize_optimization_excluded_pages'),
+			),
 			'rapidpress_html_minify' => 'boolean',
 			'rapidpress_css_minify' => 'boolean',
 			'rapidpress_combine_css' => 'boolean',
+			'rapidpress_enable_css_combine_exclusions' => 'boolean',
+			'rapidpress_combine_css_exclusions' => array(
+				'sanitize_callback' => array($this, 'sanitize_combine_css_exclusions'),
+			),
 			'rapidpress_js_minify' => 'boolean',
 			'rapidpress_js_defer' => 'boolean',
-			'rapidpress_css_exclusions' => array(
-				'sanitize_callback' => array($this, 'sanitize_css_combine_exclusions'),
-			),
+			'rapidpress_enable_js_defer_exclusions' => 'boolean',
 			'rapidpress_js_defer_exclusions' => array(
 				'sanitize_callback' => array($this, 'sanitize_js_defer_exclusions'),
 			),
@@ -123,6 +138,7 @@ class RapidPress_Admin {
 				'type' => 'string',
 				'sanitize_callback' => array($this, 'sanitize_js_delay_duration'),
 			),
+			'rapidpress_enable_js_delay_exclusions' => 'boolean',
 			'rapidpress_js_delay_exclusions' => array(
 				'sanitize_callback' => array($this, 'sanitize_js_delay_exclusions'),
 			),
@@ -134,22 +150,7 @@ class RapidPress_Admin {
 				'type' => 'array',
 				'sanitize_callback' => array($this, 'sanitize_css_disable_rules'),
 			),
-			'rapidpress_optimization_scope' => array(
-				'type' => 'string',
-				'sanitize_callback' => 'sanitize_text_field',
-			),
-			'rapidpress_optimized_pages' => array(
-				'type' => 'string',
-				'sanitize_callback' => array($this, 'sanitize_optimized_pages'),
-			),
-			'rapidpress_excluded_pages' => array(
-				'type' => 'string',
-				'sanitize_callback' => array($this, 'sanitize_excluded_pages'),
-			),
-			'rapidpress_enable_scope_exclusions' => 'boolean',
-			'rapidpress_enable_css_combine_exclusions' => 'boolean',
-			'rapidpress_enable_js_defer_exclusions' => 'boolean',
-			'rapidpress_enable_js_delay_exclusions' => 'boolean',
+
 		);
 
 		foreach ($settings as $setting => $options) {
@@ -192,7 +193,7 @@ class RapidPress_Admin {
 	}
 
 
-	public function sanitize_excluded_pages($input) {
+	public function sanitize_optimization_excluded_pages($input) {
 		$pages = explode("\n", $input);
 		$sanitized_pages = array();
 		foreach ($pages as $page) {
@@ -211,7 +212,7 @@ class RapidPress_Admin {
 	}
 
 
-	public function sanitize_css_combine_exclusions($input) {
+	public function sanitize_combine_css_exclusions($input) {
 		$sanitized = array();
 		$lines = explode("\n", $input);
 		foreach ($lines as $line) {

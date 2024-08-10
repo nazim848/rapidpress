@@ -2,35 +2,36 @@
 	"use strict";
 
 	$(document).ready(function () {
+		// Optimization Scope
 		$("#rapidpress_optimization_scope")
 			.change(function () {
 				if ($(this).val() === "specific_pages") {
 					$("#rapidpress_specific_pages_row").show();
-					$("#rapidpress_excluded_pages_row").hide();
+					$("#rapidpress_optimization_excluded_pages_row").hide();
 					$("#rapidpress_enable_scope_exclusions_label").hide();
 				} else if ($(this).val() === "entire_site") {
 					$("#rapidpress_specific_pages_row").hide();
 					$("#rapidpress_enable_scope_exclusions_label").show();
 					if ($("#rapidpress_enable_scope_exclusions").is(":checked")) {
-						$("#rapidpress_excluded_pages_row").show();
+						$("#rapidpress_optimization_excluded_pages_row").show();
 					}
 				} else {
 					$("#rapidpress_specific_pages_row").hide();
 					$("#rapidpress_enable_scope_exclusions_label").hide();
-					$("#rapidpress_excluded_pages_row").hide();
+					$("#rapidpress_optimization_excluded_pages_row").hide();
 				}
 			})
 			.change(); // Trigger change event on page load
+
 		$("#rapidpress_enable_scope_exclusions").change(function () {
 			if ($(this).is(":checked")) {
-				$("#rapidpress_excluded_pages_row").show();
+				$("#rapidpress_optimization_excluded_pages_row").show();
 			} else {
-				$("#rapidpress_excluded_pages_row").hide();
+				$("#rapidpress_optimization_excluded_pages_row").hide();
 			}
 		});
-		// $("#rapidpress_enable_exclusions").change();
 
-		// Handle combine css click event
+		// Enable combine css
 		$("#rapidpress_combine_css")
 			.change(function () {
 				if ($(this).is(":checked")) {
@@ -38,20 +39,71 @@
 					if (
 						$("#rapidpress_enable_css_combine_exclusions").is(":checked")
 					) {
-						$("#rapidpress_css_exclusions_row").show();
+						$("#rapidpress_combine_css_exclusions_row").show();
 					}
 				} else {
 					$("#rapidpress_enable_css_combine_exclusions_btn").hide();
-					$("#rapidpress_css_exclusions_row").hide();
+					$("#rapidpress_combine_css_exclusions_row").hide();
 				}
 			})
 			.change();
 
+		// enable combine css exclusions
 		$("#rapidpress_enable_css_combine_exclusions").change(function () {
 			if ($(this).is(":checked")) {
-				$("#rapidpress_css_exclusions_row").show();
+				$("#rapidpress_combine_css_exclusions_row").show();
 			} else {
-				$("#rapidpress_css_exclusions_row").hide();
+				$("#rapidpress_combine_css_exclusions_row").hide();
+			}
+		});
+
+		// Enable js defer
+		$("#rapidpress_js_defer")
+			.change(function () {
+				if ($(this).is(":checked")) {
+					$("#rapidpress_enable_js_defer_exclusions_btn").show();
+					if ($("#rapidpress_enable_js_defer_exclusions").is(":checked")) {
+						$("#rapidpress_js_defer_exclusions_row").show();
+					}
+				} else {
+					$("#rapidpress_enable_js_defer_exclusions_btn").hide();
+					$("#rapidpress_js_defer_exclusions_row").hide();
+				}
+			})
+			.change();
+
+		// enable js defer exclusions
+		$("#rapidpress_enable_js_defer_exclusions").change(function () {
+			if ($(this).is(":checked")) {
+				$("#rapidpress_js_defer_exclusions_row").show();
+			} else {
+				$("#rapidpress_js_defer_exclusions_row").hide();
+			}
+		});
+
+		// Enable js delay
+		$("#rapidpress_js_delay")
+			.change(function () {
+				if ($(this).is(":checked")) {
+					$("#rapidpress_js_delay_options").show();
+					$("#rapidpress_enable_js_delay_exclusions_btn").show();
+					if ($("#rapidpress_enable_js_delay_exclusions").is(":checked")) {
+						$("#rapidpress_js_delay_exclusions_row").show();
+					}
+				} else {
+					$("#rapidpress_js_delay_options").hide();
+					$("#rapidpress_enable_js_delay_exclusions_btn").hide();
+					$("#rapidpress_js_delay_exclusions_row").hide();
+				}
+			})
+			.change();
+
+		//enable js delay exclusions
+		$("#rapidpress_enable_js_delay_exclusions").change(function () {
+			if ($(this).is(":checked")) {
+				$("#rapidpress_js_delay_exclusions_row").show();
+			} else {
+				$("#rapidpress_js_delay_exclusions_row").hide();
 			}
 		});
 
@@ -227,16 +279,16 @@
 		// Toggle visibility for various options
 		// toggleVisibility(
 		// 	"#rapidpress_combine_css",
-		// 	"#rapidpress_css_exclusions_row"
+		// 	"#rapidpress_combine_css_exclusions_row"
 		// );
-		toggleVisibility(
-			"#rapidpress_js_defer",
-			"#rapidpress_js_defer_exclusions_row"
-		);
-		toggleVisibility(
-			"#rapidpress_js_delay",
-			"#rapidpress_js_delay_options, #rapidpress_js_delay_exclusions_row"
-		);
+		// toggleVisibility(
+		// 	"#rapidpress_js_defer",
+		// 	"#rapidpress_js_defer_exclusions_row"
+		// );
+		// toggleVisibility(
+		// 	"#rapidpress_js_delay",
+		// 	"#rapidpress_js_delay_options, #rapidpress_js_delay_exclusions_row"
+		// );
 
 		// Accordion functionality
 		$(document).on("click", ".accordion-header", function (e) {

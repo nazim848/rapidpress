@@ -24,7 +24,7 @@ class RapidPress_CSS_Combiner {
 			return true;
 		}
 
-		$exclusions = get_option('rapidpress_css_exclusions', '');
+		$exclusions = get_option('rapidpress_combine_css_exclusions', '');
 		$this->excluded_files = array_filter(array_map('trim', explode("\n", $exclusions)));
 	}
 

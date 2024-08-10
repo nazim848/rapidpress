@@ -25,7 +25,7 @@ class RapidPress_Optimization_Scope {
 			return true;
 		}
 
-		$excluded_pages = get_option('rapidpress_excluded_pages', '');
+		$excluded_pages = get_option('rapidpress_optimization_excluded_pages', '');
 		$excluded_pages = array_filter(array_map('trim', explode("\n", $excluded_pages)));
 
 		if (empty($excluded_pages)) {
