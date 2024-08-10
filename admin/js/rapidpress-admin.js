@@ -28,7 +28,30 @@
 				$("#rapidpress_excluded_pages_row").hide();
 			}
 		});
-		$("#rapidpress_enable_exclusions").change();
+		// $("#rapidpress_enable_exclusions").change();
+
+		// Handle combine css click event
+		$("#rapidpress_combine_css")
+			.change(function () {
+				if ($(this).is(":checked")) {
+					$("#rapidpress_enable_css_exclusions_btn").show();
+					if ($("#rapidpress_enable_css_exclusions").is(":checked")) {
+						$("#rapidpress_css_exclusions_row").show();
+					}
+				} else {
+					$("#rapidpress_enable_css_exclusions_btn").hide();
+					$("#rapidpress_css_exclusions_row").hide();
+				}
+			})
+			.change();
+
+		$("#rapidpress_enable_css_exclusions").change(function () {
+			if ($(this).is(":checked")) {
+				$("#rapidpress_css_exclusions_row").show();
+			} else {
+				$("#rapidpress_css_exclusions_row").hide();
+			}
+		});
 
 		// Handle JS disable scope change
 		$(document).on("change", ".js-disable-scope", function () {
@@ -200,10 +223,10 @@
 		});
 
 		// Toggle visibility for various options
-		toggleVisibility(
-			"#rapidpress_combine_css",
-			"#rapidpress_css_exclusions_row"
-		);
+		// toggleVisibility(
+		// 	"#rapidpress_combine_css",
+		// 	"#rapidpress_css_exclusions_row"
+		// );
 		toggleVisibility(
 			"#rapidpress_js_defer",
 			"#rapidpress_js_defer_exclusions_row"

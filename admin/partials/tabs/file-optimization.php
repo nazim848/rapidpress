@@ -66,9 +66,23 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 						<input type="checkbox" name="rapidpress_combine_css" id="rapidpress_combine_css" value="1" <?php checked(1, get_option('rapidpress_combine_css'), true); ?> />
 						Enable CSS file combination
 					</label>
+					<!-- <div id="rapidpress_css_exclusions_button" style="margin-top: 15px">
+						<button class="button button-small button-secondary">CSS Exclusions</button>
+					</div> -->
+					<div class="checkbox-btn" id="rapidpress_enable_css_exclusions_btn">
+						<label>
+							<input type="checkbox" name="rapidpress_enable_css_exclusions" id="rapidpress_enable_css_exclusions" value="1" <?php checked(1, get_option('rapidpress_enable_css_exclusions'), true); ?> />
+							<span>Enable CSS Exclusions</span>
+						</label>
+					</div>
+				</td>
 				</td>
 			</tr>
-			<tr valign="top" id="rapidpress_css_exclusions_row">
+			<!-- <tr valign="top" id="rapidpress_css_exclusions_button">
+				<th scope="row"></th>
+				<td><button class="button button-small button-secondary">Add Exclusions</button></td>
+			</tr> -->
+			<tr valign="top" id="rapidpress_css_exclusions_row" style="display: none;">
 				<th scope="row">CSS Exclusions</th>
 				<td>
 					<textarea name="rapidpress_css_exclusions" rows="3" cols="70" placeholder="Enter one CSS file URL per line"><?php echo esc_textarea(get_option('rapidpress_css_exclusions', '')); ?></textarea>
