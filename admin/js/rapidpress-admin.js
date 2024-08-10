@@ -34,18 +34,20 @@
 		$("#rapidpress_combine_css")
 			.change(function () {
 				if ($(this).is(":checked")) {
-					$("#rapidpress_enable_css_exclusions_btn").show();
-					if ($("#rapidpress_enable_css_exclusions").is(":checked")) {
+					$("#rapidpress_enable_css_combine_exclusions_btn").show();
+					if (
+						$("#rapidpress_enable_css_combine_exclusions").is(":checked")
+					) {
 						$("#rapidpress_css_exclusions_row").show();
 					}
 				} else {
-					$("#rapidpress_enable_css_exclusions_btn").hide();
+					$("#rapidpress_enable_css_combine_exclusions_btn").hide();
 					$("#rapidpress_css_exclusions_row").hide();
 				}
 			})
 			.change();
 
-		$("#rapidpress_enable_css_exclusions").change(function () {
+		$("#rapidpress_enable_css_combine_exclusions").change(function () {
 			if ($(this).is(":checked")) {
 				$("#rapidpress_css_exclusions_row").show();
 			} else {

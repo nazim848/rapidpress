@@ -66,22 +66,15 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 						<input type="checkbox" name="rapidpress_combine_css" id="rapidpress_combine_css" value="1" <?php checked(1, get_option('rapidpress_combine_css'), true); ?> />
 						Enable CSS file combination
 					</label>
-					<!-- <div id="rapidpress_css_exclusions_button" style="margin-top: 15px">
-						<button class="button button-small button-secondary">CSS Exclusions</button>
-					</div> -->
-					<div class="checkbox-btn" id="rapidpress_enable_css_exclusions_btn">
+					<div class="checkbox-btn" id="rapidpress_enable_css_combine_exclusions_btn">
 						<label>
-							<input type="checkbox" name="rapidpress_enable_css_exclusions" id="rapidpress_enable_css_exclusions" value="1" <?php checked(1, get_option('rapidpress_enable_css_exclusions'), true); ?> />
+							<input type="checkbox" name="rapidpress_enable_css_combine_exclusions" id="rapidpress_enable_css_combine_exclusions" value="1" <?php checked(1, get_option('rapidpress_enable_css_combine_exclusions'), true); ?> />
 							<span>Enable CSS Exclusions</span>
 						</label>
 					</div>
 				</td>
 				</td>
 			</tr>
-			<!-- <tr valign="top" id="rapidpress_css_exclusions_button">
-				<th scope="row"></th>
-				<td><button class="button button-small button-secondary">Add Exclusions</button></td>
-			</tr> -->
 			<tr valign="top" id="rapidpress_css_exclusions_row" style="display: none;">
 				<th scope="row">CSS Exclusions</th>
 				<td>
@@ -105,6 +98,12 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 						<input type="checkbox" name="rapidpress_js_defer" id="rapidpress_js_defer" value="1" <?php checked(1, get_option('rapidpress_js_defer'), true); ?> />
 						Enable JavaScript deferring
 					</label>
+					<div class="checkbox-btn" id="rapidpress_enable_js_defer_exclusions_btn">
+						<label>
+							<input type="checkbox" name="rapidpress_enable_js_defer_exclusions" id="rapidpress_enable_js_defer_exclusions" value="1" <?php checked(1, get_option('rapidpress_enable_js_defer_exclusions'), true); ?> />
+							<span>Enable JS Defer Exclusions</span>
+						</label>
+					</div>
 				</td>
 			</tr>
 			<tr valign="top" id="rapidpress_js_defer_exclusions_row">
@@ -121,6 +120,12 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 						<input type="checkbox" name="rapidpress_js_delay" id="rapidpress_js_delay" value="1" <?php checked(1, get_option('rapidpress_js_delay'), true); ?> />
 						Enable JavaScript delay
 					</label>
+					<div class="checkbox-btn" id="rapidpress_enable_js_delay_exclusions_btn">
+						<label>
+							<input type="checkbox" name="rapidpress_enable_js_delay_exclusions" id="rapidpress_enable_js_delay_exclusions" value="1" <?php checked(1, get_option('rapidpress_enable_js_delay_exclusions'), true); ?> />
+							<span>Enable JS Delay Exclusions</span>
+						</label>
+					</div>
 				</td>
 			</tr>
 			<tr valign="top" id="rapidpress_js_delay_options" style="display: none;">

@@ -147,7 +147,9 @@ class RapidPress_Admin {
 				'sanitize_callback' => array($this, 'sanitize_excluded_pages'),
 			),
 			'rapidpress_enable_scope_exclusions' => 'boolean',
-			'rapidpress_enable_css_exclusions' => 'boolean',
+			'rapidpress_enable_css_combine_exclusions' => 'boolean',
+			'rapidpress_enable_js_defer_exclusions' => 'boolean',
+			'rapidpress_enable_js_delay_exclusions' => 'boolean',
 		);
 
 		foreach ($settings as $setting => $options) {

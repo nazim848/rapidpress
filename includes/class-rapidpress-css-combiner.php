@@ -19,7 +19,7 @@ class RapidPress_CSS_Combiner {
 
 	private function set_excluded_files() {
 
-		$enable_exclusions = get_option('rapidpress_enable_css_exclusions', '0');
+		$enable_exclusions = get_option('rapidpress_enable_css_combine_exclusions', '0');
 		if ($enable_exclusions !== '1') {
 			return true;
 		}
