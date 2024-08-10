@@ -123,7 +123,7 @@ class RapidPress_Admin {
 			'rapidpress_html_minify' => 'boolean',
 			'rapidpress_css_minify' => 'boolean',
 			'rapidpress_combine_css' => 'boolean',
-			'rapidpress_enable_css_combine_exclusions' => 'boolean',
+			'rapidpress_enable_combine_css_exclusions' => 'boolean',
 			'rapidpress_combine_css_exclusions' => array(
 				'sanitize_callback' => array($this, 'sanitize_combine_css_exclusions'),
 			),

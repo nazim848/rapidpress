@@ -66,9 +66,9 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 						<input type="checkbox" name="rapidpress_combine_css" id="rapidpress_combine_css" value="1" <?php checked(1, get_option('rapidpress_combine_css'), true); ?> />
 						Enable CSS file combination
 					</label>
-					<div class="checkbox-btn" id="rapidpress_enable_css_combine_exclusions_btn">
+					<div class="checkbox-btn" id="rapidpress_enable_combine_css_exclusions_btn">
 						<label>
-							<input type="checkbox" name="rapidpress_enable_css_combine_exclusions" id="rapidpress_enable_css_combine_exclusions" value="1" <?php checked(1, get_option('rapidpress_enable_css_combine_exclusions'), true); ?> />
+							<input type="checkbox" name="rapidpress_enable_combine_css_exclusions" id="rapidpress_enable_combine_css_exclusions" value="1" <?php checked(1, get_option('rapidpress_enable_combine_css_exclusions'), true); ?> />
 							<span>Enable CSS Exclusions</span>
 						</label>
 					</div>
