@@ -177,6 +177,7 @@ class RapidPress_Admin {
 						'exclude_enabled' => isset($rule['exclude_enabled']) ? '1' : '0',
 						'exclude_pages' => $this->sanitize_pages($rule['exclude_pages']),
 						'pages' => $this->sanitize_pages($rule['pages']),
+						'is_active' => isset($rule['is_active']) ? '1' : '0',
 					);
 					if (!empty($sanitized_rule['styles'])) {
 						$sanitized_rules[] = $sanitized_rule;

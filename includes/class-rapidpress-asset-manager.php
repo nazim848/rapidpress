@@ -16,6 +16,9 @@ class RapidPress_Asset_Manager {
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($css_rules as $rule) {
+			if (!isset($rule['is_active']) || $rule['is_active'] !== '1') {
+				continue;
+			}
 			$styles = $this->get_styles_from_rule($rule);
 			$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site';
 			$should_disable = $this->should_disable_for_scope($scope, $current_url, $rule);
@@ -28,12 +31,12 @@ class RapidPress_Asset_Manager {
 		}
 	}
 
-	private function disable_style($handle) {
-		if (wp_style_is($handle, 'enqueued')) {
-			wp_dequeue_style($handle);
+	private function disable_style($style) {
+		if (wp_style_is($style, 'enqueued')) {
+			wp_dequeue_style($style);
 		}
-		if (wp_style_is($handle, 'registered')) {
-			wp_deregister_style($handle);
+		if (wp_style_is($style, 'registered')) {
+			wp_deregister_style($style);
 		}
 	}
 
@@ -42,6 +45,9 @@ class RapidPress_Asset_Manager {
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($css_rules as $rule) {
+			if (!isset($rule['is_active']) || $rule['is_active'] !== '1') {
+				continue;
+			}
 			$styles = $this->get_styles_from_rule($rule);
 			$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site';
 			$should_disable = $this->should_disable_for_scope($scope, $current_url, $rule);
@@ -91,6 +97,9 @@ class RapidPress_Asset_Manager {
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($css_rules as $rule) {
+			if (!isset($rule['is_active']) || $rule['is_active'] !== '1') {
+				continue;
+			}
 			$styles = $this->get_styles_from_rule($rule);
 			$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site';
 			$should_disable = $this->should_disable_for_scope($scope, $current_url, $rule);
@@ -108,7 +117,10 @@ class RapidPress_Asset_Manager {
 	}
 
 	private function get_styles_from_rule($rule) {
-		return isset($rule['styles']) ? $rule['styles'] : array();
+		if (isset($rule['styles'])) {
+			return is_array($rule['styles']) ? $rule['styles'] : array_filter(array_map('trim', explode("\n", $rule['styles'])));
+		}
+		return array();
 	}
 
 	public function final_js_cleanup() {

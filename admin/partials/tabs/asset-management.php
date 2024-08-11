@@ -55,8 +55,9 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 			<div class="rapidpress-card">
 				<table class="form-table" id="css-asset-management">
 					<tr class="table-head">
-						<th style="width: 45%;">CSS URL or Handle (one per line)</th>
-						<th style="width: 45%;">Disable Scope</th>
+						<th style="width: 40%;">CSS URL or Handle (one per line)</th>
+						<th style="width: 40%;">Disable Scope</th>
+						<th style="width: 10%;">Status</th>
 						<th style="width: 10%;">Action</th>
 					</tr>
 					<?php
@@ -65,6 +66,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 						$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site';
 						$styles = isset($rule['styles']) ? $rule['styles'] : array();
 						$styles_text = is_array($styles) ? implode("\n", $styles) : $styles;
+						$is_active = isset($rule['is_active']) ? $rule['is_active'] : true;
 						echo '<tr>';
 						echo '<td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[' . $index . '][styles]" placeholder="CSS URL or Handle (one per line)">' . esc_textarea($styles_text) . '</textarea></td>';
 						echo '<td>';
@@ -82,6 +84,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 						$pages_text = is_array($pages) ? implode("\n", $pages) : $pages;
 						echo '<textarea cols="65" rows="3" name="rapidpress_css_disable_rules[' . $index . '][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="css-disable-pages" style="display:' . ($scope === 'specific_pages' ? 'block' : 'none') . ';">' . esc_textarea($pages_text) . '</textarea>';
 						echo '</td>';
+						echo '<td><input type="checkbox" name="rapidpress_css_disable_rules[' . $index . '][is_active]" value="1" ' . checked($is_active, true, false) . '> Active</td>';
 						echo '<td><button type="button" class="button remove-css-rule">Remove</button></td>';
 						echo '</tr>';
 					}
