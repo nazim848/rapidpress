@@ -84,6 +84,10 @@ class RapidPressAdmin {
 						<option value="front_page">Front Page</option>
 						<option value="specific_pages">Specific Pages</option>
 				  </select>
+				  <div class="${ruleName}-exclude-pages-wrapper" style="display:none;">
+                    <label><input type="checkbox" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_enabled]" class="${ruleName}-exclude-enabled" value="1"> Exclude pages?</label>
+                    <textarea cols="65" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-exclude-pages" style="display:none;"></textarea>
+                  </div>
 				  <textarea cols="65" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
 			 </td>
 			 <td><button type="button" class="button remove-${ruleName}-rule">Remove</button></td>
@@ -112,6 +116,51 @@ class RapidPressAdmin {
 		this.setupTabSwitching();
 		this.setupFormSubmission();
 		this.setupSubmitButtonVisibility();
+
+		// Handle JS and CSS disable scope change
+		this.$(document).on(
+			"change",
+			".js-disable-scope, .css-disable-scope",
+			event => {
+				const $select = this.$(event.target);
+				const $row = $select.closest("tr");
+				const $excludeWrapper = $row.find(
+					".js-exclude-pages-wrapper, .css-exclude-pages-wrapper"
+				);
+				const $excludePages = $row.find(
+					".js-exclude-pages, .css-exclude-pages"
+				);
+				const $disablePages = $row.find(
+					".js-disable-pages, .css-disable-pages"
+				);
+
+				if ($select.val() === "entire_site") {
+					$excludeWrapper.show();
+					$disablePages.hide();
+				} else {
+					$excludeWrapper.hide();
+					$excludePages.hide();
+					if ($select.val() === "specific_pages") {
+						$disablePages.show();
+					} else {
+						$disablePages.hide();
+					}
+				}
+			}
+		);
+
+		// Handle exclude pages checkbox change
+		this.$(document).on(
+			"change",
+			".js-exclude-enabled, .css-exclude-enabled",
+			event => {
+				const $checkbox = this.$(event.target);
+				const $excludePages = $checkbox
+					.closest("div")
+					.find(".js-exclude-pages, .css-exclude-pages");
+				$excludePages.toggle($checkbox.is(":checked"));
+			}
+		);
 	}
 
 	setupOptimizationScope() {

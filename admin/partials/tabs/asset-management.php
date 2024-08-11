@@ -19,15 +19,25 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 					<?php
 					$js_rules = get_option('rapidpress_js_disable_rules', array());
 					foreach ($js_rules as $index => $rule) {
+						$scripts = isset($rule['scripts']) ? $rule['scripts'] : array();
+						$scripts_text = is_array($scripts) ? implode("\n", $scripts) : $scripts;
 						echo '<tr>';
-						echo '<td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[' . $index . '][scripts]" placeholder="Script URL or Handle (one per line)">' . esc_textarea(implode("\n", $rule['scripts'])) . '</textarea></td>';
+						echo '<td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[' . $index . '][scripts]" placeholder="Script URL or Handle (one per line)">' . esc_textarea($scripts_text) . '</textarea></td>';
 						echo '<td>';
 						echo '<select name="rapidpress_js_disable_rules[' . $index . '][scope]" class="js-disable-scope">';
 						echo '<option value="entire_site" ' . selected($rule['scope'], 'entire_site', false) . '>Entire Site</option>';
 						echo '<option value="front_page" ' . selected($rule['scope'], 'front_page', false) . '>Front Page</option>';
 						echo '<option value="specific_pages" ' . selected($rule['scope'], 'specific_pages', false) . '>Specific Pages</option>';
 						echo '</select>';
-						echo '<textarea cols="65" rows="3" name="rapidpress_js_disable_rules[' . $index . '][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="js-disable-pages" style="display:' . ($rule['scope'] === 'specific_pages' ? 'block' : 'none') . ';">' . esc_textarea(implode("\n", $rule['pages'])) . '</textarea>';
+						echo '<div class="js-exclude-pages-wrapper" style="display:' . ($rule['scope'] === 'entire_site' ? 'block' : 'none') . ';">';
+						echo '<label><input type="checkbox" name="rapidpress_js_disable_rules[' . $index . '][exclude_enabled]" class="js-exclude-enabled" value="1" ' . checked(isset($rule['exclude_enabled']) ? $rule['exclude_enabled'] : false, true, false) . '> Exclude pages?</label>';
+						$exclude_pages = isset($rule['exclude_pages']) ? $rule['exclude_pages'] : '';
+						$exclude_pages_text = is_array($exclude_pages) ? implode("\n", $exclude_pages) : $exclude_pages;
+						echo '<textarea cols="65" rows="3" name="rapidpress_js_disable_rules[' . $index . '][exclude_pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="js-exclude-pages" style="display:' . (isset($rule['exclude_enabled']) && $rule['exclude_enabled'] ? 'block' : 'none') . ';">' . esc_textarea($exclude_pages_text) . '</textarea>';
+						echo '</div>';
+						$pages = isset($rule['pages']) ? $rule['pages'] : array();
+						$pages_text = is_array($pages) ? implode("\n", $pages) : $pages;
+						echo '<textarea cols="65" rows="3" name="rapidpress_js_disable_rules[' . $index . '][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="js-disable-pages" style="display:' . ($rule['scope'] === 'specific_pages' ? 'block' : 'none') . ';">' . esc_textarea($pages_text) . '</textarea>';
 						echo '</td>';
 						echo '<td><button type="button" class="button remove-js-rule">Remove</button></td>';
 						echo '</tr>';
@@ -52,15 +62,19 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 					$css_rules = get_option('rapidpress_css_disable_rules', array());
 					foreach ($css_rules as $index => $rule) {
 						$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site'; // Default to 'entire_site' if not set
+						$styles = isset($rule['styles']) ? $rule['styles'] : array();
+						$styles_text = is_array($styles) ? implode("\n", $styles) : $styles;
 						echo '<tr>';
-						echo '<td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[' . $index . '][styles]" placeholder="CSS URL or Handle (one per line)">' . esc_textarea(implode("\n", isset($rule['styles']) ? $rule['styles'] : array())) . '</textarea></td>';
+						echo '<td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[' . $index . '][styles]" placeholder="CSS URL or Handle (one per line)">' . esc_textarea($styles_text) . '</textarea></td>';
 						echo '<td>';
 						echo '<select name="rapidpress_css_disable_rules[' . $index . '][scope]" class="css-disable-scope">';
 						echo '<option value="entire_site" ' . selected($scope, 'entire_site', false) . '>Entire Site</option>';
 						echo '<option value="front_page" ' . selected($scope, 'front_page', false) . '>Front Page</option>';
 						echo '<option value="specific_pages" ' . selected($scope, 'specific_pages', false) . '>Specific Pages</option>';
 						echo '</select>';
-						echo '<textarea cols="65" rows="3" name="rapidpress_css_disable_rules[' . $index . '][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="css-disable-pages" style="display:' . ($scope === 'specific_pages' ? 'block' : 'none') . ';">' . esc_textarea(implode("\n", isset($rule['pages']) ? $rule['pages'] : array())) . '</textarea>';
+						$pages = isset($rule['pages']) ? $rule['pages'] : array();
+						$pages_text = is_array($pages) ? implode("\n", $pages) : $pages;
+						echo '<textarea cols="65" rows="3" name="rapidpress_css_disable_rules[' . $index . '][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="css-disable-pages" style="display:' . ($scope === 'specific_pages' ? 'block' : 'none') . ';">' . esc_textarea($pages_text) . '</textarea>';
 						echo '</td>';
 						echo '<td><button type="button" class="button remove-css-rule">Remove</button></td>';
 						echo '</tr>';

@@ -260,6 +260,8 @@ class RapidPress_Admin {
 							? array_filter(array_map('trim', $rule['scripts']))
 							: array_filter(array_map('trim', explode("\n", sanitize_textarea_field($rule['scripts'])))),
 						'scope' => sanitize_text_field($rule['scope']),
+						'exclude_enabled' => isset($rule['exclude_enabled']) ? '1' : '0',
+						'exclude_pages' => isset($rule['exclude_pages']) ? sanitize_textarea_field($rule['exclude_pages']) : '',
 						'pages' => array(),
 					);
 					if ($sanitized_rule['scope'] === 'specific_pages' && !empty($rule['pages'])) {
