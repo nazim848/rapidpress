@@ -112,6 +112,7 @@
 
 .accordion-content .form-table td {
 	padding: 5px 0;
+	/* vertical-align: top; */
 }
 
 .accordion-content.active {
@@ -164,4 +165,10 @@
 .js-exclude-enabled,
 .css-exclude-enabled {
 	margin-right: 5px;
+}
+
+#js-asset-management .js-exclude-pages-wrapper,
+#css-asset-management .css-exclude-pages-wrapper {
+	display: inline-block;
+	margin: 0 0 10px 10px;
 }
