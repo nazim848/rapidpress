@@ -10,12 +10,14 @@ class RapidPress_JS_Delay {
 			return $html;
 		}
 
-		// $exclusions = $this->get_exclusions();
-		// $delay_duration = get_option('rapidpress_js_delay_duration', '1');
-
 		$enable_exclusions = get_option('rapidpress_enable_js_delay_exclusions', '0');
 		$exclusions = $enable_exclusions === '1' ? $this->get_exclusions() : array();
 		$delay_duration = get_option('rapidpress_js_delay_duration', '1');
+
+		// Check if HTML is empty
+		if (empty($html)) {
+			return $html;
+		}
 
 		// Use DOMDocument to parse and modify the HTML
 		$dom = new DOMDocument();

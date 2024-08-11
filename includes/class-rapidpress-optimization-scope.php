@@ -60,9 +60,10 @@ class RapidPress_Optimization_Scope {
 
 	private static function get_current_relative_url() {
 		$home_path = parse_url(home_url(), PHP_URL_PATH);
-		$home_path = trim($home_path, '/');
+		$home_path = $home_path ? trim($home_path, '/') : '';
 
-		$current_url = trim($_SERVER['REQUEST_URI'], '/');
+		$current_url = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+		$current_url = trim($current_url, '/');
 
 		if ($home_path && strpos($current_url, $home_path) === 0) {
 			$current_url = substr($current_url, strlen($home_path));
