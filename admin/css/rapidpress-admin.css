@@ -11,6 +11,10 @@
 	color: #999 !important;
 }
 
+.rapidpress-admin-content .button {
+	vertical-align: middle;
+}
+
 .nav-tab-wrapper {
 	margin-bottom: 20px;
 }
@@ -171,4 +175,27 @@
 #css-asset-management .css-exclude-pages-wrapper {
 	display: inline-block;
 	margin: 0 0 10px 10px;
+}
+
+#asset-management .checkbox-btn {
+	display: inline;
+	margin-right: 10px;
+}
+
+#asset-management .checkbox-btn label span {
+	font-size: 13px;
+	padding: 6px 8px;
+	background-color: #f6f7f7;
+}
+
+#asset-management .checkbox-btn label span:hover {
+	background-color: #f0f0f1;
+	border-color: #0a4b78;
+	color: #0a4b78;
+}
+
+#asset-management .checkbox-btn input:checked + span {
+	background-color: #04a17a;
+	border-color: #04a17a;
+	color: #fff;
 }

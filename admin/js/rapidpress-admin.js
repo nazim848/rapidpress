@@ -86,24 +86,26 @@ class RapidPressAdmin {
 				  </select>
 				 
                     <label class="${ruleName}-exclude-pages-wrapper" style="display:inline-block;"><input type="checkbox" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_enabled]" class="${ruleName}-exclude-enabled" value="1"> Exclude pages?</label>
-                    <textarea cols="65" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-exclude-pages" style="display:none;"></textarea>
+                    <textarea cols="63" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-exclude-pages" style="display:none;"></textarea>
                   
-				  <textarea cols="65" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
-         </td>
-         <td><input type="checkbox" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][is_active]" value="1" checked> Active</td>
-         <td><button type="button" class="button remove-${ruleName}-rule">Remove</button></td>
+				  <textarea cols="63" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
+     </td>
+     <td>
+	  <div class="checkbox-btn"><label><input type="checkbox" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][is_active]" value="1" checked><span>Active</span></label></div>
+         <button type="button" class="button remove-${ruleName}-rule">Remove</button>
+     </td>
 		`;
 
 		if (ruleName === "js") {
 			return `
 				  <tr>
-						<td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[new_${timestamp}][scripts]" placeholder="Script URL or Handle (one per line)"></textarea></td>
+						<td><textarea cols="63" rows="3" name="rapidpress_js_disable_rules[new_${timestamp}][scripts]" placeholder="Script URL or Handle (one per line)"></textarea></td>
 						${commonFields}
 				  </tr>`;
 		} else if (ruleName === "css") {
 			return `
 				  <tr>
-						<td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[new_${timestamp}][styles]" placeholder="CSS URL or Handle (one per line)"></textarea></td>
+						<td><textarea cols="63" rows="3" name="rapidpress_css_disable_rules[new_${timestamp}][styles]" placeholder="CSS URL or Handle (one per line)"></textarea></td>
 						${commonFields}
 				  </tr>`;
 		}
