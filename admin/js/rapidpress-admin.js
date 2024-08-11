@@ -89,8 +89,9 @@ class RapidPressAdmin {
                     <textarea cols="65" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-exclude-pages" style="display:none;"></textarea>
                   
 				  <textarea cols="65" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
-			 </td>
-			 <td><button type="button" class="button remove-${ruleName}-rule">Remove</button></td>
+         </td>
+         <td><input type="checkbox" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][is_active]" value="1" checked> Active</td>
+         <td><button type="button" class="button remove-${ruleName}-rule">Remove</button></td>
 		`;
 
 		if (ruleName === "js") {

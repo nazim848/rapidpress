@@ -275,6 +275,7 @@ class RapidPress_Admin {
 						'exclude_enabled' => isset($rule['exclude_enabled']) ? '1' : '0',
 						'exclude_pages' => isset($rule['exclude_pages']) ? sanitize_textarea_field($rule['exclude_pages']) : '',
 						'pages' => array(),
+						'is_active' => isset($rule['is_active']) ? '1' : '0',
 					);
 					if ($sanitized_rule['scope'] === 'specific_pages' && !empty($rule['pages'])) {
 						$sanitized_rule['pages'] = is_array($rule['pages'])

@@ -12,8 +12,9 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 			<div class="rapidpress-card">
 				<table class="form-table" id="js-asset-management">
 					<tr class="table-head">
-						<th style="width: 45%;">Script URL or Handle (one per line)</th>
-						<th style="width: 45%;">Disable Scope</th>
+						<th style="width: 40%;">Script URL or Handle (one per line)</th>
+						<th style="width: 40%;">Disable Scope</th>
+						<th style="width: 10%;">Status</th>
 						<th style="width: 10%;">Action</th>
 					</tr>
 					<?php
@@ -21,6 +22,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 					foreach ($js_rules as $index => $rule) {
 						$scripts = isset($rule['scripts']) ? $rule['scripts'] : array();
 						$scripts_text = is_array($scripts) ? implode("\n", $scripts) : $scripts;
+						$is_active = isset($rule['is_active']) ? $rule['is_active'] : true;
 						echo '<tr>';
 						echo '<td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[' . $index . '][scripts]" placeholder="Script URL or Handle (one per line)">' . esc_textarea($scripts_text) . '</textarea></td>';
 						echo '<td>';
@@ -37,6 +39,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 						$pages_text = is_array($pages) ? implode("\n", $pages) : $pages;
 						echo '<textarea cols="65" rows="3" name="rapidpress_js_disable_rules[' . $index . '][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="js-disable-pages" style="display:' . ($rule['scope'] === 'specific_pages' ? 'block' : 'none') . ';">' . esc_textarea($pages_text) . '</textarea>';
 						echo '</td>';
+						echo '<td><input type="checkbox" name="rapidpress_js_disable_rules[' . $index . '][is_active]" value="1" ' . checked($is_active, true, false) . '> Active</td>';
 						echo '<td><button type="button" class="button remove-js-rule">Remove</button></td>';
 						echo '</tr>';
 					}
