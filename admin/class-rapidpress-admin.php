@@ -172,17 +172,12 @@ class RapidPress_Admin {
 			foreach ($input as $rule) {
 				if (!empty($rule['styles'])) {
 					$sanitized_rule = array(
-						'styles' => is_array($rule['styles'])
-							? array_filter(array_map('trim', $rule['styles']))
-							: array_filter(array_map('trim', explode("\n", sanitize_textarea_field($rule['styles'])))),
-						'scope' => isset($rule['scope']) ? sanitize_text_field($rule['scope']) : 'entire_site',
-						'pages' => array(),
+						'styles' => $this->sanitize_scripts_or_styles($rule['styles']),
+						'scope' => sanitize_text_field($rule['scope']),
+						'exclude_enabled' => isset($rule['exclude_enabled']) ? '1' : '0',
+						'exclude_pages' => $this->sanitize_pages($rule['exclude_pages']),
+						'pages' => $this->sanitize_pages($rule['pages']),
 					);
-					if ($sanitized_rule['scope'] === 'specific_pages' && !empty($rule['pages'])) {
-						$sanitized_rule['pages'] = is_array($rule['pages'])
-							? array_filter(array_map('trailingslashit', array_map('esc_url_raw', $rule['pages'])))
-							: array_filter(array_map('trailingslashit', array_map('esc_url_raw', explode("\n", sanitize_textarea_field($rule['pages'])))));
-					}
 					if (!empty($sanitized_rule['styles'])) {
 						$sanitized_rules[] = $sanitized_rule;
 					}
@@ -192,6 +187,23 @@ class RapidPress_Admin {
 		return $sanitized_rules;
 	}
 
+	private function sanitize_scripts_or_styles($input) {
+		if (is_array($input)) {
+			return array_filter(array_map('trim', $input));
+		} elseif (is_string($input)) {
+			return array_filter(array_map('trim', explode("\n", sanitize_textarea_field($input))));
+		}
+		return array();
+	}
+
+	private function sanitize_pages($input) {
+		if (is_array($input)) {
+			return array_filter(array_map('trailingslashit', array_map('esc_url_raw', $input)));
+		} elseif (is_string($input)) {
+			return array_filter(array_map('trailingslashit', array_map('esc_url_raw', explode("\n", sanitize_textarea_field($input)))));
+		}
+		return array();
+	}
 
 	public function sanitize_optimization_excluded_pages($input) {
 		$pages = explode("\n", $input);

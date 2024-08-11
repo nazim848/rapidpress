@@ -257,11 +257,11 @@ class RapidPressAdmin {
 
 			// Close all other accordions
 			this.$(".accordion-header").not($this).removeClass("active");
-			this.$(".accordion-content").not($content).slideUp(200);
+			this.$(".accordion-content").not($content).slideUp(250);
 
 			// Toggle the clicked accordion
 			$this.toggleClass("active", !isActive);
-			$content.slideToggle(200);
+			$content.slideToggle(250);
 
 			this.saveAccordionState();
 		});
