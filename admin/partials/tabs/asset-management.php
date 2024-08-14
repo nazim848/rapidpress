@@ -96,22 +96,4 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 			</div>
 		</div>
 	</div>
-	<div class="accordion-item">
-		<div class="accordion-header">Plugins</div>
-		<div class="accordion-content">
-			<div class="rapidpress-card">
-				<table class="form-table" id="plugin-asset-management">
-					<tr class="table-head">
-						<th>Plugin</th>
-						<th>Status</th>
-						<th>Assets</th>
-						<th>Action</th>
-					</tr>
-					<tbody id="plugin-assets-list">
-						<!-- Plugin assets will be populated here via JavaScript -->
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
 </div>
