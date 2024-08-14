@@ -1,6 +1,8 @@
 <?php
 
-class RapidPress_Asset_Manager {
+namespace RapidPress;
+
+class Asset_Manager {
 
 	public function __construct() {
 		add_action('wp_enqueue_scripts', array($this, 'manage_js_assets'), 9999);

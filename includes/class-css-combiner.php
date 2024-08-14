@@ -1,6 +1,8 @@
 <?php
 
-class RapidPress_CSS_Combiner {
+namespace RapidPress;
+
+class CSS_Combiner {
 
 	private $combined_css = '';
 	private $combined_filename = '';
@@ -31,7 +33,7 @@ class RapidPress_CSS_Combiner {
 	public function combine_css() {
 
 		// Exclude admin, POST requests, and pages not in the optimization scope
-		if (!get_option('rapidpress_combine_css') || is_admin() || !RapidPress_Optimization_Scope::should_optimize()) {
+		if (!get_option('rapidpress_combine_css') || is_admin() || !\RapidPress\Optimization_Scope::should_optimize()) {
 			$this->debug_log[] = "CSS combination is disabled, is admin page, or not in optimization scope.";
 			return;
 		}

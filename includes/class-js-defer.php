@@ -1,13 +1,15 @@
 <?php
 
-class RapidPress_JS_Defer {
+namespace RapidPress;
+
+class JS_Defer {
 
 	public function __construct() {
 		add_filter('script_loader_tag', array($this, 'defer_js'), 10, 3);
 	}
 
 	public function defer_js($tag, $handle, $src) {
-		if (is_admin() || !get_option('rapidpress_js_defer') || !RapidPress_Optimization_Scope::should_optimize()) {
+		if (is_admin() || !get_option('rapidpress_js_defer') || !\RapidPress\Optimization_Scope::should_optimize()) {
 			return $tag;
 		}
 

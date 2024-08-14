@@ -1,6 +1,8 @@
 <?php
 
-class RapidPress_HTML_Minifier {
+namespace RapidPress;
+
+class HTML_Minifier {
 
 	private $css_minifier;
 	private $js_minifier;
@@ -8,9 +10,9 @@ class RapidPress_HTML_Minifier {
 
 	public function __construct() {
 		add_action('init', array($this, 'start_output_buffering'));
-		$this->css_minifier = new RapidPress_CSS_Minifier();
-		$this->js_minifier = new RapidPress_JS_Minifier();
-		$this->js_delay = new RapidPress_JS_Delay();
+		$this->css_minifier = new \RapidPress\CSS_Minifier();
+		$this->js_minifier = new \RapidPress\JS_Minifier();
+		$this->js_delay = new \RapidPress\JS_Delay();
 	}
 
 	public function start_output_buffering() {
@@ -19,7 +21,7 @@ class RapidPress_HTML_Minifier {
 
 	public function minify_html($html) {
 		// Exclude admin, POST requests, and pages not in the optimization scope
-		if (is_admin() || $_SERVER['REQUEST_METHOD'] == 'POST' || !RapidPress_Optimization_Scope::should_optimize()) {
+		if (is_admin() || $_SERVER['REQUEST_METHOD'] == 'POST' || !\RapidPress\Optimization_Scope::should_optimize()) {
 			return $html;
 		}
 

@@ -1,6 +1,8 @@
 <?php
 
-class RapidPress_Admin {
+namespace RapidPress;
+
+class Admin {
 	private $plugin_name;
 	private $version;
 
@@ -100,7 +102,7 @@ class RapidPress_Admin {
 			$active_tab = '#' . sanitize_text_field($_GET['tab']);
 		}
 
-		include_once 'partials/rapidpress-admin-display.php';
+		include_once 'partials/admin-display.php';
 
 		echo "<script>jQuery(document).ready(function($) { setActiveTab('$active_tab'); });</script>";
 	}

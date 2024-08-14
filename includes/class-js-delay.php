@@ -1,12 +1,14 @@
 <?php
 
-class RapidPress_JS_Delay {
+namespace RapidPress;
+
+class JS_Delay {
 	public function __construct() {
 		// Remove the filter hook as we're now applying delay directly in the HTML minifier
 	}
 
 	public function apply_js_delay($html) {
-		if (is_admin() || !get_option('rapidpress_js_delay') || !RapidPress_Optimization_Scope::should_optimize()) {
+		if (is_admin() || !get_option('rapidpress_js_delay') || !\RapidPress\Optimization_Scope::should_optimize()) {
 			return $html;
 		}
 
@@ -20,7 +22,7 @@ class RapidPress_JS_Delay {
 		}
 
 		// Use DOMDocument to parse and modify the HTML
-		$dom = new DOMDocument();
+		$dom = new \DOMDocument();
 		@$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
 		$scripts = $dom->getElementsByTagName('script');
