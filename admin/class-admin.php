@@ -16,6 +16,7 @@ class Admin {
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_styles'));
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
 		add_action('admin_bar_menu', array($this, 'add_toolbar_items'), 100);
+		add_filter('plugin_action_links_' . plugin_basename(RAPIDPRESS_PLUGIN_FILE), array($this, 'add_action_links'));
 	}
 
 	public function enqueue_styles($hook) {
@@ -48,6 +49,12 @@ class Admin {
 <?php
 			delete_transient('rapidpress_activation_notice');
 		}
+	}
+
+	public function add_action_links($links) {
+		$settings_link = '<a href="' . admin_url('options-general.php?page=rapidpress') . '">' . __('Settings', 'rapidpress') . '</a>';
+		array_unshift($links, $settings_link);
+		return $links;
 	}
 
 	// Add the main RapidPress menu item to the settings menu
