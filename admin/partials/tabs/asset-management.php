@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 ?>
 
 <div id="asset-management" class="tab-pane">
-	<h2 class="content-title">Asset Management</h2>
+	<h2 class="content-title">Disable Assets</h2>
 	<div class="accordion-item">
 		<div class="accordion-header">JavaScript</div>
 		<div class="accordion-content">
