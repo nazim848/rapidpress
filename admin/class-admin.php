@@ -143,9 +143,17 @@ class Admin {
 				'sanitize_callback' => array($this, 'sanitize_js_defer_exclusions'),
 			),
 			'rapidpress_js_delay' => 'boolean',
+			'rapidpress_js_delay_type' => array(
+				'type' => 'string',
+				'sanitize_callback' => array($this, 'sanitize_js_delay_type'),
+			),
 			'rapidpress_js_delay_duration' => array(
 				'type' => 'string',
 				'sanitize_callback' => array($this, 'sanitize_js_delay_duration'),
+			),
+			'rapidpress_js_delay_specific_files' => array(
+				'type' => 'string',
+				'sanitize_callback' => array($this, 'sanitize_js_delay_specific_files'),
 			),
 			'rapidpress_enable_js_delay_exclusions' => 'boolean',
 			'rapidpress_js_delay_exclusions' => array(
@@ -268,6 +276,23 @@ class Admin {
 		$sanitized = array();
 		foreach ($exclusions as $exclusion) {
 			$sanitized[] = esc_url_raw(trim($exclusion));
+		}
+		return implode("\n", array_filter($sanitized));
+	}
+
+	public function sanitize_js_delay_type($input) {
+		$valid_options = array('all', 'specific');
+		return in_array($input, $valid_options) ? $input : 'all';
+	}
+
+	public function sanitize_js_delay_specific_files($input) {
+		if (!is_string($input)) {
+			return '';
+		}
+		$files = explode("\n", $input);
+		$sanitized = array();
+		foreach ($files as $file) {
+			$sanitized[] = esc_url_raw(trim($file));
 		}
 		return implode("\n", array_filter($sanitized));
 	}

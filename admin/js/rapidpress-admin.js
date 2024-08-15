@@ -218,6 +218,42 @@ class RapidPressAdmin {
 			})
 			.change();
 
+		// Handle JS delay options
+		const $jsDelay = this.$("#rapidpress_js_delay");
+		const $jsDelayOptions = this.$("#rapidpress_js_delay_options");
+		const $jsDelayType = this.$("#rapidpress_js_delay_type");
+		const $jsDelaySpecific = this.$("#rapidpress_js_delay_specific");
+		const $jsDelayAll = this.$("#rapidpress_js_delay_all");
+		const $jsDelayExclusionsRow = this.$(
+			"#rapidpress_js_delay_exclusions_row"
+		);
+		const $enableJsDelayExclusions = this.$(
+			"#rapidpress_enable_js_delay_exclusions"
+		);
+
+		const updateJsDelayVisibility = () => {
+			const isJsDelayChecked = $jsDelay.is(":checked");
+			const isSpecific = $jsDelayType.val() === "specific";
+			const isExclusionsEnabled = $enableJsDelayExclusions.is(":checked");
+
+			$jsDelayOptions.toggle(isJsDelayChecked);
+			$jsDelaySpecific.toggle(isJsDelayChecked && isSpecific);
+			$jsDelayAll.toggle(isJsDelayChecked && !isSpecific);
+			$jsDelayExclusionsRow.toggle(
+				isJsDelayChecked && !isSpecific && isExclusionsEnabled
+			);
+			$enableJsDelayExclusions
+				.closest(".checkbox-btn")
+				.toggle(isJsDelayChecked && !isSpecific);
+		};
+
+		$jsDelay.change(updateJsDelayVisibility);
+		$jsDelayType.change(updateJsDelayVisibility);
+		$enableJsDelayExclusions.change(updateJsDelayVisibility);
+
+		// Initial state
+		updateJsDelayVisibility();
+
 		// Handle JS and CSS disable scope change
 		this.$(document).on(
 			"change",

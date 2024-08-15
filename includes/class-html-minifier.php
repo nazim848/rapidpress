@@ -16,13 +16,18 @@ class HTML_Minifier {
 	}
 
 	public function start_output_buffering() {
-		ob_start(array($this, 'minify_html'));
+		ob_start(array($this, 'process_html'));
 	}
 
-	public function minify_html($html) {
+	public function process_html($html) {
 		// Exclude admin, POST requests, and pages not in the optimization scope
 		if (is_admin() || $_SERVER['REQUEST_METHOD'] == 'POST' || !\RapidPress\Optimization_Scope::should_optimize()) {
 			return $html;
+		}
+
+		// Apply JS delay first
+		if (get_option('rapidpress_js_delay')) {
+			$html = $this->js_delay->apply_js_delay($html);
 		}
 
 		// Minify HTML
@@ -39,12 +44,6 @@ class HTML_Minifier {
 		if (get_option('rapidpress_js_minify')) {
 			$html = $this->js_minifier->minify_inline_js($html);
 		}
-
-		// Apply JS delay after minification
-		if (get_option('rapidpress_js_delay')) {
-			$html = $this->js_delay->apply_js_delay($html);
-		}
-
 		return $html;
 	}
 

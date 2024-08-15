@@ -3,53 +3,62 @@
 namespace RapidPress;
 
 class JS_Delay {
-	public function __construct() {
-		// Remove the filter hook as we're now applying delay directly in the HTML minifier
-	}
-
 	public function apply_js_delay($html) {
 		if (is_admin() || !get_option('rapidpress_js_delay') || !\RapidPress\Optimization_Scope::should_optimize()) {
 			return $html;
 		}
 
-		$enable_exclusions = get_option('rapidpress_enable_js_delay_exclusions', '0');
-		$exclusions = $enable_exclusions === '1' ? $this->get_exclusions() : array();
+		$delay_type = get_option('rapidpress_js_delay_type', 'all');
+		$specific_files = $delay_type === 'specific' ? $this->get_specific_files() : array();
+		$exclusions = ($delay_type === 'all' && get_option('rapidpress_enable_js_delay_exclusions')) ? $this->get_exclusions() : array();
 		$delay_duration = get_option('rapidpress_js_delay_duration', '1');
 
-		// Check if HTML is empty
 		if (empty($html)) {
 			return $html;
 		}
 
-		// Use DOMDocument to parse and modify the HTML
-		$dom = new \DOMDocument();
-		@$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-
-		$scripts = $dom->getElementsByTagName('script');
-		$scripts_to_delay = array();
-
-		foreach ($scripts as $script) {
-			$src = $script->getAttribute('src');
-			if ($src && !$this->is_excluded($src, $exclusions)) {
-				$scripts_to_delay[] = $script;
+		// Use a regular expression to find and modify script tags
+		$pattern = '/<script\b[^>]*src=["\']([^"\']+)["\'][^>]*>/i';
+		$html = preg_replace_callback($pattern, function ($matches) use ($delay_type, $specific_files, $exclusions, $delay_duration) {
+			$src = $matches[1];
+			if (($delay_type === 'specific' && $this->is_specific_file($src, $specific_files)) ||
+				($delay_type === 'all' && !$this->is_excluded($src, $exclusions))
+			) {
+				return $this->get_delay_script_tag($src, $delay_duration);
 			}
-		}
+			return $matches[0];
+		}, $html);
 
-		foreach ($scripts_to_delay as $script) {
-			$new_script = $dom->createElement('script');
-			$src = $script->getAttribute('src');
-
-			if ($delay_duration === 'interaction') {
-				$new_script->textContent = $this->get_interaction_delay_script($src);
-			} else {
-				$new_script->textContent = $this->get_timeout_delay_script($src, intval($delay_duration));
-			}
-
-			$script->parentNode->replaceChild($new_script, $script);
-		}
-
-		$html = $dom->saveHTML();
 		return $html;
+	}
+
+	private function get_delay_script_tag($src, $delay_duration) {
+		if ($delay_duration === 'interaction') {
+			return "<script type='text/javascript'>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var loadScript = function() {
+                        var script = document.createElement('script');
+                        script.src = '$src';
+                        document.body.appendChild(script);
+                        ['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {
+                            document.removeEventListener(event, loadScript, {passive: true});
+                        });
+                    };
+                    ['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {
+                        document.addEventListener(event, loadScript, {passive: true});
+                    });
+                });
+            </script>";
+		} else {
+			$delay = intval($delay_duration) * 1000;
+			return "<script type='text/javascript'>
+                setTimeout(function() {
+                    var script = document.createElement('script');
+                    script.src = '$src';
+                    document.body.appendChild(script);
+                }, $delay);
+            </script>";
+		}
 	}
 
 	private function get_exclusions() {
@@ -66,27 +75,17 @@ class JS_Delay {
 		return false;
 	}
 
-	private function get_interaction_delay_script($src) {
-		return "document.addEventListener('DOMContentLoaded', function() {
-			var loadScript = function() {
-				var script = document.createElement('script');
-				script.src = '$src';
-				document.body.appendChild(script);
-				['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {
-					document.removeEventListener(event, loadScript, {passive: true});
-				});
-			};
-			['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {
-				document.addEventListener(event, loadScript, {passive: true});
-			});
-		});";
+	private function get_specific_files() {
+		$specific_files_string = get_option('rapidpress_js_delay_specific_files', '');
+		return array_filter(array_map('trim', explode("\n", $specific_files_string)));
 	}
 
-	private function get_timeout_delay_script($src, $delay) {
-		return "setTimeout(function() {
-			var script = document.createElement('script');
-			script.src = '$src';
-			document.body.appendChild(script);
-		}, " . ($delay * 1000) . ");";
+	private function is_specific_file($src, $specific_files) {
+		foreach ($specific_files as $file) {
+			if (strpos($src, $file) !== false) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
