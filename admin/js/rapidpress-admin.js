@@ -223,7 +223,8 @@ class RapidPressAdmin {
 		const $jsDelayOptions = this.$("#rapidpress_js_delay_options");
 		const $jsDelayType = this.$("#rapidpress_js_delay_type");
 		const $jsDelaySpecific = this.$("#rapidpress_js_delay_specific");
-		const $jsDelayAll = this.$("#rapidpress_js_delay_all");
+		const $jsDelayAll = this.$("#js_delay_exclusions_wrapper");
+		const $jsDelayDuration = this.$("#rapidpress_js_delay_duration").parent(); // Select the parent container
 		const $jsDelayExclusionsRow = this.$(
 			"#rapidpress_js_delay_exclusions_row"
 		);
@@ -239,6 +240,7 @@ class RapidPressAdmin {
 			$jsDelayOptions.toggle(isJsDelayChecked);
 			$jsDelaySpecific.toggle(isJsDelayChecked && isSpecific);
 			$jsDelayAll.toggle(isJsDelayChecked && !isSpecific);
+			$jsDelayDuration.toggle(isJsDelayChecked); // Always show duration when JS delay is checked
 			$jsDelayExclusionsRow.toggle(
 				isJsDelayChecked && !isSpecific && isExclusionsEnabled
 			);
