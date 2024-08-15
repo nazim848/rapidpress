@@ -241,7 +241,7 @@ class RapidPressAdmin {
 			const isMainChecked = $mainCheckbox.is(":checked");
 			const isExclusionChecked = $exclusionCheckbox.is(":checked");
 
-			$exclusionCheckbox.closest("label").toggle(isMainChecked);
+			$exclusionCheckbox.closest(".checkbox-btn").toggle(isMainChecked);
 			$row.toggle(isMainChecked && isExclusionChecked);
 		};
 
