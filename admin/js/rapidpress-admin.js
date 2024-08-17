@@ -79,23 +79,19 @@ class RapidPressAdmin {
 		const timestamp = Date.now();
 		const commonFields = `
 			 <td>
-				  <select name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][scope]" class="${ruleName}-disable-scope">
+			 <select name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][scope]" class="${ruleName}-disable-scope">
 						<option value="entire_site">Entire Site</option>
 						<option value="front_page">Front Page</option>
 						<option value="specific_pages">Specific Pages</option>
-				  </select>
-				 
-                    <label class="${ruleName}-exclude-pages-wrapper" style="display:inline-block;"><input type="checkbox" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_enabled]" class="${ruleName}-exclude-enabled" value="1"> Exclude pages?</label>
-                    <textarea cols="63" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-exclude-pages" style="display:none;"></textarea>
-                  
-				  <textarea cols="63" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
+				  </select><div class="checkbox-radio"><label class="${ruleName}-exclude-pages-wrapper" style="display:inline-block;"><input type="checkbox" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_enabled]" class="${ruleName}-exclude-enabled" value="1"> Exclude pages?</label></div>
+				 <textarea cols="63" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-exclude-pages" style="display:none;"></textarea>
+				 <textarea cols="63" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
      </td>
      <td>
 	  <div class="checkbox-btn"><label><input type="checkbox" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][is_active]" value="1" checked><span>Active</span></label></div>
          <button type="button" class="button remove-${ruleName}-rule">Remove</button>
      </td>
 		`;
-
 		if (ruleName === "js") {
 			return `
 				  <tr>

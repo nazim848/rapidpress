@@ -4,11 +4,10 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 ?>
 
-<div id="file-optimization" class="tab-pane">
-	<h2 class="content-title">File Optimization</h2>
+<div id="<?php echo esc_attr($tab_id); ?>" class="tab-pane">
+	<h2 class="content-title"><span class="dashicons dashicons-media-code"></span> File Optimization</h2>
 	<div class="rapidpress-card">
-		<input type="hidden" name="rapidpress_active_tab" id="rapidpress_active_tab" value="#minification">
-
+		<!-- <input type="hidden" name="rapidpress_active_tab" id="rapidpress_active_tab" value="#minification"> -->
 		<table class="form-table">
 			<tr valign="top">
 				<th scope="row">Optimization Scope</th>
@@ -18,10 +17,12 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 						<option value="front_page" <?php selected(get_option('rapidpress_optimization_scope'), 'front_page'); ?>>Front Page</option>
 						<option value="specific_pages" <?php selected(get_option('rapidpress_optimization_scope'), 'specific_pages'); ?>>Specific Pages</option>
 					</select>
-					<label style="margin-left: 10px;" id="rapidpress_enable_scope_exclusions_label">
-						<input type="checkbox" name="rapidpress_enable_scope_exclusions" id="rapidpress_enable_scope_exclusions" value="1" <?php checked(get_option('rapidpress_enable_scope_exclusions'), '1'); ?> />
-						Exclude pages?
-					</label>
+					<div class="checkbox-radio" style="margin-left: 10px;" id="rapidpress_enable_scope_exclusions_label">
+						<label>
+							<input type="checkbox" name="rapidpress_enable_scope_exclusions" id="rapidpress_enable_scope_exclusions" value="1" <?php checked(get_option('rapidpress_enable_scope_exclusions'), '1'); ?> />
+							Exclude pages?
+						</label>
+					</div>
 				</td>
 			</tr>
 			<tr valign="top" id="rapidpress_specific_pages_row" style="display: none;">
@@ -44,28 +45,34 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 			<tr valign="top">
 				<th scope="row">HTML Minification</th>
 				<td>
-					<label>
-						<input type="checkbox" name="rapidpress_html_minify" value="1" <?php checked(1, get_option('rapidpress_html_minify'), true); ?> />
-						Enable HTML minification
-					</label>
+					<div class="checkbox-radio">
+						<label>
+							<input type="checkbox" name="rapidpress_html_minify" value="1" <?php checked(1, get_option('rapidpress_html_minify'), true); ?> />
+						</label>
+						<span class="dashicons dashicons-editor-help" title="Minify HTML files"></span>
+					</div>
 				</td>
 			</tr>
 			<tr valign="top">
 				<th scope="row">CSS Minification</th>
 				<td>
-					<label>
-						<input type="checkbox" name="rapidpress_css_minify" value="1" <?php checked(1, get_option('rapidpress_css_minify'), true); ?> />
-						Enable CSS minification (inline styles)
-					</label>
+					<div class="checkbox-radio">
+						<label>
+							<input type="checkbox" name="rapidpress_css_minify" value="1" <?php checked(1, get_option('rapidpress_css_minify'), true); ?> />
+						</label>
+						<span class="dashicons dashicons-editor-help" title="Minify CSS files"></span>
+					</div>
 				</td>
 			</tr>
 			<tr valign="top">
 				<th scope="row">Combine CSS Files</th>
 				<td>
-					<label>
-						<input type="checkbox" name="rapidpress_combine_css" id="rapidpress_combine_css" value="1" <?php checked(1, get_option('rapidpress_combine_css'), true); ?> />
-						Enable CSS file combination
-					</label>
+					<div class="checkbox-radio">
+						<label>
+							<input type="checkbox" name="rapidpress_combine_css" id="rapidpress_combine_css" value="1" <?php checked(1, get_option('rapidpress_combine_css'), true); ?> />
+						</label>
+						<span class="dashicons dashicons-editor-help" title="Combine CSS files"></span>
+					</div>
 					<div class="checkbox-btn" id="rapidpress_enable_combine_css_exclusions_btn">
 						<label>
 							<input type="checkbox" name="rapidpress_enable_combine_css_exclusions" id="rapidpress_enable_combine_css_exclusions" value="1" <?php checked(1, get_option('rapidpress_enable_combine_css_exclusions'), true); ?> />
@@ -85,19 +92,23 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 			<tr valign="top">
 				<th scope="row">Minify JavaScript</th>
 				<td>
-					<label>
-						<input type="checkbox" name="rapidpress_js_minify" value="1" <?php checked(1, get_option('rapidpress_js_minify'), true); ?> />
-						Enable JavaScript minification
-					</label>
+					<div class="checkbox-radio">
+						<label>
+							<input type="checkbox" name="rapidpress_js_minify" value="1" <?php checked(1, get_option('rapidpress_js_minify'), true); ?> />
+						</label>
+						<span class="dashicons dashicons-editor-help" title="Minify JavaScript files"></span>
+					</div>
 				</td>
 			</tr>
 			<tr valign="top">
 				<th scope="row">Defer JavaScript</th>
 				<td>
-					<label>
-						<input type="checkbox" name="rapidpress_js_defer" id="rapidpress_js_defer" value="1" <?php checked(1, get_option('rapidpress_js_defer'), true); ?> />
-						Enable JavaScript deferring
-					</label>
+					<div class="checkbox-radio">
+						<label>
+							<input type="checkbox" name="rapidpress_js_defer" id="rapidpress_js_defer" value="1" <?php checked(1, get_option('rapidpress_js_defer'), true); ?> />
+						</label>
+						<span class="dashicons dashicons-editor-help" title="Defer JavaScript files"></span>
+					</div>
 					<div class="checkbox-btn" id="rapidpress_enable_js_defer_exclusions_btn">
 						<label>
 							<input type="checkbox" name="rapidpress_enable_js_defer_exclusions" id="rapidpress_enable_js_defer_exclusions" value="1" <?php checked(1, get_option('rapidpress_enable_js_defer_exclusions'), true); ?> />
@@ -116,10 +127,12 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 			<tr valign="top">
 				<th scope="row">Delay JavaScript Loading</th>
 				<td>
-					<label>
-						<input type="checkbox" name="rapidpress_js_delay" id="rapidpress_js_delay" value="1" <?php checked(1, get_option('rapidpress_js_delay'), true); ?> />
-						Enable JavaScript delay
-					</label>
+					<div class="checkbox-radio">
+						<label>
+							<input type="checkbox" name="rapidpress_js_delay" id="rapidpress_js_delay" value="1" <?php checked(1, get_option('rapidpress_js_delay'), true); ?> />
+						</label>
+						<span class="dashicons dashicons-editor-help" title="Delay JavaScript files"></span>
+					</div>
 				</td>
 			</tr>
 			<tr valign="top" id="rapidpress_js_delay_options" style="display: none;">

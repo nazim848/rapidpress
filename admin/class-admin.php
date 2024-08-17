@@ -83,9 +83,9 @@ class Admin {
 
 		// Add submenu items
 		$submenu_items = array(
-			'dashboard' 			=> __('Dashboard', 'rapidpress'),
+			'general' 			=> __('General', 'rapidpress'),
 			'file-optimization' 	=> __('File Optimization', 'rapidpress'),
-			'asset-management' => __('Asset Management', 'rapidpress'),
+			'asset-manager' => __('Asset Manager', 'rapidpress'),
 		);
 
 		foreach ($submenu_items as $slug => $title) {
@@ -103,7 +103,7 @@ class Admin {
 	}
 
 	public function display_plugin_setup_page() {
-		$active_tab = '#dashboard'; // Default to dashboard
+		$active_tab = '#general'; // Default to general
 
 		if (isset($_GET['tab'])) {
 			$active_tab = '#' . sanitize_text_field($_GET['tab']);
@@ -264,7 +264,7 @@ class Admin {
 	}
 
 	public function sanitize_js_delay_duration($input) {
-		$valid_options = array('1', '2', 'interaction');
+		$valid_options = array('1', '2', '3', 'interaction');
 		return in_array($input, $valid_options) ? $input : '1';
 	}
 

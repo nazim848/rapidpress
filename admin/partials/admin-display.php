@@ -34,9 +34,8 @@ $settings_updated = isset($_GET['settings-updated']) && $_GET['settings-updated'
 $tabs = array(
 	'general' => 'General',
 	'file-optimization' => 'File Optimization',
-	'asset-management' => 'Asset Management',
-	'caching' => 'Caching',
-	'advanced' => 'Advanced'
+	'asset-manager' => 'Asset Manager',
+	'settings' => 'Settings'
 );
 
 // Get current tab
@@ -49,7 +48,7 @@ if (!array_key_exists($active_tab, $tabs)) {
 ?>
 
 <div class="wrap">
-	<h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+	<img src="<?php echo RAPIDPRESS_PLUGIN_URL . '/admin/images/rapidpress-logo.svg'; ?>" alt="RapidPress Logo" class="rapidpress-logo" width="190">
 
 	<?php if ($settings_updated) : ?>
 		<div id="setting-error-settings_updated" class="notice notice-success settings-error is-dismissible">
@@ -78,20 +77,20 @@ if (!array_key_exists($active_tab, $tabs)) {
 				<?php
 				foreach ($tabs as $tab_id => $tab_name) {
 					$style = ($tab_id === $active_tab) ? '' : 'style="display:none;"';
-					echo '<div id="' . esc_attr($tab_id) . '" class="tab-pane" ' . $style . '>';
+					// echo '<div id="' . esc_attr($tab_id) . '" class="tab-pane" ' . $style . '>';
 					$tab_file = plugin_dir_path(__FILE__) . 'tabs/' . $tab_id . '.php';
 					if (file_exists($tab_file)) {
 						include $tab_file;
 					} else {
 						echo '<p>Tab content not found.</p>';
 					}
-					echo '</div>';
+					// echo '</div>';
 				}
 				?>
 			</div>
 			<p class="submit" id="submit-button" style="<?php // echo $active_tab === 'general' ? 'display:none;' : ''; 
 																		?>">
-				<?php submit_button(null, 'primary', 'submit', false); ?>
+				<?php submit_button(null, 'primary rapidpress-btn', 'submit', false); ?>
 			</p>
 		</form>
 	</div>
