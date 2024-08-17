@@ -77,7 +77,7 @@ class Admin {
 			'title' => 'RapidPress',
 			'href'  => admin_url('options-general.php?page=rapidpress'),
 			'meta'  => array(
-				'title' => __('RapidPress Settings', 'rapidpress'),
+				'title' => __('RapidPress', 'rapidpress'),
 			),
 		));
 
@@ -85,7 +85,9 @@ class Admin {
 		$submenu_items = array(
 			'general' 			=> __('General', 'rapidpress'),
 			'file-optimization' 	=> __('File Optimization', 'rapidpress'),
-			'asset-manager' => __('Asset Manager', 'rapidpress'),
+			'asset-manager' 		=> __('Asset Manager', 'rapidpress'),
+			'database' 			=> __('Database', 'rapidpress'),
+			'settings' 			=> __('Settings', 'rapidpress'),
 		);
 
 		foreach ($submenu_items as $slug => $title) {

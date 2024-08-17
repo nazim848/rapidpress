@@ -13,7 +13,7 @@ if (isset($_POST['rapidpress_options'])) {
 	$options = array(
 		'rapidpress_js_defer',
 		'rapidpress_js_defer_exclusions',
-		// ... other options ...
+		// ... other options ...	
 	);
 
 	foreach ($options as $option) {
@@ -35,6 +35,11 @@ $tabs = array(
 	'general' => 'General',
 	'file-optimization' => 'File Optimization',
 	'asset-manager' => 'Asset Manager',
+	// 'media' => 'Media',
+	// 'cache' => 'Cache',
+	// 'preloading' => 'Preloading',
+	// 'database' => 'Database',
+	// 'cdn' => 'CDN',
 	'settings' => 'Settings'
 );
 
