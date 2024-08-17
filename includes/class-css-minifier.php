@@ -1,6 +1,8 @@
 <?php
 
-class RapidPress_CSS_Minifier {
+namespace RapidPress;
+
+class CSS_Minifier {
 
 	public function minify($css) {
 		// Remove comments

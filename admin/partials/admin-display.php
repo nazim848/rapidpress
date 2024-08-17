@@ -32,7 +32,7 @@ $settings_updated = isset($_GET['settings-updated']) && $_GET['settings-updated'
 
 // Define tabs
 $tabs = array(
-	'dashboard' => 'Dashboard',
+	'general' => 'General',
 	'file-optimization' => 'File Optimization',
 	'asset-management' => 'Asset Management',
 	'caching' => 'Caching',
@@ -40,11 +40,11 @@ $tabs = array(
 );
 
 // Get current tab
-$active_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'dashboard';
+$active_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'general';
 
 // Ensure the active tab is valid
 if (!array_key_exists($active_tab, $tabs)) {
-	$active_tab = 'dashboard';
+	$active_tab = 'general';
 }
 ?>
 
@@ -89,7 +89,8 @@ if (!array_key_exists($active_tab, $tabs)) {
 				}
 				?>
 			</div>
-			<p class="submit" id="submit-button" style="<?php echo $active_tab === 'dashboard' ? 'display:none;' : ''; ?>">
+			<p class="submit" id="submit-button" style="<?php // echo $active_tab === 'general' ? 'display:none;' : ''; 
+																		?>">
 				<?php submit_button(null, 'primary', 'submit', false); ?>
 			</p>
 		</form>

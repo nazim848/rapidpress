@@ -1,6 +1,8 @@
 <?php
 
-class RapidPress_Public {
+namespace RapidPress;
+
+class Public_Core {
 	private $plugin_name;
 	private $version;
 

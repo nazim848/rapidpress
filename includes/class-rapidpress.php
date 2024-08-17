@@ -1,5 +1,7 @@
 <?php
 
+namespace RapidPress;
+
 class RapidPress {
 
 	protected $loader;
@@ -16,20 +18,43 @@ class RapidPress {
 	}
 
 	private function load_dependencies() {
-		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-loader.php';
-		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-html-minifier.php';
-		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-css-minifier.php';
-		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-css-combiner.php';
-		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-js-minifier.php';
-		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-js-defer.php';
-		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-js-delay.php';
-		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-optimization-scope.php';
-		require_once RAPIDPRESS_PLUGIN_DIR . 'admin/class-rapidpress-admin.php';
-		require_once RAPIDPRESS_PLUGIN_DIR . 'public/class-rapidpress-public.php';
-		require_once RAPIDPRESS_PLUGIN_DIR . 'includes/class-rapidpress-asset-manager.php';
+		require_once RAPIDPRESS_PATH . 'includes/class-loader.php';
+		require_once RAPIDPRESS_PATH . 'includes/class-html-minifier.php';
+		require_once RAPIDPRESS_PATH . 'includes/class-css-minifier.php';
+		require_once RAPIDPRESS_PATH . 'includes/class-css-combiner.php';
+		require_once RAPIDPRESS_PATH . 'includes/class-js-minifier.php';
+		require_once RAPIDPRESS_PATH . 'includes/class-js-defer.php';
+		require_once RAPIDPRESS_PATH . 'includes/class-js-delay.php';
+		require_once RAPIDPRESS_PATH . 'includes/class-optimization-scope.php';
+		require_once RAPIDPRESS_PATH . 'admin/class-admin.php';
+		require_once RAPIDPRESS_PATH . 'public/class-public.php';
+		require_once RAPIDPRESS_PATH . 'includes/class-asset-manager.php';
 
-		$this->loader = new RapidPress_Loader();
+		$this->loader = new \RapidPress\Loader();
 	}
+
+	private function define_public_hooks() {
+		$plugin_public = new \RapidPress\Public_Core($this->get_plugin_name(), $this->get_version());
+
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
+
+		new \RapidPress\Optimization_Scope();
+		new \RapidPress\HTML_Minifier();
+		new \RapidPress\CSS_Combiner();
+		new \RapidPress\JS_Defer();
+		new \RapidPress\Asset_Manager();
+	}
+
+	private function define_admin_hooks() {
+		$plugin_admin = new \RapidPress\Admin($this->get_plugin_name(), $this->get_version());
+
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
+		$this->loader->add_action('admin_init', $plugin_admin, 'register_settings');
+	}
+
+
 
 	private function set_locale() {
 		add_action('plugins_loaded', array($this, 'load_plugin_textdomain'));
@@ -41,39 +66,6 @@ class RapidPress {
 			false,
 			dirname(dirname(plugin_basename(__FILE__))) . '/languages/'
 		);
-	}
-
-	private function define_admin_hooks() {
-		$plugin_admin = new RapidPress_Admin($this->get_plugin_name(), $this->get_version());
-
-		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
-		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
-		$this->loader->add_action('admin_init', $plugin_admin, 'register_settings');
-	}
-
-	private function define_public_hooks() {
-		$plugin_public = new RapidPress_Public($this->get_plugin_name(), $this->get_version());
-
-		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
-		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
-
-		// Initialize HTML Minifier
-		new RapidPress_HTML_Minifier();
-
-		// Initialize CSS Combiner
-		new RapidPress_CSS_Combiner();
-
-		// Initialize JS Defer
-		new RapidPress_JS_Defer();
-
-		// Initialize JS Delay
-		//new RapidPress_JS_Delay();
-
-		// Initialize Asset Manager
-		new RapidPress_Asset_Manager();
-
-		// Initialize Optimization Scope
-		new RapidPress_Optimization_Scope();
 	}
 
 	public function run() {

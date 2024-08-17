@@ -123,22 +123,45 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 				</td>
 			</tr>
 			<tr valign="top" id="rapidpress_js_delay_options" style="display: none;">
-				<th scope="row">Delay Duration</th>
+				<th scope="row">Delay Options</th>
 				<td>
-					<select name="rapidpress_js_delay_duration">
-						<option value="1" <?php selected(get_option('rapidpress_js_delay_duration'), '1'); ?>>1 second</option>
-						<option value="2" <?php selected(get_option('rapidpress_js_delay_duration'), '2'); ?>>2 seconds</option>
-						<option value="3" <?php selected(get_option('rapidpress_js_delay_duration'), '3'); ?>>3 seconds</option>
-						<option value="interaction" <?php selected(get_option('rapidpress_js_delay_duration'), 'interaction'); ?>>Until user interaction</option>
+					<select name="rapidpress_js_delay_type" id="rapidpress_js_delay_type">
+						<option value="all" <?php selected(get_option('rapidpress_js_delay_type'), 'all'); ?>>All JavaScripts</option>
+						<option value="specific" <?php selected(get_option('rapidpress_js_delay_type'), 'specific'); ?>>Specific JavaScripts</option>
 					</select>
-					<div class="checkbox-btn" id="rapidpress_enable_js_delay_exclusions_btn">
-						<label>
-							<input type="checkbox" name="rapidpress_enable_js_delay_exclusions" id="rapidpress_enable_js_delay_exclusions" value="1" <?php checked(1, get_option('rapidpress_enable_js_delay_exclusions'), true); ?> />
-							<span>Enable JS Delay Exclusions</span>
-						</label>
+
+
+					<div id="rapidpress_js_delay_duration" style="margin-top: 10px;">
+						<select name="rapidpress_js_delay_duration">
+							<option value="1" <?php selected(get_option('rapidpress_js_delay_duration'), '1'); ?>>1 second</option>
+							<option value="2" <?php selected(get_option('rapidpress_js_delay_duration'), '2'); ?>>2 seconds</option>
+							<option value="3" <?php selected(get_option('rapidpress_js_delay_duration'), '3'); ?>>3 seconds</option>
+							<option value="interaction" <?php selected(get_option('rapidpress_js_delay_duration'), 'interaction'); ?>>Until user interaction</option>
+						</select>
 					</div>
+
+					<div id="js_delay_exclusions_wrapper">
+						<div class="checkbox-btn" id="rapidpress_enable_js_delay_exclusions_btn">
+							<label>
+								<input type="checkbox" name="rapidpress_enable_js_delay_exclusions" id="rapidpress_enable_js_delay_exclusions" value="1" <?php checked(1, get_option('rapidpress_enable_js_delay_exclusions'), true); ?> />
+								<span>Enable JS Delay Exclusions</span>
+							</label>
+						</div>
+					</div>
+
+
 				</td>
 			</tr>
+
+			<tr valign="top" id="rapidpress_js_delay_specific" style="display: none;">
+				<th scope="row">Specific JS Files</th>
+				<td>
+					<textarea name="rapidpress_js_delay_specific_files" rows="3" cols="70" placeholder="Enter one JavaScript file URL per line"><?php echo esc_textarea(get_option('rapidpress_js_delay_specific_files', '')); ?></textarea>
+					<p class="description">Enter the URLs of JavaScript files you want to delay, one per line.</p>
+
+				</td>
+			</tr>
+
 			<tr valign="top" id="rapidpress_js_delay_exclusions_row" style="display: none;">
 				<th scope="row">JS Delay Exclusions</th>
 				<td>

@@ -1,6 +1,8 @@
 <?php
 
-class RapidPress_Optimization_Scope {
+namespace RapidPress;
+
+class Optimization_Scope {
 
 	public static function should_optimize() {
 		$scope = get_option('rapidpress_optimization_scope', 'entire_site');

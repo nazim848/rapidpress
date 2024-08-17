@@ -19,15 +19,16 @@ if (!defined('WPINC')) {
 }
 
 define('RAPIDPRESS_VERSION', '1.0.0');
-define('RAPIDPRESS_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('RAPIDPRESS_PATH', plugin_dir_path(__FILE__));
 define('RAPIDPRESS_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('RAPIDPRESS_PLUGIN_FILE', __FILE__);
 
 // Load the main plugin class
 require plugin_dir_path(__FILE__) . 'includes/class-rapidpress.php';
 
 // Run the plugin
 function run_rapidpress() {
-	$plugin = new RapidPress();
+	$plugin = new RapidPress\RapidPress();
 	$plugin->run();
 }
 run_rapidpress();

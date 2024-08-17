@@ -1,6 +1,8 @@
 <?php
 
-class RapidPress_JS_Minifier {
+namespace RapidPress;
+
+class JS_Minifier {
 
 	public function minify($js) {
 		if (trim($js) === "") return $js;

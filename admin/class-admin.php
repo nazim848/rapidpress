@@ -1,6 +1,8 @@
 <?php
 
-class RapidPress_Admin {
+namespace RapidPress;
+
+class Admin {
 	private $plugin_name;
 	private $version;
 
@@ -14,6 +16,7 @@ class RapidPress_Admin {
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_styles'));
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
 		add_action('admin_bar_menu', array($this, 'add_toolbar_items'), 100);
+		add_filter('plugin_action_links_' . plugin_basename(RAPIDPRESS_PLUGIN_FILE), array($this, 'add_action_links'));
 	}
 
 	public function enqueue_styles($hook) {
@@ -46,6 +49,12 @@ class RapidPress_Admin {
 <?php
 			delete_transient('rapidpress_activation_notice');
 		}
+	}
+
+	public function add_action_links($links) {
+		$settings_link = '<a href="' . admin_url('options-general.php?page=rapidpress') . '">' . __('Settings', 'rapidpress') . '</a>';
+		array_unshift($links, $settings_link);
+		return $links;
 	}
 
 	// Add the main RapidPress menu item to the settings menu
@@ -100,7 +109,7 @@ class RapidPress_Admin {
 			$active_tab = '#' . sanitize_text_field($_GET['tab']);
 		}
 
-		include_once 'partials/rapidpress-admin-display.php';
+		include_once 'partials/admin-display.php';
 
 		echo "<script>jQuery(document).ready(function($) { setActiveTab('$active_tab'); });</script>";
 	}
@@ -134,9 +143,17 @@ class RapidPress_Admin {
 				'sanitize_callback' => array($this, 'sanitize_js_defer_exclusions'),
 			),
 			'rapidpress_js_delay' => 'boolean',
+			'rapidpress_js_delay_type' => array(
+				'type' => 'string',
+				'sanitize_callback' => array($this, 'sanitize_js_delay_type'),
+			),
 			'rapidpress_js_delay_duration' => array(
 				'type' => 'string',
 				'sanitize_callback' => array($this, 'sanitize_js_delay_duration'),
+			),
+			'rapidpress_js_delay_specific_files' => array(
+				'type' => 'string',
+				'sanitize_callback' => array($this, 'sanitize_js_delay_specific_files'),
 			),
 			'rapidpress_enable_js_delay_exclusions' => 'boolean',
 			'rapidpress_js_delay_exclusions' => array(
@@ -172,17 +189,13 @@ class RapidPress_Admin {
 			foreach ($input as $rule) {
 				if (!empty($rule['styles'])) {
 					$sanitized_rule = array(
-						'styles' => is_array($rule['styles'])
-							? array_filter(array_map('trim', $rule['styles']))
-							: array_filter(array_map('trim', explode("\n", sanitize_textarea_field($rule['styles'])))),
-						'scope' => isset($rule['scope']) ? sanitize_text_field($rule['scope']) : 'entire_site',
-						'pages' => array(),
+						'styles' => $this->sanitize_scripts_or_styles($rule['styles']),
+						'scope' => sanitize_text_field($rule['scope']),
+						'exclude_enabled' => isset($rule['exclude_enabled']) ? '1' : '0',
+						'exclude_pages' => $this->sanitize_pages($rule['exclude_pages']),
+						'pages' => $this->sanitize_pages($rule['pages']),
+						'is_active' => isset($rule['is_active']) ? '1' : '0',
 					);
-					if ($sanitized_rule['scope'] === 'specific_pages' && !empty($rule['pages'])) {
-						$sanitized_rule['pages'] = is_array($rule['pages'])
-							? array_filter(array_map('trailingslashit', array_map('esc_url_raw', $rule['pages'])))
-							: array_filter(array_map('trailingslashit', array_map('esc_url_raw', explode("\n", sanitize_textarea_field($rule['pages'])))));
-					}
 					if (!empty($sanitized_rule['styles'])) {
 						$sanitized_rules[] = $sanitized_rule;
 					}
@@ -192,6 +205,23 @@ class RapidPress_Admin {
 		return $sanitized_rules;
 	}
 
+	private function sanitize_scripts_or_styles($input) {
+		if (is_array($input)) {
+			return array_filter(array_map('trim', $input));
+		} elseif (is_string($input)) {
+			return array_filter(array_map('trim', explode("\n", sanitize_textarea_field($input))));
+		}
+		return array();
+	}
+
+	private function sanitize_pages($input) {
+		if (is_array($input)) {
+			return array_filter(array_map('trailingslashit', array_map('esc_url_raw', $input)));
+		} elseif (is_string($input)) {
+			return array_filter(array_map('trailingslashit', array_map('esc_url_raw', explode("\n", sanitize_textarea_field($input)))));
+		}
+		return array();
+	}
 
 	public function sanitize_optimization_excluded_pages($input) {
 		$pages = explode("\n", $input);
@@ -250,6 +280,23 @@ class RapidPress_Admin {
 		return implode("\n", array_filter($sanitized));
 	}
 
+	public function sanitize_js_delay_type($input) {
+		$valid_options = array('all', 'specific');
+		return in_array($input, $valid_options) ? $input : 'all';
+	}
+
+	public function sanitize_js_delay_specific_files($input) {
+		if (!is_string($input)) {
+			return '';
+		}
+		$files = explode("\n", $input);
+		$sanitized = array();
+		foreach ($files as $file) {
+			$sanitized[] = esc_url_raw(trim($file));
+		}
+		return implode("\n", array_filter($sanitized));
+	}
+
 	public function sanitize_js_disable_rules($input) {
 		$sanitized_rules = array();
 		if (is_array($input)) {
@@ -260,7 +307,10 @@ class RapidPress_Admin {
 							? array_filter(array_map('trim', $rule['scripts']))
 							: array_filter(array_map('trim', explode("\n", sanitize_textarea_field($rule['scripts'])))),
 						'scope' => sanitize_text_field($rule['scope']),
+						'exclude_enabled' => isset($rule['exclude_enabled']) ? '1' : '0',
+						'exclude_pages' => isset($rule['exclude_pages']) ? sanitize_textarea_field($rule['exclude_pages']) : '',
 						'pages' => array(),
+						'is_active' => isset($rule['is_active']) ? '1' : '0',
 					);
 					if ($sanitized_rule['scope'] === 'specific_pages' && !empty($rule['pages'])) {
 						$sanitized_rule['pages'] = is_array($rule['pages'])

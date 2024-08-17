@@ -1,6 +1,8 @@
 <?php
 
-class RapidPress_Loader {
+namespace RapidPress;
+
+class Loader {
 	protected $actions;
 	protected $filters;
 

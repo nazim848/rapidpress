@@ -1,6 +1,8 @@
 <?php
 
-class RapidPress_Asset_Manager {
+namespace RapidPress;
+
+class Asset_Manager {
 
 	public function __construct() {
 		add_action('wp_enqueue_scripts', array($this, 'manage_js_assets'), 9999);
@@ -16,6 +18,9 @@ class RapidPress_Asset_Manager {
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($css_rules as $rule) {
+			if (!isset($rule['is_active']) || $rule['is_active'] !== '1') {
+				continue;
+			}
 			$styles = $this->get_styles_from_rule($rule);
 			$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site';
 			$should_disable = $this->should_disable_for_scope($scope, $current_url, $rule);
@@ -28,12 +33,12 @@ class RapidPress_Asset_Manager {
 		}
 	}
 
-	private function disable_style($handle) {
-		if (wp_style_is($handle, 'enqueued')) {
-			wp_dequeue_style($handle);
+	private function disable_style($style) {
+		if (wp_style_is($style, 'enqueued')) {
+			wp_dequeue_style($style);
 		}
-		if (wp_style_is($handle, 'registered')) {
-			wp_deregister_style($handle);
+		if (wp_style_is($style, 'registered')) {
+			wp_deregister_style($style);
 		}
 	}
 
@@ -42,6 +47,9 @@ class RapidPress_Asset_Manager {
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($css_rules as $rule) {
+			if (!isset($rule['is_active']) || $rule['is_active'] !== '1') {
+				continue;
+			}
 			$styles = $this->get_styles_from_rule($rule);
 			$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site';
 			$should_disable = $this->should_disable_for_scope($scope, $current_url, $rule);
@@ -57,15 +65,28 @@ class RapidPress_Asset_Manager {
 	private function should_disable_for_scope($scope, $current_url, $rule) {
 		switch ($scope) {
 			case 'entire_site':
+				if (isset($rule['exclude_enabled']) && $rule['exclude_enabled'] == '1') {
+					$excluded_pages = isset($rule['exclude_pages']) ? $this->parse_pages($rule['exclude_pages']) : array();
+					return !in_array($current_url, $excluded_pages);
+				}
 				return true;
 			case 'front_page':
 				return $this->is_front_page();
 			case 'specific_pages':
-				$pages = $this->get_pages_from_rule($rule);
+				$pages = isset($rule['pages']) ? $this->parse_pages($rule['pages']) : array();
 				return in_array($current_url, $pages);
 			default:
 				return false;
 		}
+	}
+
+	private function parse_pages($pages) {
+		if (is_array($pages)) {
+			return array_map('trailingslashit', array_map('esc_url_raw', $pages));
+		} elseif (is_string($pages)) {
+			return array_map('trailingslashit', array_map('esc_url_raw', explode("\n", $pages)));
+		}
+		return array();
 	}
 
 	public function remove_style_tag($tag, $handle) {
@@ -78,6 +99,9 @@ class RapidPress_Asset_Manager {
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($css_rules as $rule) {
+			if (!isset($rule['is_active']) || $rule['is_active'] !== '1') {
+				continue;
+			}
 			$styles = $this->get_styles_from_rule($rule);
 			$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site';
 			$should_disable = $this->should_disable_for_scope($scope, $current_url, $rule);
@@ -95,7 +119,10 @@ class RapidPress_Asset_Manager {
 	}
 
 	private function get_styles_from_rule($rule) {
-		return isset($rule['styles']) ? $rule['styles'] : array();
+		if (isset($rule['styles'])) {
+			return is_array($rule['styles']) ? $rule['styles'] : array_filter(array_map('trim', explode("\n", $rule['styles'])));
+		}
+		return array();
 	}
 
 	public function final_js_cleanup() {
@@ -103,10 +130,14 @@ class RapidPress_Asset_Manager {
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($js_rules as $rule) {
-			$pages = $this->get_pages_from_rule($rule);
+			if (!isset($rule['is_active']) || $rule['is_active'] !== '1') {
+				continue;
+			}
 			$scripts = $this->get_scripts_from_rule($rule);
+			$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site';
+			$should_disable = $this->should_disable_for_scope($scope, $current_url, $rule);
 
-			if (in_array($current_url, $pages)) {
+			if ($should_disable) {
 				foreach ($scripts as $script) {
 					$this->disable_script($script);
 				}
@@ -119,21 +150,12 @@ class RapidPress_Asset_Manager {
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($js_rules as $rule) {
-			$scripts = $this->get_scripts_from_rule($rule);
-			$should_disable = false;
-
-			switch ($rule['scope']) {
-				case 'entire_site':
-					$should_disable = true;
-					break;
-				case 'front_page':
-					$should_disable = $this->is_front_page();
-					break;
-				case 'specific_pages':
-					$pages = $this->get_pages_from_rule($rule);
-					$should_disable = in_array($current_url, $pages);
-					break;
+			if (!isset($rule['is_active']) || $rule['is_active'] !== '1') {
+				continue;
 			}
+			$scripts = $this->get_scripts_from_rule($rule);
+			$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site';
+			$should_disable = $this->should_disable_for_scope($scope, $current_url, $rule);
 
 			if ($should_disable) {
 				foreach ($scripts as $script) {
@@ -172,10 +194,14 @@ class RapidPress_Asset_Manager {
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($js_rules as $rule) {
-			$pages = $this->get_pages_from_rule($rule);
+			if (!isset($rule['is_active']) || $rule['is_active'] !== '1') {
+				continue;
+			}
 			$scripts = $this->get_scripts_from_rule($rule);
+			$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site';
+			$should_disable = $this->should_disable_for_scope($scope, $current_url, $rule);
 
-			if (in_array($current_url, $pages)) {
+			if ($should_disable) {
 				foreach ($scripts as $script) {
 					if ($handle === $script || strpos($tag, $script) !== false) {
 						return '';
@@ -188,9 +214,8 @@ class RapidPress_Asset_Manager {
 	}
 
 	private function get_pages_from_rule($rule) {
-		return isset($rule['pages']) ? $rule['pages'] : array();
+		return isset($rule['pages']) ? $this->parse_pages($rule['pages']) : array();
 	}
-
 
 	private function get_scripts_from_rule($rule) {
 		if (is_array($rule['scripts'])) {

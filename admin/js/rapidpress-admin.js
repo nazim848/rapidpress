@@ -84,21 +84,28 @@ class RapidPressAdmin {
 						<option value="front_page">Front Page</option>
 						<option value="specific_pages">Specific Pages</option>
 				  </select>
-				  <textarea cols="65" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
-			 </td>
-			 <td><button type="button" class="button remove-${ruleName}-rule">Remove</button></td>
+				 
+                    <label class="${ruleName}-exclude-pages-wrapper" style="display:inline-block;"><input type="checkbox" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_enabled]" class="${ruleName}-exclude-enabled" value="1"> Exclude pages?</label>
+                    <textarea cols="63" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-exclude-pages" style="display:none;"></textarea>
+                  
+				  <textarea cols="63" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
+     </td>
+     <td>
+	  <div class="checkbox-btn"><label><input type="checkbox" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][is_active]" value="1" checked><span>Active</span></label></div>
+         <button type="button" class="button remove-${ruleName}-rule">Remove</button>
+     </td>
 		`;
 
 		if (ruleName === "js") {
 			return `
 				  <tr>
-						<td><textarea cols="65" rows="3" name="rapidpress_js_disable_rules[new_${timestamp}][scripts]" placeholder="Script URL or Handle (one per line)"></textarea></td>
+						<td><textarea cols="63" rows="3" name="rapidpress_js_disable_rules[new_${timestamp}][scripts]" placeholder="Script URL or Handle (one per line)"></textarea></td>
 						${commonFields}
 				  </tr>`;
 		} else if (ruleName === "css") {
 			return `
 				  <tr>
-						<td><textarea cols="65" rows="3" name="rapidpress_css_disable_rules[new_${timestamp}][styles]" placeholder="CSS URL or Handle (one per line)"></textarea></td>
+						<td><textarea cols="63" rows="3" name="rapidpress_css_disable_rules[new_${timestamp}][styles]" placeholder="CSS URL or Handle (one per line)"></textarea></td>
 						${commonFields}
 				  </tr>`;
 		}
@@ -112,6 +119,52 @@ class RapidPressAdmin {
 		this.setupTabSwitching();
 		this.setupFormSubmission();
 		this.setupSubmitButtonVisibility();
+
+		// Handle JS and CSS disable scope change
+		this.$(document).on(
+			"change",
+			".js-disable-scope, .css-disable-scope",
+			event => {
+				const $select = this.$(event.target);
+				const $row = $select.closest("tr");
+				const $excludeWrapper = $row.find(
+					".js-exclude-pages-wrapper, .css-exclude-pages-wrapper"
+				);
+				const $excludePages = $row.find(
+					".js-exclude-pages, .css-exclude-pages"
+				);
+				const $disablePages = $row.find(
+					".js-disable-pages, .css-disable-pages"
+				);
+
+				if ($select.val() === "entire_site") {
+					$excludeWrapper.show();
+					$disablePages.hide();
+				} else {
+					$excludeWrapper.hide();
+					$excludePages.hide();
+					if ($select.val() === "specific_pages") {
+						$disablePages.show();
+					} else {
+						$disablePages.hide();
+					}
+				}
+			}
+		);
+
+		// Handle exclude pages checkbox change
+		this.$(document).on(
+			"change",
+			".js-exclude-enabled, .css-exclude-enabled",
+			event => {
+				const $checkbox = this.$(event.target);
+				const $row = $checkbox.closest("tr");
+				const $excludePages = $row.find(
+					".js-exclude-pages, .css-exclude-pages"
+				);
+				$excludePages.toggle($checkbox.is(":checked"));
+			}
+		);
 	}
 
 	setupOptimizationScope() {
@@ -165,6 +218,44 @@ class RapidPressAdmin {
 			})
 			.change();
 
+		// Handle JS delay options
+		const $jsDelay = this.$("#rapidpress_js_delay");
+		const $jsDelayOptions = this.$("#rapidpress_js_delay_options");
+		const $jsDelayType = this.$("#rapidpress_js_delay_type");
+		const $jsDelaySpecific = this.$("#rapidpress_js_delay_specific");
+		const $jsDelayAll = this.$("#js_delay_exclusions_wrapper");
+		const $jsDelayDuration = this.$("#rapidpress_js_delay_duration").parent(); // Select the parent container
+		const $jsDelayExclusionsRow = this.$(
+			"#rapidpress_js_delay_exclusions_row"
+		);
+		const $enableJsDelayExclusions = this.$(
+			"#rapidpress_enable_js_delay_exclusions"
+		);
+
+		const updateJsDelayVisibility = () => {
+			const isJsDelayChecked = $jsDelay.is(":checked");
+			const isSpecific = $jsDelayType.val() === "specific";
+			const isExclusionsEnabled = $enableJsDelayExclusions.is(":checked");
+
+			$jsDelayOptions.toggle(isJsDelayChecked);
+			$jsDelaySpecific.toggle(isJsDelayChecked && isSpecific);
+			$jsDelayAll.toggle(isJsDelayChecked && !isSpecific);
+			$jsDelayDuration.toggle(isJsDelayChecked); // Always show duration when JS delay is checked
+			$jsDelayExclusionsRow.toggle(
+				isJsDelayChecked && !isSpecific && isExclusionsEnabled
+			);
+			$enableJsDelayExclusions
+				.closest(".checkbox-btn")
+				.toggle(isJsDelayChecked && !isSpecific);
+		};
+
+		$jsDelay.change(updateJsDelayVisibility);
+		$jsDelayType.change(updateJsDelayVisibility);
+		$enableJsDelayExclusions.change(updateJsDelayVisibility);
+
+		// Initial state
+		updateJsDelayVisibility();
+
 		// Handle JS and CSS disable scope change
 		this.$(document).on(
 			"change",
@@ -188,7 +279,7 @@ class RapidPressAdmin {
 			const isMainChecked = $mainCheckbox.is(":checked");
 			const isExclusionChecked = $exclusionCheckbox.is(":checked");
 
-			$exclusionCheckbox.closest("label").toggle(isMainChecked);
+			$exclusionCheckbox.closest(".checkbox-btn").toggle(isMainChecked);
 			$row.toggle(isMainChecked && isExclusionChecked);
 		};
 
@@ -208,11 +299,11 @@ class RapidPressAdmin {
 
 			// Close all other accordions
 			this.$(".accordion-header").not($this).removeClass("active");
-			this.$(".accordion-content").not($content).slideUp(200);
+			this.$(".accordion-content").not($content).slideUp(250);
 
 			// Toggle the clicked accordion
 			$this.toggleClass("active", !isActive);
-			$content.slideToggle(200);
+			$content.slideToggle(250);
 
 			this.saveAccordionState();
 		});
