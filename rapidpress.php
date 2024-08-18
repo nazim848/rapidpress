@@ -26,6 +26,13 @@ define('RAPIDPRESS_PLUGIN_FILE', __FILE__);
 // Load the main plugin class
 require plugin_dir_path(__FILE__) . 'includes/class-rapidpress.php';
 
+// Check if the plugin version is different from the current version
+$rapidpress_version = get_option('rapidpress_version');
+//update version
+if ($rapidpress_version != RAPIDPRESS_VERSION) {
+	update_option('rapidpress_version', RAPIDPRESS_VERSION, false);
+}
+
 // Run the plugin
 function run_rapidpress() {
 	$plugin = new RapidPress\RapidPress();

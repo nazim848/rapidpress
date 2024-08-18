@@ -26,22 +26,22 @@ class HTML_Minifier {
 		}
 
 		// Apply JS delay first
-		if (get_option('rapidpress_js_delay')) {
+		if (RP_Options::get_option('js_delay')) {
 			$html = $this->js_delay->apply_js_delay($html);
 		}
 
 		// Minify HTML
-		if (get_option('rapidpress_html_minify')) {
+		if (RP_Options::get_option('html_minify')) {
 			$html = $this->perform_html_minification($html);
 		}
 
 		// Minify inline CSS
-		if (get_option('rapidpress_css_minify')) {
+		if (RP_Options::get_option('css_minify')) {
 			$html = $this->css_minifier->minify_inline_css($html);
 		}
 
 		// Minify inline JavaScript
-		if (get_option('rapidpress_js_minify')) {
+		if (RP_Options::get_option('js_minify')) {
 			$html = $this->js_minifier->minify_inline_js($html);
 		}
 		return $html;

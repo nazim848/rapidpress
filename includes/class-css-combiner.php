@@ -21,19 +21,19 @@ class CSS_Combiner {
 
 	private function set_excluded_files() {
 
-		$enable_exclusions = get_option('rapidpress_enable_combine_css_exclusions', '0');
+		$enable_exclusions = RP_Options::get_option('enable_combine_css_exclusions', '0');
 		if ($enable_exclusions !== '1') {
 			return true;
 		}
 
-		$exclusions = get_option('rapidpress_combine_css_exclusions', '');
+		$exclusions = RP_Options::get_option('combine_css_exclusions', '');
 		$this->excluded_files = array_filter(array_map('trim', explode("\n", $exclusions)));
 	}
 
 	public function combine_css() {
 
 		// Exclude admin, POST requests, and pages not in the optimization scope
-		if (!get_option('rapidpress_combine_css') || is_admin() || !\RapidPress\Optimization_Scope::should_optimize()) {
+		if (!RP_Options::get_option('combine_css') || is_admin() || !\RapidPress\Optimization_Scope::should_optimize()) {
 			$this->debug_log[] = "CSS combination is disabled, is admin page, or not in optimization scope.";
 			return;
 		}
@@ -165,11 +165,12 @@ class CSS_Combiner {
 			'hash' => $styles_hash,
 			'expires' => time() + $this->cache_expiration,
 		);
-		update_option('rapidpress_css_cache_meta', $cache_meta);
+
+		RP_Options::update_option('css_cache_meta', $cache_meta);
 	}
 
 	private function is_cached_file_valid($styles_hash) {
-		$cache_meta = get_option('rapidpress_css_cache_meta', array());
+		$cache_meta = RP_Options::get_option('css_cache_meta', array());
 		if (isset($cache_meta['hash']) && $cache_meta['hash'] === $styles_hash) {
 			if (isset($cache_meta['expires']) && $cache_meta['expires'] > time()) {
 				return true;

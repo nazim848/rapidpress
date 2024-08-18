@@ -10,24 +10,12 @@ if (!current_user_can('manage_options')) {
 // Process form submission
 if (isset($_POST['rapidpress_options'])) {
 	check_admin_referer('rapidpress_options_verify');
-	$options = array(
-		'rapidpress_js_defer',
-		'rapidpress_js_defer_exclusions',
-		// ... other options ...	
-	);
-
-	foreach ($options as $option) {
-		if (isset($_POST[$option])) {
-			update_option($option, $_POST[$option]);
-		} else {
-			delete_option($option);
-		}
-	}
+	$options = $_POST['rapidpress_options'];
+	$sanitized_options = $this->sanitize_options($options);
+	update_option('rapidpress_options', $sanitized_options);
 	wp_safe_redirect(add_query_arg('settings-updated', 'true', wp_get_referer()));
 	exit;
-	// Process and sanitize form data here
 }
-
 $settings_updated = isset($_GET['settings-updated']) && $_GET['settings-updated'] == 'true';
 
 // Define tabs

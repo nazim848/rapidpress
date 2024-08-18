@@ -19,6 +19,7 @@ class RapidPress {
 
 	private function load_dependencies() {
 		require_once RAPIDPRESS_PATH . 'includes/class-loader.php';
+		require_once RAPIDPRESS_PATH . 'includes/class-rapidpress-options.php';
 		require_once RAPIDPRESS_PATH . 'includes/class-html-minifier.php';
 		require_once RAPIDPRESS_PATH . 'includes/class-css-minifier.php';
 		require_once RAPIDPRESS_PATH . 'includes/class-css-combiner.php';
