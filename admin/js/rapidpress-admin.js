@@ -9,6 +9,40 @@ class RapidPressAdmin {
 		this.initializeTabs();
 		this.restoreAccordionState();
 		this.initializeRuleManagement();
+		this.setupResetSettings();
+	}
+
+	setupResetSettings() {
+		this.$("#rapidpress-reset-settings").on("click", e => {
+			e.preventDefault();
+			if (
+				confirm(
+					"Are you sure you want to reset all RapidPress settings? This action cannot be undone."
+				)
+			) {
+				this.$.ajax({
+					url: rapidpress_admin.ajax_url,
+					type: "POST",
+					data: {
+						action: "rapidpress_reset_settings",
+						nonce: rapidpress_admin.nonce
+					},
+					success: response => {
+						if (response.success) {
+							alert(
+								"Settings reset successfully. The page will now reload."
+							);
+							location.reload();
+						} else {
+							alert("Failed to reset settings. Please try again.");
+						}
+					},
+					error: () => {
+						alert("An error occurred. Please try again.");
+					}
+				});
+			}
+		});
 	}
 
 	// Helper methods
@@ -79,29 +113,29 @@ class RapidPressAdmin {
 		const timestamp = Date.now();
 		const commonFields = `
 			 <td>
-			 <select name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][scope]" class="${ruleName}-disable-scope">
+			 <select name="rapidpress_options[${ruleName}_disable_rules][new_${timestamp}][scope]" class="${ruleName}-disable-scope">
 						<option value="entire_site">Entire Site</option>
 						<option value="front_page">Front Page</option>
 						<option value="specific_pages">Specific Pages</option>
-				  </select><div class="checkbox-radio"><label class="${ruleName}-exclude-pages-wrapper" style="display:inline-block;"><input type="checkbox" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_enabled]" class="${ruleName}-exclude-enabled" value="1"> Exclude pages?</label></div>
-				 <textarea cols="63" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-exclude-pages" style="display:none;"></textarea>
-				 <textarea cols="63" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
+				  </select><div class="checkbox-radio"><label class="${ruleName}-exclude-pages-wrapper" style="display:inline-block;"><input type="checkbox" name="rapidpress_options[${ruleName}_disable_rules][new_${timestamp}][exclude_enabled]" class="${ruleName}-exclude-enabled" value="1"> Exclude pages?</label></div>
+				 <textarea cols="63" rows="3" name="rapidpress_options[${ruleName}_disable_rules][new_${timestamp}][exclude_pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-exclude-pages" style="display:none;"></textarea>
+				 <textarea cols="63" rows="3" name="rapidpress_options[${ruleName}_disable_rules][new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
      </td>
      <td>
-	  <div class="checkbox-btn"><label><input type="checkbox" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][is_active]" value="1" checked><span>Active</span></label></div>
+	  <div class="checkbox-btn"><label><input type="checkbox" name="rapidpress_options[${ruleName}_disable_rules][new_${timestamp}][is_active]" value="1" checked><span>Active</span></label></div>
          <button type="button" class="button remove-${ruleName}-rule">Remove</button>
      </td>
 		`;
 		if (ruleName === "js") {
 			return `
 				  <tr>
-						<td><textarea cols="63" rows="3" name="rapidpress_js_disable_rules[new_${timestamp}][scripts]" placeholder="Script URL or Handle (one per line)"></textarea></td>
+						<td><textarea cols="63" rows="3" name="rapidpress_options[js_disable_rules][new_${timestamp}][scripts]" placeholder="Script URL or Handle (one per line)"></textarea></td>
 						${commonFields}
 				  </tr>`;
 		} else if (ruleName === "css") {
 			return `
 				  <tr>
-						<td><textarea cols="63" rows="3" name="rapidpress_css_disable_rules[new_${timestamp}][styles]" placeholder="CSS URL or Handle (one per line)"></textarea></td>
+						<td><textarea cols="63" rows="3" name="rapidpress_options[css_disable_rules][new_${timestamp}][styles]" placeholder="CSS URL or Handle (one per line)"></textarea></td>
 						${commonFields}
 				  </tr>`;
 		}

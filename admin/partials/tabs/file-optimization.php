@@ -126,7 +126,7 @@ use RapidPress\RP_Options;
 				</td>
 			</tr>
 			<tr valign="top">
-				<th scope="row">Delay JavaScript Loading</th>
+				<th scope="row">Delay JavaScript</th>
 				<td>
 					<div class="checkbox-radio">
 						<label>

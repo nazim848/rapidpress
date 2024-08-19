@@ -17,6 +17,7 @@ class Admin {
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
 		add_action('admin_bar_menu', array($this, 'add_toolbar_items'), 100);
 		add_filter('plugin_action_links_' . plugin_basename(RAPIDPRESS_PLUGIN_FILE), array($this, 'add_action_links'));
+		add_action('wp_ajax_rapidpress_reset_settings', array($this, 'reset_settings'));
 	}
 
 	public function enqueue_styles($hook) {
@@ -214,6 +215,40 @@ class Admin {
 		return $sanitized_options;
 	}
 
+	public function reset_settings() {
+		check_ajax_referer('rapidpress_admin_nonce', 'nonce');
+
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error('Insufficient permissions');
+		}
+
+		$default_options = [
+			// 'optimization_scope' => 'entire_site',
+			// 'enable_optimization_scope_exclusions' => '0',
+			// 'optimized_pages' => '',
+			// 'optimization_excluded_pages' => '',
+			// 'html_minify' => '0',
+			// 'css_minify' => '0',
+			// 'combine_css' => '0',
+			// 'enable_combine_css_exclusions' => '0',
+			// 'combine_css_exclusions' => '',
+			// 'js_minify' => '0',
+			// 'js_defer' => '0',
+			// 'enable_js_defer_exclusions' => '0',
+			// 'js_defer_exclusions' => '',
+			// 'js_delay' => '0',
+			// 'js_delay_type' => 'all',
+			// 'js_delay_duration' => '1',
+			// 'enable_js_delay_exclusions' => '0',
+			// 'js_delay_exclusions' => '',
+			// 'js_delay_specific_files' => '',
+			// 'js_disable_rules' => [],
+			// 'css_disable_rules' => []
+		];
+		update_option('rapidpress_options', $default_options);
+		wp_send_json_success('Settings reset successfully');
+	}
+
 	public function sanitize_css_disable_rules($input) {
 		$sanitized_rules = array();
 		if (is_array($input)) {
@@ -278,8 +313,15 @@ class Admin {
 		foreach ($lines as $line) {
 			$sanitized[] = esc_url_raw(trim($line));
 		}
+
 		return implode("\n", array_filter($sanitized));
 	}
+
+	// private function sanitize_combine_css_exclusions($input) {
+	// 	$sanitized = sanitize_textarea_field($input);
+	// 	error_log("Sanitized CSS Exclusions: " . $sanitized);
+	// 	return $sanitized;
+	// }
 
 	public function sanitize_js_defer_exclusions($input) {
 		if (!is_string($input)) {
@@ -290,6 +332,7 @@ class Admin {
 		foreach ($exclusions as $exclusion) {
 			$sanitized[] = esc_url_raw(trim($exclusion));
 		}
+
 		return implode("\n", array_filter($sanitized));
 	}
 

@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 				<th scope="row">Reset Settings</th>
 				<td>
 					<div class="checkbox-radio">
-						<button type="button" class="button" onclick="rapidpress_reset_settings()">Reset Settings</button>
+						<button type="button" class="button" id="rapidpress-reset-settings">Reset Settings</button>
 						<span class="dashicons dashicons-editor-help" title="Reset all plugin settings to their default values"></span>
 					</div>
 				</td>

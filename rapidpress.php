@@ -18,7 +18,7 @@ if (!defined('WPINC')) {
 	die;
 }
 
-define('RAPIDPRESS_VERSION', '1.0.0');
+define('RAPIDPRESS_VERSION', '1.0');
 define('RAPIDPRESS_PATH', plugin_dir_path(__FILE__));
 define('RAPIDPRESS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('RAPIDPRESS_PLUGIN_FILE', __FILE__);

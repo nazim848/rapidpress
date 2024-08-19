@@ -14,7 +14,7 @@ class Asset_Manager {
 	}
 
 	public function manage_css_assets() {
-		$css_rules = get_option('rapidpress_css_disable_rules', array());
+		$css_rules = RP_Options::get_option('css_disable_rules', array());
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($css_rules as $rule) {
@@ -43,7 +43,7 @@ class Asset_Manager {
 	}
 
 	public function final_css_cleanup() {
-		$css_rules = get_option('rapidpress_css_disable_rules', array());
+		$css_rules = RP_Options::get_option('css_disable_rules', array());
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($css_rules as $rule) {
@@ -90,7 +90,7 @@ class Asset_Manager {
 	}
 
 	public function remove_style_tag($tag, $handle) {
-		$css_rules = get_option('rapidpress_css_disable_rules', array());
+		$css_rules = RP_Options::get_option('css_disable_rules', array());
 
 		if (empty($css_rules)) {
 			return $tag;
@@ -126,7 +126,7 @@ class Asset_Manager {
 	}
 
 	public function final_js_cleanup() {
-		$js_rules = get_option('rapidpress_js_disable_rules', array());
+		$js_rules = RP_Options::get_option('js_disable_rules', array());
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($js_rules as $rule) {
@@ -146,7 +146,7 @@ class Asset_Manager {
 	}
 
 	public function manage_js_assets() {
-		$js_rules = get_option('rapidpress_js_disable_rules', array());
+		$js_rules = RP_Options::get_option('js_disable_rules', array());
 		$current_url = trailingslashit($this->get_current_url());
 
 		foreach ($js_rules as $rule) {
@@ -185,7 +185,7 @@ class Asset_Manager {
 	}
 
 	public function remove_script_tag($tag, $handle) {
-		$js_rules = get_option('rapidpress_js_disable_rules', array());
+		$js_rules = RP_Options::get_option('js_disable_rules', array());
 
 		if (empty($js_rules)) {
 			return $tag;
