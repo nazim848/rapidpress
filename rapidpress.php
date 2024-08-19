@@ -2,15 +2,32 @@
 
 /**
  * Plugin Name: RapidPress
- * Plugin URI: https://github.com/yourusername/rapidpress
- * Description: A lightweight and robust WordPress optimization plugin
- * Version: 1.0.0
+ * Description: A lightweight and robust WordPress speed optimization plugin with granual control over your website.
+ * Version: 1.0
  * Author: Nazim Husain
- * Author URI: https://yourwebsite.com
+ * Author URI: https://nazimansari.com
  * License: GPL-2.0+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain: rapidpress
  * Domain Path: /languages
+ */
+
+/**
+ * @copyright 2024  Nazim Husain  https://nazimansari.com
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 // If this file is called directly, abort.

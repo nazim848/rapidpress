@@ -211,6 +211,10 @@ class Admin {
 			$sanitized_options['css_disable_rules'] = $this->sanitize_css_disable_rules($options['css_disable_rules']);
 		}
 
+		if (isset($options['clean_uninstall'])) {
+			$sanitized_options['clean_uninstall'] = (bool) $options['clean_uninstall'];
+		}
+
 		// Add more sanitization for other options...
 		return $sanitized_options;
 	}
