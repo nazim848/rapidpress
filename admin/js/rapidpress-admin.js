@@ -417,6 +417,14 @@ jQuery(function ($) {
 
 	// Initialize tabs
 	const urlParams = new URLSearchParams(window.location.search);
-	const activeTab = urlParams.get("tab") || "dashboard";
+	const activeTab = urlParams.get("tab") || "general";
 	setActiveTab(activeTab);
+
+	// Make submit button visible after all the tabs are loaded
+	setTimeout(function () {
+		var submitButton = document.getElementById("submit-button");
+		if (submitButton) {
+			submitButton.style.display = "block";
+		}
+	}, 50); // Delay of 50 milliseconds
 });

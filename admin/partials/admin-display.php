@@ -70,21 +70,20 @@ if (!array_key_exists($active_tab, $tabs)) {
 				<?php
 				foreach ($tabs as $tab_id => $tab_name) {
 					$style = ($tab_id === $active_tab) ? '' : 'style="display:none;"';
-					// echo '<div id="' . esc_attr($tab_id) . '" class="tab-pane" ' . $style . '>';
 					$tab_file = plugin_dir_path(__FILE__) . 'tabs/' . $tab_id . '.php';
 					if (file_exists($tab_file)) {
 						include $tab_file;
 					} else {
 						echo '<p>Tab content not found.</p>';
 					}
-					// echo '</div>';
 				}
 				?>
 			</div>
-			<p class="submit" id="submit-button" style="<?php // echo $active_tab === 'general' ? 'display:none;' : ''; 
-																		?>">
+
+			<p class="submit" id="submit-button" style="display: none;">
 				<?php submit_button(null, 'primary rapidpress-btn', 'submit', false); ?>
 			</p>
+
 		</form>
 	</div>
 </div>

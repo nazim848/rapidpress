@@ -179,7 +179,7 @@ use RapidPress\RP_Options;
 			<tr valign="top">
 				<th scope="row">Disable Rest API</th>
 				<td>
-					<select name="rapidpress_disable_rest_api" id="rapidpress_disable_rest_api">
+					<select name="rapidpress_options[disable_rest_api]" id="rapidpress_disable_rest_api">
 						<option value>Default (Enabled)</option>
 						<option value="non_admins" <?php selected(RP_Options::get_option('disable_rest_api'), 'non_admins'); ?>>Disable for Non-Admins</option>
 						<option value="guest_users" <?php selected(RP_Options::get_option('disable_rest_api'), 'guest_users'); ?>>Disable for Guest Users</option>
@@ -200,7 +200,7 @@ use RapidPress\RP_Options;
 			<tr valign="top"></tr>
 			<th scope="row">Limit Post Revisions</th>
 			<td>
-				<select name="rapidpress_limit_post_revisions" id="rapidpress_limit_post_revisions">
+				<select name="rapidpress_options[limit_post_revisions]" id="rapidpress_limit_post_revisions">
 					<option value>Default (Unlimited)</option>
 					<option value="disable_revisions" <?php selected(RP_Options::get_option('limit_post_revisions'), 'disable_revisions'); ?>>Disable Post Revisions</option>
 					<option value="custom_revisions" <?php selected(RP_Options::get_option('limit_post_revisions'), 'custom_revisions'); ?>>Custom Revisions</option>
