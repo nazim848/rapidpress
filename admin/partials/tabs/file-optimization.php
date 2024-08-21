@@ -51,7 +51,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[html_minify]" value="1" <?php checked(1, RP_Options::get_option('html_minify'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" title="Minify HTML files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Minify HTML files"></span>
 					</div>
 				</td>
 			</tr>
@@ -62,7 +62,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[css_minify]" value="1" <?php checked(1, RP_Options::get_option('css_minify'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" title="Minify CSS files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Minify CSS files"></span>
 					</div>
 				</td>
 			</tr>
@@ -73,7 +73,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[combine_css]" id="rapidpress_combine_css" value="1" <?php checked(1, RP_Options::get_option('combine_css'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" title="Combine CSS files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Combine CSS files"></span>
 					</div>
 					<div class="checkbox-btn" id="rapidpress_enable_combine_css_exclusions_btn">
 						<label>
@@ -97,7 +97,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[js_minify]" value="1" <?php checked(1, RP_Options::get_option('js_minify'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" title="Minify JavaScript files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Minify JavaScript files"></span>
 					</div>
 				</td>
 			</tr>
@@ -108,7 +108,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[js_defer]" id="rapidpress_js_defer" value="1" <?php checked(1, RP_Options::get_option('js_defer'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" title="Defer JavaScript files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Defer JavaScript files"></span>
 					</div>
 					<div class="checkbox-btn" id="rapidpress_enable_js_defer_exclusions_btn">
 						<label>
@@ -132,7 +132,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[js_delay]" id="rapidpress_js_delay" value="1" <?php checked(1, RP_Options::get_option('js_delay'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" title="Delay JavaScript files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Delay JavaScript files"></span>
 					</div>
 				</td>
 			</tr>

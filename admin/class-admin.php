@@ -125,99 +125,159 @@ class Admin {
 
 	public function sanitize_options($options) {
 		$sanitized_options = array();
+		$sanitization_rules = array(
+			'disable_comments'                     => 'boolean',
+			'remove_comment_urls'                  => 'boolean',
+			'disable_dashicons'                    => 'boolean',
+			'optimization_scope'                   => 'text_field',
+			'optimized_pages'                      => 'optimized_pages',
+			'enable_optimization_scope_exclusions' => 'boolean',
+			'optimization_excluded_pages'          => 'optimization_excluded_pages',
+			'html_minify'                          => 'boolean',
+			'css_minify'                           => 'boolean',
+			'combine_css'                          => 'boolean',
+			'enable_combine_css_exclusions'        => 'boolean',
+			'combine_css_exclusions'               => 'combine_css_exclusions',
+			'js_minify'                            => 'boolean',
+			'js_defer'                             => 'boolean',
+			'enable_js_defer_exclusions'           => 'boolean',
+			'js_defer_exclusions'                  => 'js_defer_exclusions',
+			'js_delay'                             => 'boolean',
+			'js_delay_type'                        => 'js_delay_type',
+			'js_delay_duration'                    => 'js_delay_duration',
+			'js_delay_specific_files'              => 'js_delay_specific_files',
+			'enable_js_delay_exclusions'           => 'boolean',
+			'js_delay_exclusions'                  => 'js_delay_exclusions',
+			'js_disable_rules'                     => 'js_disable_rules',
+			'css_disable_rules'                    => 'css_disable_rules',
+			'clean_uninstall'                      => 'boolean',
+		);
 
-		// Sanitize each option
-		if (isset($options['optimization_scope'])) {
-			$sanitized_options['optimization_scope'] = sanitize_text_field($options['optimization_scope']);
+		foreach ($sanitization_rules as $option => $rule) {
+			if (isset($options[$option])) {
+				switch ($rule) {
+					case 'boolean':
+						$sanitized_options[$option] = rest_sanitize_boolean($options[$option]);
+						break;
+					case 'text_field':
+						$sanitized_options[$option] = sanitize_text_field($options[$option]);
+						break;
+					default:
+						$method = "sanitize_{$rule}";
+						if (method_exists($this, $method)) {
+							$sanitized_options[$option] = $this->$method($options[$option]);
+						}
+						break;
+				}
+			}
 		}
 
-		if (isset($options['optimized_pages'])) {
-			$sanitized_options['optimized_pages'] = $this->sanitize_optimized_pages($options['optimized_pages']);
-		}
-
-		if (isset($options['enable_optimization_scope_exclusions'])) {
-			$sanitized_options['enable_optimization_scope_exclusions'] = (bool) $options['enable_optimization_scope_exclusions'];
-		}
-
-		if (isset($options['optimization_excluded_pages'])) {
-			$sanitized_options['optimization_excluded_pages'] = $this->sanitize_optimization_excluded_pages($options['optimization_excluded_pages']);
-		}
-
-		if (isset($options['html_minify'])) {
-			$sanitized_options['html_minify'] = (bool) $options['html_minify'];
-		}
-
-		if (isset($options['css_minify'])) {
-			$sanitized_options['css_minify'] = (bool) $options['css_minify'];
-		}
-
-		if (isset($options['combine_css'])) {
-			$sanitized_options['combine_css'] = (bool) $options['combine_css'];
-		}
-
-		if (isset($options['enable_combine_css_exclusions'])) {
-			$sanitized_options['enable_combine_css_exclusions'] = (bool) $options['enable_combine_css_exclusions'];
-		}
-
-		if (isset($options['combine_css_exclusions'])) {
-			$sanitized_options['combine_css_exclusions'] = $this->sanitize_combine_css_exclusions($options['combine_css_exclusions']);
-		}
-
-		if (isset($options['js_minify'])) {
-			$sanitized_options['js_minify'] = (bool) $options['js_minify'];
-		}
-
-		if (isset($options['js_defer'])) {
-			$sanitized_options['js_defer'] = (bool) $options['js_defer'];
-		}
-
-		if (isset($options['enable_js_defer_exclusions'])) {
-			$sanitized_options['enable_js_defer_exclusions'] = (bool) $options['enable_js_defer_exclusions'];
-		}
-
-		if (isset($options['js_defer_exclusions'])) {
-			$sanitized_options['js_defer_exclusions'] = $this->sanitize_js_defer_exclusions($options['js_defer_exclusions']);
-		}
-
-		if (isset($options['js_delay'])) {
-			$sanitized_options['js_delay'] = (bool) $options['js_delay'];
-		}
-
-		if (isset($options['js_delay_type'])) {
-			$sanitized_options['js_delay_type'] = $this->sanitize_js_delay_type($options['js_delay_type']);
-		}
-
-		if (isset($options['js_delay_duration'])) {
-			$sanitized_options['js_delay_duration'] = $this->sanitize_js_delay_duration($options['js_delay_duration']);
-		}
-
-		if (isset($options['js_delay_specific_files'])) {
-			$sanitized_options['js_delay_specific_files'] = $this->sanitize_js_delay_specific_files($options['js_delay_specific_files']);
-		}
-
-		if (isset($options['enable_js_delay_exclusions'])) {
-			$sanitized_options['enable_js_delay_exclusions'] = (bool) $options['enable_js_delay_exclusions'];
-		}
-
-		if (isset($options['js_delay_exclusions'])) {
-			$sanitized_options['js_delay_exclusions'] = $this->sanitize_js_delay_exclusions($options['js_delay_exclusions']);
-		}
-
-		if (isset($options['js_disable_rules'])) {
-			$sanitized_options['js_disable_rules'] = $this->sanitize_js_disable_rules($options['js_disable_rules']);
-		}
-
-		if (isset($options['css_disable_rules'])) {
-			$sanitized_options['css_disable_rules'] = $this->sanitize_css_disable_rules($options['css_disable_rules']);
-		}
-
-		if (isset($options['clean_uninstall'])) {
-			$sanitized_options['clean_uninstall'] = (bool) $options['clean_uninstall'];
-		}
-
-		// Add more sanitization for other options...
 		return $sanitized_options;
 	}
+
+	// public function sanitize_options($options) {
+	// 	$sanitized_options = array();
+
+	// 	// Sanitize each option
+	// 	if (isset($options['disable_comments'])) {
+	// 		$sanitized_options['disable_comments'] = (bool) $options['disable_comments'];
+	// 	}
+
+	// 	if (isset($options['remove_comment_urls'])) {
+	// 		$sanitized_options['remove_comment_urls'] = (bool) $options['remove_comment_urls'];
+	// 	}
+
+	// 	if (isset($options['optimization_scope'])) {
+	// 		$sanitized_options['optimization_scope'] = sanitize_text_field($options['optimization_scope']);
+	// 	}
+
+	// 	if (isset($options['optimized_pages'])) {
+	// 		$sanitized_options['optimized_pages'] = $this->sanitize_optimized_pages($options['optimized_pages']);
+	// 	}
+
+	// 	if (isset($options['enable_optimization_scope_exclusions'])) {
+	// 		$sanitized_options['enable_optimization_scope_exclusions'] = (bool) $options['enable_optimization_scope_exclusions'];
+	// 	}
+
+	// 	if (isset($options['optimization_excluded_pages'])) {
+	// 		$sanitized_options['optimization_excluded_pages'] = $this->sanitize_optimization_excluded_pages($options['optimization_excluded_pages']);
+	// 	}
+
+	// 	if (isset($options['html_minify'])) {
+	// 		$sanitized_options['html_minify'] = (bool) $options['html_minify'];
+	// 	}
+
+	// 	if (isset($options['css_minify'])) {
+	// 		$sanitized_options['css_minify'] = (bool) $options['css_minify'];
+	// 	}
+
+	// 	if (isset($options['combine_css'])) {
+	// 		$sanitized_options['combine_css'] = (bool) $options['combine_css'];
+	// 	}
+
+	// 	if (isset($options['enable_combine_css_exclusions'])) {
+	// 		$sanitized_options['enable_combine_css_exclusions'] = (bool) $options['enable_combine_css_exclusions'];
+	// 	}
+
+	// 	if (isset($options['combine_css_exclusions'])) {
+	// 		$sanitized_options['combine_css_exclusions'] = $this->sanitize_combine_css_exclusions($options['combine_css_exclusions']);
+	// 	}
+
+	// 	if (isset($options['js_minify'])) {
+	// 		$sanitized_options['js_minify'] = (bool) $options['js_minify'];
+	// 	}
+
+	// 	if (isset($options['js_defer'])) {
+	// 		$sanitized_options['js_defer'] = (bool) $options['js_defer'];
+	// 	}
+
+	// 	if (isset($options['enable_js_defer_exclusions'])) {
+	// 		$sanitized_options['enable_js_defer_exclusions'] = (bool) $options['enable_js_defer_exclusions'];
+	// 	}
+
+	// 	if (isset($options['js_defer_exclusions'])) {
+	// 		$sanitized_options['js_defer_exclusions'] = $this->sanitize_js_defer_exclusions($options['js_defer_exclusions']);
+	// 	}
+
+	// 	if (isset($options['js_delay'])) {
+	// 		$sanitized_options['js_delay'] = (bool) $options['js_delay'];
+	// 	}
+
+	// 	if (isset($options['js_delay_type'])) {
+	// 		$sanitized_options['js_delay_type'] = $this->sanitize_js_delay_type($options['js_delay_type']);
+	// 	}
+
+	// 	if (isset($options['js_delay_duration'])) {
+	// 		$sanitized_options['js_delay_duration'] = $this->sanitize_js_delay_duration($options['js_delay_duration']);
+	// 	}
+
+	// 	if (isset($options['js_delay_specific_files'])) {
+	// 		$sanitized_options['js_delay_specific_files'] = $this->sanitize_js_delay_specific_files($options['js_delay_specific_files']);
+	// 	}
+
+	// 	if (isset($options['enable_js_delay_exclusions'])) {
+	// 		$sanitized_options['enable_js_delay_exclusions'] = (bool) $options['enable_js_delay_exclusions'];
+	// 	}
+
+	// 	if (isset($options['js_delay_exclusions'])) {
+	// 		$sanitized_options['js_delay_exclusions'] = $this->sanitize_js_delay_exclusions($options['js_delay_exclusions']);
+	// 	}
+
+	// 	if (isset($options['js_disable_rules'])) {
+	// 		$sanitized_options['js_disable_rules'] = $this->sanitize_js_disable_rules($options['js_disable_rules']);
+	// 	}
+
+	// 	if (isset($options['css_disable_rules'])) {
+	// 		$sanitized_options['css_disable_rules'] = $this->sanitize_css_disable_rules($options['css_disable_rules']);
+	// 	}
+
+	// 	if (isset($options['clean_uninstall'])) {
+	// 		$sanitized_options['clean_uninstall'] = (bool) $options['clean_uninstall'];
+	// 	}
+
+	// 	// Add more sanitization for other options...
+	// 	return $sanitized_options;
+	// }
 
 	public function reset_settings() {
 		check_ajax_referer('rapidpress_admin_nonce', 'nonce');

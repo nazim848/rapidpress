@@ -220,16 +220,19 @@
 }
 
 .dashicons-editor-help:hover::after {
+	max-width: 300px;
 	display: inline-block;
-	content: attr(title);
+	content: attr(data-title);
 	position: absolute;
-	background: #1d2327;
+	background: #3d464d;
+	text-align: left;
 	color: #fff;
 	padding: 10px;
 	border-radius: 5px;
 	font-family: "system-ui", sans-serif;
 	font-size: 12px;
-	white-space: nowrap;
+	line-height: 18px;
+	/* white-space: nowrap; */
 	z-index: 9999;
 }
 

@@ -422,9 +422,17 @@ jQuery(function ($) {
 
 	// Make submit button visible after all the tabs are loaded
 	setTimeout(function () {
-		var submitButton = document.getElementById("submit-button");
+		let submitButton = document.getElementById("submit-button");
 		if (submitButton) {
 			submitButton.style.display = "block";
 		}
 	}, 50); // Delay of 50 milliseconds
+
+	// Hide save changes notification after few seconds
+	setTimeout(function () {
+		let notice = $(".notice-success");
+		if (notice) {
+			notice.slideToggle();
+		}
+	}, 1500); // Delay of 1.5 seconds
 });

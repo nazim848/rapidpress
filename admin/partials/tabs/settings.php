@@ -15,7 +15,7 @@ use RapidPress\RP_Options;
 				<td>
 					<div class="checkbox-radio">
 						<button type="button" class="button" id="rapidpress-reset-settings">Reset Settings</button>
-						<span class="dashicons dashicons-editor-help" title="Reset all plugin settings to their default values"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Reset all plugin settings to their default values"></span>
 					</div>
 				</td>
 			</tr>
@@ -26,7 +26,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[clean_uninstall]" value="1" <?php checked(RP_Options::get_option('clean_uninstall'), '1'); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" title="When enabled, all RapidPress settings and data will be deleted from the database when the plugin is uninstalled!"></span>
+						<span class="dashicons dashicons-editor-help" data-title="When enabled, all RapidPress settings and data will be deleted from the database when the plugin is uninstalled!"></span>
 					</div>
 				</td>
 			</tr>
