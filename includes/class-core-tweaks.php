@@ -5,39 +5,32 @@ namespace RapidPress;
 class Core_Tweaks {
 
 	public function __construct() {
-		add_action('init', [$this, 'initialize_tweaks']);
+		$this->initialize_tweaks();
 	}
 
 	public function initialize_tweaks() {
-		if (RP_Options::get_option('disable_comments')) {
-			$this->disable_comments();
-		}
-		if (RP_Options::get_option('remove_comment_urls')) {
-			$this->remove_comment_urls();
-		}
-		if (RP_Options::get_option('disable_dashicons')) {
-			$this->disable_dashicons();
-		}
-		if (RP_Options::get_option('disable_embeds')) {
-			$this->disable_embeds();
-		}
-		if (RP_Options::get_option('disable_xmlrpc')) {
-			$this->disable_xmlrpc();
-		}
-		if (RP_Options::get_option('disable_emojis')) {
-			$this->disable_emojis();
-		}
-		if (RP_Options::get_option('remove_jquery_migrate')) {
-			$this->remove_jquery_migrate();
-		}
-		if (RP_Options::get_option('disable_rss_feeds')) {
-			$this->disable_rss_feeds();
-		}
-		if (RP_Options::get_option('remove_rsd_link')) {
-			$this->remove_rsd_link();
-		}
-		if (RP_Options::get_option('hide_wp_version')) {
-			$this->hide_wp_version();
+		$tweaks = [
+			'disable_comments',
+			'remove_comment_urls',
+			'disable_dashicons',
+			'disable_embeds',
+			'disable_xmlrpc',
+			'disable_emojis',
+			'remove_jquery_migrate',
+			'disable_rss_feeds',
+			'remove_rsd_link',
+			'hide_wp_version',
+			'remove_global_styles',
+			'separate_block_styles',
+			'disable_self_pingbacks',
+			'disable_google_maps',
+			'remove_shortlink',
+		];
+
+		foreach ($tweaks as $option) {
+			if (RP_Options::get_option($option)) {
+				$this->$option();
+			}
 		}
 	}
 
@@ -113,8 +106,6 @@ class Core_Tweaks {
 
 	// Disable Embeds
 	private function disable_embeds() {
-		global $wp;
-		$wp->public_query_vars = array_diff($wp->public_query_vars, array('embed'));
 		add_filter('tiny_mce_plugins', [$this, 'disable_embeds_tiny_mce_plugin']);
 		add_filter('rewrite_rules_array', [$this, 'disable_embeds_rewrites']);
 		add_filter('embed_oembed_discover', '__return_false');
@@ -254,5 +245,86 @@ class Core_Tweaks {
 	private function hide_wp_version() {
 		remove_action('wp_head', 'wp_generator');
 		add_filter('the_generator', '__return_false');
+	}
+
+	// Remove Global Styles
+	private function remove_global_styles() {
+		remove_action('wp_enqueue_scripts', 'wp_enqueue_global_styles');
+		remove_action('wp_body_open', 'wp_global_styles_render_svg_filters');
+		remove_action('wp_footer', 'wp_enqueue_global_styles', 1);
+		remove_action('in_admin_header', 'wp_global_styles_render_svg_filters');
+		add_action('wp_footer', [$this, 'dequeue_global_styles']);
+	}
+
+	public function dequeue_global_styles() {
+		wp_dequeue_style('global-styles');
+		wp_dequeue_style('core-block-supports');
+	}
+
+	// Separate Block Styles
+	private function separate_block_styles() {
+		add_filter('should_load_separate_core_block_assets', '__return_true');
+	}
+
+	// Disable Self Pingbacks
+	private function disable_self_pingbacks() {
+		add_action('pre_ping', [$this, 'no_self_ping']);
+	}
+
+	public function no_self_ping(&$links) {
+		$home = get_option('home');
+		foreach ($links as $l => $link) {
+			if (0 === strpos($link, $home)) {
+				unset($links[$l]);
+			}
+		}
+	}
+
+	// Disable Google Maps
+	private function disable_google_maps() {
+		add_action('template_redirect', [$this, 'no_google_maps']);
+		add_action('wp_enqueue_scripts', [$this, 'dequeue_google_maps'], 100);
+		add_filter('script_loader_tag', [$this, 'remove_google_maps_script'], 10, 2);
+	}
+
+	public function no_google_maps() {
+		ob_start([$this, 'disable_google_maps_regex']);
+	}
+
+	function disable_google_maps_regex($html) {
+		$patterns = [
+			// Remove script tags
+			'/<script[^<>]*\/\/maps\.(googleapis|google|gstatic)\.com\/[^<>]*><\/script>/i',
+			// Remove iframe tags
+			'/<iframe[^>]*src=["\']https?:\/\/(www\.)?google\.com\/maps\/embed[^>]*><\/iframe>/i'
+		];
+
+		foreach ($patterns as $pattern) {
+			$html = preg_replace($pattern, '', $html);
+		}
+
+		return $html;
+	}
+
+	public function dequeue_google_maps() {
+		wp_dequeue_script('google-maps');
+		wp_deregister_script('google-maps');
+	}
+
+	public function remove_google_maps_script($tag, $handle) {
+		if (
+			strpos($tag, 'maps.googleapis.com') != false ||
+			strpos($tag, 'maps.google.com') != false ||
+			strpos($tag, 'maps.gstatic.com') != false
+		) {
+			return '';
+		}
+		return $tag;
+	}
+
+	// Remove Shortlink
+	private function remove_shortlink() {
+		remove_action('wp_head', 'wp_shortlink_wp_head');
+		remove_action('template_redirect', 'wp_shortlink_header', 11, 0);
 	}
 }

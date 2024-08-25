@@ -127,7 +127,18 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[remove_global_styles]" value="1" <?php checked(1, RP_Options::get_option('remove_global_styles'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Remove Global Styles"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Removes the inline global styles (CSS and SVG)."></span>
+					</div>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">Separate Block Styles</th>
+				<td>
+					<div class="checkbox-radio">
+						<label>
+							<input type="checkbox" name="rapidpress_options[separate_block_styles]" value="1" <?php checked(1, RP_Options::get_option('separate_block_styles'), true); ?> />
+						</label>
+						<span class="dashicons dashicons-editor-help" data-title="Load core block styles only when they are rendered instead of in a global styles."></span>
 					</div>
 				</td>
 			</tr>
@@ -138,7 +149,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[disable_self_pingbacks]" value="1" <?php checked(1, RP_Options::get_option('disable_self_pingbacks'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Disable Self Pingbacks"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Disables Self Pingbacks when linking to any internal article."></span>
 					</div>
 				</td>
 			</tr>
@@ -149,7 +160,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[disable_google_maps]" value="1" <?php checked(1, RP_Options::get_option('disable_google_maps'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Disable Google Maps"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Removes Google Maps script or iframe loading from the entire website."></span>
 					</div>
 				</td>
 			</tr>
@@ -160,7 +171,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[remove_shortlink]" value="1" <?php checked(1, RP_Options::get_option('remove_shortlink'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Remove Shortlink"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Removes Shortlink tag from the front end."></span>
 						</label>
 					</div>
 				</td>

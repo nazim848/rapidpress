@@ -140,6 +140,7 @@ class Admin {
 			'remove_rsd_link'                    	=> 'boolean',
 			'hide_wp_version'                    	=> 'boolean',
 			'remove_global_styles'                 => 'boolean',
+			'separate_block_styles'                => 'boolean',
 			'disable_self_pingbacks'               => 'boolean',
 			'disable_google_maps'                  => 'boolean',
 			'remove_shortlink'                    	=> 'boolean',
