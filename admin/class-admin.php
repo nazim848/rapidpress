@@ -124,11 +124,27 @@ class Admin {
 	}
 
 	public function sanitize_options($options) {
+		if (!is_array($options)) {
+			return array();
+		}
 		$sanitized_options = array();
 		$sanitization_rules = array(
 			'disable_comments'                     => 'boolean',
 			'remove_comment_urls'                  => 'boolean',
 			'disable_dashicons'                    => 'boolean',
+			'disable_embeds'                    	=> 'boolean',
+			'disable_xmlrpc'                    	=> 'boolean',
+			'disable_emojis'                   	 	=> 'boolean',
+			'remove_jquery_migrate'                => 'boolean',
+			'disable_rss_feeds'                    => 'boolean',
+			'disable_rss_feed_links'               => 'boolean',
+			'hide_wp_version'                    	=> 'boolean',
+			'remove_global_styles'                 => 'boolean',
+			'disable_self_pingbacks'               => 'boolean',
+			'disable_google_maps'                  => 'boolean',
+			'remove_rsd_link'                    	=> 'boolean',
+			'remove_shortlink'                    	=> 'boolean',
+			'remove_rest_api_links'                => 'boolean',
 			'optimization_scope'                   => 'text_field',
 			'optimized_pages'                      => 'optimized_pages',
 			'enable_optimization_scope_exclusions' => 'boolean',
@@ -185,6 +201,18 @@ class Admin {
 
 	// 	if (isset($options['remove_comment_urls'])) {
 	// 		$sanitized_options['remove_comment_urls'] = (bool) $options['remove_comment_urls'];
+	// 	}
+
+	// 	if (isset($options['disable_dashicons'])) {
+	// 		$sanitized_options['disable_dashicons'] = (bool) $options['disable_dashicons'];
+	// 	}
+
+	// 	if (isset($options['disable_embeds'])) {
+	// 		$sanitized_options['disable_embeds'] = (bool) $options['disable_embeds'];
+	// 	}
+
+	// 	if (isset($options['disable_xmlrpc'])) {
+	// 		$sanitized_options['disable_xmlrpc'] = (bool) $options['disable_xmlrpc'];
 	// 	}
 
 	// 	if (isset($options['optimization_scope'])) {
@@ -275,7 +303,6 @@ class Admin {
 	// 		$sanitized_options['clean_uninstall'] = (bool) $options['clean_uninstall'];
 	// 	}
 
-	// 	// Add more sanitization for other options...
 	// 	return $sanitized_options;
 	// }
 
