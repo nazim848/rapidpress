@@ -72,7 +72,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[disable_emojis]" value="1" <?php checked(1, RP_Options::get_option('disable_emojis'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Disable Emojis"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Removes WordPress Emojis and related JavaScript file from the front end."></span>
 					</div>
 				</td>
 			</tr>
@@ -83,7 +83,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[remove_jquery_migrate]" value="1" <?php checked(1, RP_Options::get_option('remove_jquery_migrate'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Remove jQuery Migrate"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Removes jQuery Migrate JavaScript file."></span>
 					</div>
 				</td>
 			</tr>
@@ -94,18 +94,18 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[disable_rss_feeds]" value="1" <?php checked(1, RP_Options::get_option('disable_rss_feeds'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Disable RSS Feeds"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Disable WordPress generated RSS Feed and related links."></span>
 					</div>
 				</td>
 			</tr>
 			<tr valign="top">
-				<th scope="row">Disable RSS Feed Links</th>
+				<th scope="row">Remove RSD Link</th>
 				<td>
 					<div class="checkbox-radio">
 						<label>
-							<input type="checkbox" name="rapidpress_options[disable_rss_feed_links]" value="1" <?php checked(1, RP_Options::get_option('disable_rss_feed_links'), true); ?> />
+							<input type="checkbox" name="rapidpress_options[remove_rsd_link]" value="1" <?php checked(1, RP_Options::get_option('remove_rsd_link'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Disable RSS Feed Links"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Removes RSD (Real Simple Dicovery) link tag."></span>
 					</div>
 				</td>
 			</tr>
@@ -116,7 +116,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[hide_wp_version]" value="1" <?php checked(1, RP_Options::get_option('hide_wp_version'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Hide WP Version"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Removes WordPress version meta tag from front end."></span>
 					</div>
 				</td>
 			</tr>
@@ -150,17 +150,6 @@ use RapidPress\RP_Options;
 							<input type="checkbox" name="rapidpress_options[disable_google_maps]" value="1" <?php checked(1, RP_Options::get_option('disable_google_maps'), true); ?> />
 						</label>
 						<span class="dashicons dashicons-editor-help" data-title="Disable Google Maps"></span>
-					</div>
-				</td>
-			</tr>
-			<tr valign="top">
-				<th scope="row">Remove RSD Link</th>
-				<td>
-					<div class="checkbox-radio">
-						<label>
-							<input type="checkbox" name="rapidpress_options[remove_rsd_link]" value="1" <?php checked(1, RP_Options::get_option('remove_rsd_link'), true); ?> />
-						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Remove RSD Link"></span>
 					</div>
 				</td>
 			</tr>
