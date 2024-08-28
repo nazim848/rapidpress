@@ -144,7 +144,9 @@ class Admin {
 			'disable_self_pingbacks'               => 'boolean',
 			'disable_google_maps'                  => 'boolean',
 			'remove_shortlink'                    	=> 'boolean',
+			'disable_rest_api'							=> 'text_field',
 			'remove_rest_api_links'                => 'boolean',
+			'limit_post_revisions'                 => 'limit_post_revisions',
 			'optimization_scope'                   => 'text_field',
 			'optimized_pages'                      => 'optimized_pages',
 			'enable_optimization_scope_exclusions' => 'boolean',
@@ -338,6 +340,19 @@ class Admin {
 		];
 		update_option('rapidpress_options', $default_options);
 		wp_send_json_success('Settings reset successfully');
+	}
+
+	private function sanitize_limit_post_revisions($value) {
+
+		if (empty($value)) {
+			return '';
+		}
+
+		if ($value === false || $value === 'false') {
+			return 'false';
+		}
+
+		return intval($value);
 	}
 
 	public function sanitize_css_disable_rules($input) {

@@ -182,9 +182,8 @@ use RapidPress\RP_Options;
 					<select name="rapidpress_options[disable_rest_api]" id="rapidpress_disable_rest_api">
 						<option value>Default (Enabled)</option>
 						<option value="non_admins" <?php selected(RP_Options::get_option('disable_rest_api'), 'non_admins'); ?>>Disable for Non-Admins</option>
-						<option value="guest_users" <?php selected(RP_Options::get_option('disable_rest_api'), 'guest_users'); ?>>Disable for Guest Users</option>
 					</select>
-					<span class="dashicons dashicons-editor-help" data-title="Disable Rest API"></span>
+					<span class="dashicons dashicons-editor-help" data-title="Disable Rest API requests."></span>
 				</td>
 			</tr>
 			<tr valign="top">
@@ -194,7 +193,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[remove_rest_api_links]" value="1" <?php checked(1, RP_Options::get_option('remove_rest_api_links'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Remove REST API link tag from the header"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Remove REST API link tag from the header."></span>
 				</td>
 			</tr>
 			<tr valign="top">
@@ -202,8 +201,15 @@ use RapidPress\RP_Options;
 				<td>
 					<select name="rapidpress_options[limit_post_revisions]" id="rapidpress_limit_post_revisions">
 						<option value>Default (Unlimited)</option>
-						<option value="disable_revisions" <?php selected(RP_Options::get_option('limit_post_revisions'), 'disable_revisions'); ?>>Disable Post Revisions</option>
-						<option value="custom_revisions" <?php selected(RP_Options::get_option('limit_post_revisions'), 'custom_revisions'); ?>>Custom Revisions</option>
+						<option value="false" <?php selected(RP_Options::get_option('limit_post_revisions'), 'false'); ?>>Disable Post Revisions</option>
+						<option value="1" <?php selected(RP_Options::get_option('limit_post_revisions'), 1); ?>>1</option>
+						<option value="2" <?php selected(RP_Options::get_option('limit_post_revisions'), 2); ?>>2</option>
+						<option value="3" <?php selected(RP_Options::get_option('limit_post_revisions'), 3); ?>>3</option>
+						<option value="4" <?php selected(RP_Options::get_option('limit_post_revisions'), 4); ?>>4</option>
+						<option value="5" <?php selected(RP_Options::get_option('limit_post_revisions'), 5); ?>>5</option>
+						<option value="10" <?php selected(RP_Options::get_option('limit_post_revisions'), 10); ?>>10</option>
+						<option value="15" <?php selected(RP_Options::get_option('limit_post_revisions'), 15); ?>>15</option>
+						<option value="20" <?php selected(RP_Options::get_option('limit_post_revisions'), 20); ?>>20</option>
 					</select>
 					<span class="dashicons dashicons-editor-help" data-title="Limit Post Revisions"></span>
 				</td>
