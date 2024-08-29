@@ -44,6 +44,7 @@ if (!array_key_exists($active_tab, $tabs)) {
 	<img src="<?php echo RAPIDPRESS_PLUGIN_URL . '/admin/images/rapidpress-logo.svg'; ?>" alt="RapidPress Logo" class="rapidpress-logo" width="190">
 
 	<?php if ($settings_updated) : ?>
+		<?php error_log('Test'); ?>
 		<div class="notice notice-success is-dismissible">
 			<p><strong>Settings saved.</strong></p>
 		</div>
