@@ -377,7 +377,8 @@
 	padding: 4px 15px;
 }
 
-.button-primary.rapidpress-btn:hover {
+.button-primary.rapidpress-btn:hover,
+.button-primary.rapidpress-btn:focus {
 	background-color: #7a5af7;
 	border-color: #7a5af7;
 }

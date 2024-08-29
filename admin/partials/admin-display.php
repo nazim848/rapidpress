@@ -61,7 +61,7 @@ if (!array_key_exists($active_tab, $tabs)) {
 			?>
 		</h2>
 
-		<form method="post" action="options.php">
+		<form id="rapidpress-settings-form" method="post" action="options.php">
 			<?php settings_fields('rapidpress_options'); ?>
 			<?php wp_nonce_field('rapidpress_settings', 'rapidpress_nonce'); ?>
 			<input type="hidden" id="rapidpress_active_tab" name="rapidpress_active_tab" value="<?php echo esc_attr($active_tab); ?>">

@@ -381,7 +381,6 @@ class Core_Tweaks {
 	}
 
 
-
 	// Limit Post Revisions
 	private function limit_post_revisions() {
 		if (defined('WP_POST_REVISIONS')) {
