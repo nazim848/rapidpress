@@ -197,6 +197,29 @@ use RapidPress\RP_Options;
 				</td>
 			</tr>
 			<tr valign="top">
+				<th scope="row">Disable Heartbeat</th>
+				<td>
+					<select name="rapidpress_options[disable_heartbeat]" id="rapidpress_disable_heartbeat">
+						<option value>Default</option>
+						<option value="disable_everywhere" <?php selected(RP_Options::get_option('disable_heartbeat'), 'disable_everywhere'); ?>>Disable Everywhere</option>
+						<option value="allow_posts" <?php selected(RP_Options::get_option('disable_heartbeat'), 'allow_posts'); ?>>Only Allow When Editing Posts/Pages</option>
+					</select>
+					<span class="dashicons dashicons-editor-help" data-title="Disables WordPress Heartbeat (used for auto saving & revision tracking)."></span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">Heartbeat Frequency</th>
+				<td>
+					<select name="rapidpress_options[heartbeat_frequency]" id="rapidpress_heartbeat_frequency">
+						<option value>15 Seconds (Default)</option>
+						<option value="30" <?php selected(RP_Options::get_option('heartbeat_frequency'), 30); ?>>30 Seconds</option>
+						<option value="45" <?php selected(RP_Options::get_option('heartbeat_frequency'), 45); ?>>45 Seconds</option>
+						<option value="60" <?php selected(RP_Options::get_option('heartbeat_frequency'), 60); ?>>60 Seconds</option>
+					</select>
+					<span class="dashicons dashicons-editor-help" data-title="Controls how often the WordPress Heartbeat API is allowed to run."></span>
+				</td>
+			</tr>
+			<tr valign="top">
 				<th scope="row">Limit Post Revisions</th>
 				<td>
 					<select name="rapidpress_options[limit_post_revisions]" id="rapidpress_limit_post_revisions">
@@ -211,7 +234,24 @@ use RapidPress\RP_Options;
 						<option value="15" <?php selected(RP_Options::get_option('limit_post_revisions'), 15); ?>>15</option>
 						<option value="20" <?php selected(RP_Options::get_option('limit_post_revisions'), 20); ?>>20</option>
 					</select>
-					<span class="dashicons dashicons-editor-help" data-title="Limit Post Revisions"></span>
+					<span class="dashicons dashicons-editor-help" data-title="Limits the number of revisions that are allowed for posts and pages."></span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">Autosave Interval</th>
+				<td>
+					<select name="rapidpress_options[autosave_interval]" id="rapidpress_autosave_interval">
+						<option value>1 Minute (Default)</option>
+						<option value="172800" <?php selected(RP_Options::get_option('autosave_interval'), 172800); ?>>Disable Autosave Interval</option>
+						<option value="2" <?php selected(RP_Options::get_option('autosave_interval'), 2); ?>>2 Minutes</option>
+						<option value="3" <?php selected(RP_Options::get_option('autosave_interval'), 3); ?>>3 Minutes</option>
+						<option value="4" <?php selected(RP_Options::get_option('autosave_interval'), 4); ?>>4 Minutes</option>
+						<option value="5" <?php selected(RP_Options::get_option('autosave_interval'), 5); ?>>5 Minutes</option>
+						<option value="10" <?php selected(RP_Options::get_option('autosave_interval'), 10); ?>>10 Minutes</option>
+						<option value="15" <?php selected(RP_Options::get_option('autosave_interval'), 15); ?>>15 Minutes</option>
+						<option value="20" <?php selected(RP_Options::get_option('autosave_interval'), 20); ?>>20 Minutes</option>
+					</select>
+					<span class="dashicons dashicons-editor-help" data-title="Controls how often WordPress auto save posts and pages while editing."></span>
 				</td>
 			</tr>
 		</table>
