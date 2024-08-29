@@ -45,6 +45,7 @@ class Core_Tweaks {
 		add_filter('pings_open', '__return_false', 20, 0);
 		add_filter('comments_array', '__return_empty_array', 10, 0);
 		add_action('init', [$this, 'disable_comments_post_types_support'], 100);
+		error_log('Test');
 	}
 
 	public function disable_comments_admin_actions() {
