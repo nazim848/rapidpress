@@ -430,17 +430,17 @@ class RapidPressAdmin {
 	}
 
 	setupSubmitButtonVisibility() {
-		this.$(".nav-tab-wrapper .nav-tab").on("click", e => {
-			e.preventDefault();
-			const tabId = this.$(e.currentTarget).attr("href").substring(1);
-			this.$("#submit-button").toggle(tabId !== "dashboard");
-		});
+		// this.$(".nav-tab-wrapper .nav-tab").on("click", e => {
+		// 	e.preventDefault();
+		// 	const tabId = this.$(e.currentTarget).attr("href").substring(1);
+		// 	this.$("#submit-button").toggle(tabId !== "general");
+		// });
 	}
 
 	// Initialization methods
 	initializeTabs() {
 		const urlParams = new URLSearchParams(window.location.search);
-		const activeTab = urlParams.get("tab") || "dashboard";
+		const activeTab = urlParams.get("tab") || "general";
 		this.setActiveTab(activeTab);
 	}
 

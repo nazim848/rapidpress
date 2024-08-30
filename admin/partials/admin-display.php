@@ -65,7 +65,6 @@ if (!array_key_exists($active_tab, $tabs)) {
 			<p class="submit" id="submit-button" style="display: none;">
 				<?php submit_button(null, 'primary rapidpress-btn', 'submit', false); ?>
 			</p>
-
 		</form>
 	</div>
 </div>
