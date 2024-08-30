@@ -352,51 +352,6 @@ class RapidPressAdmin {
 		});
 	}
 
-	// setupFormSubmission() {
-	// 	this.$("form").on("submit", e => {
-	// 		e.preventDefault();
-	// 		let form = this.$(e.currentTarget);
-
-	// 		// Serialize the form data
-	// 		let formData = form.serializeArray();
-
-	// 		// Add unchecked checkboxes to the formData
-	// 		form.find("input[type=checkbox]:not(:checked)").each(function () {
-	// 			formData.push({ name: this.name, value: "0" });
-	// 		});
-
-	// 		// Convert formData to a string
-	// 		formData = jQuery.param(formData);
-
-	// 		formData += "&action=rapidpress_save_settings";
-	// 		formData += "&rapidpress_nonce=" + rapidpress_admin.nonce;
-
-	// 		console.log("Submitting form data:", formData);
-
-	// 		jQuery.ajax({
-	// 			url: rapidpress_admin.ajax_url,
-	// 			type: "POST",
-	// 			data: formData,
-	// 			success: response => {
-	// 				console.log("AJAX Response:", response);
-	// 				if (response.success) {
-	// 					this.showNotice(response.data, "success");
-	// 				} else {
-	// 					let errorMessage =
-	// 						response.data ||
-	// 						"Failed to save settings. Please try again.";
-	// 					this.showNotice(errorMessage, "error");
-	// 					console.error("Error details:", errorMessage);
-	// 				}
-	// 			},
-	// 			error: (jqXHR, textStatus, errorThrown) => {
-	// 				console.error("AJAX Error:", textStatus, errorThrown);
-	// 				this.showNotice("An error occurred. Please try again.", "error");
-	// 			}
-	// 		});
-	// 	});
-	// }
-
 	setupFormSubmission() {
 		this.$("form").on("submit", e => {
 			e.preventDefault();
@@ -446,11 +401,16 @@ class RapidPressAdmin {
 	}
 
 	showNotice(message, type) {
+		// Remove any existing notices
+		this.$(".rapidpress-inline-notice").remove();
+
 		let noticeClass = type === "success" ? "notice-success" : "notice-error";
 		let notice = this.$(
-			`<div class="notice ${noticeClass} is-dismissible"><p><strong>${message}</strong></p></div>`
+			`<span class="rapidpress-inline-notice ${noticeClass}">${message}</span>`
 		);
-		this.$(".wrap").prepend(notice);
+
+		// Insert the notice after the submit button
+		this.$("#submit").after(notice);
 
 		// Automatically remove the notice after 3 seconds
 		setTimeout(() => {
@@ -463,13 +423,13 @@ class RapidPressAdmin {
 	showLoadingIndicator() {
 		// Add a loading indicator to the submit button
 		const submitButton = this.$("#submit");
-		submitButton.prop("disabled", true).addClass("updating-message");
+		submitButton.val("Saving...");
 	}
 
 	hideLoadingIndicator() {
 		// Remove the loading indicator from the submit button
 		const submitButton = this.$("#submit");
-		submitButton.prop("disabled", false).removeClass("updating-message");
+		submitButton.val("Save Changes");
 	}
 
 	setupSubmitButtonVisibility() {

@@ -375,6 +375,8 @@
 	background-color: var(--primary-color);
 	border-color: var(--primary-color);
 	padding: 4px 15px;
+	width: 120px;
+	text-align: center;
 }
 
 .button-primary.rapidpress-btn:hover,
@@ -383,22 +385,22 @@
 	border-color: #7a5af7;
 }
 
-.updating-message::before {
-	content: "\f463";
+.rapidpress-inline-notice {
 	display: inline-block;
-	font: normal 20px/1 dashicons;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	vertical-align: bottom;
-	animation: rotation 2s infinite linear;
-	margin-right: 5px;
+	margin-left: 10px;
+	padding: 5px 10px;
+	border-radius: 3px;
+	font-weight: bold;
 }
 
-@keyframes rotation {
-	0% {
-		transform: rotate(0deg);
-	}
-	100% {
-		transform: rotate(359deg);
-	}
+.rapidpress-inline-notice.notice-success {
+	background-color: #dff0d8;
+	color: #3c763d;
+	border: 1px solid #d6e9c6;
+}
+
+.rapidpress-inline-notice.notice-error {
+	background-color: #f2dede;
+	color: #a94442;
+	border: 1px solid #ebccd1;
 }

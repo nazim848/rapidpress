@@ -10,9 +10,6 @@ class Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
-		// Process form submission
-		//add_action('admin_init', array($this, 'process_form_submission'));
-
 		add_action('wp_ajax_rapidpress_save_settings', array($this, 'ajax_save_settings'));
 
 		add_action('admin_notices', array($this, 'activation_notice'));
@@ -42,59 +39,6 @@ class Admin {
 			'nonce' => wp_create_nonce('rapidpress_options_verify')
 		));
 	}
-
-	// public function ajax_save_settings() {
-	// 	if (!current_user_can('manage_options')) {
-	// 		wp_send_json_error('Insufficient permissions');
-	// 	}
-
-	// 	if (!isset($_POST['rapidpress_nonce']) || !wp_verify_nonce($_POST['rapidpress_nonce'], 'rapidpress_options_verify')) {
-	// 		wp_send_json_error('Invalid nonce');
-	// 	}
-
-	// 	$new_options = isset($_POST['rapidpress_options']) ? $this->sanitize_options($_POST['rapidpress_options']) : array();
-	// 	$old_options = get_option('rapidpress_options', array());
-
-	// 	// Special handling for js_disable_rules and css_disable_rules
-	// 	if (isset($new_options['js_disable_rules']) && $new_options['js_disable_rules'] === 'js_disable_rules') {
-	// 		$new_options['js_disable_rules'] = isset($old_options['js_disable_rules']) ? $old_options['js_disable_rules'] : array();
-	// 	}
-	// 	if (isset($new_options['css_disable_rules']) && $new_options['css_disable_rules'] === 'css_disable_rules') {
-	// 		$new_options['css_disable_rules'] = isset($old_options['css_disable_rules']) ? $old_options['css_disable_rules'] : array();
-	// 	}
-
-	// 	// Compare new options with old options
-	// 	$changed = false;
-	// 	foreach ($new_options as $key => $value) {
-	// 		if (!isset($old_options[$key]) || $old_options[$key] !== $value) {
-	// 			$changed = true;
-	// 			break;
-	// 		}
-	// 	}
-
-	// 	if (!$changed) {
-	// 		wp_send_json_success('No changes detected in settings.');
-	// 		return;
-	// 	}
-
-	// 	// Merge new options with old options to preserve any settings not included in the current form
-	// 	$updated_options = array_merge($old_options, $new_options);
-	// 	$update_result = update_option('rapidpress_options', $updated_options);
-
-	// 	if ($update_result) {
-	// 		wp_send_json_success('Settings saved successfully');
-	// 	} else {
-	// 		// Check if the options are actually the same
-	// 		$current_options = get_option('rapidpress_options', array());
-	// 		if ($current_options == $updated_options) {
-	// 			wp_send_json_success('No changes detected in settings.');
-	// 		} else {
-	// 			wp_send_json_error('Failed to update options in the database. ' .
-	// 				'Old options: ' . json_encode($old_options) . '. ' .
-	// 				'New options: ' . json_encode($updated_options) . '.');
-	// 		}
-	// 	}
-	// }
 
 	public function ajax_save_settings() {
 		if (!current_user_can('manage_options')) {
@@ -144,17 +88,6 @@ class Admin {
 			} else {
 				wp_send_json_error('Failed to update options in the database.');
 			}
-		}
-	}
-
-	// Process Form
-	public function process_form_submission() {
-		if (isset($_POST['rapidpress_options']) && check_admin_referer('rapidpress_options_verify')) {
-			$options = $_POST['rapidpress_options'];
-			$sanitized_options = $this->sanitize_options($options);
-			update_option('rapidpress_options', $sanitized_options);
-			wp_safe_redirect(add_query_arg('settings-updated', 'true', wp_get_referer()));
-			exit;
 		}
 	}
 
