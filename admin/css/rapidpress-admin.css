@@ -382,3 +382,23 @@
 	background-color: #7a5af7;
 	border-color: #7a5af7;
 }
+
+.updating-message::before {
+	content: "\f463";
+	display: inline-block;
+	font: normal 20px/1 dashicons;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	vertical-align: bottom;
+	animation: rotation 2s infinite linear;
+	margin-right: 5px;
+}
+
+@keyframes rotation {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(359deg);
+	}
+}

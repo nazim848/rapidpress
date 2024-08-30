@@ -20,7 +20,6 @@ $tabs = array(
 	'settings' => 'Settings'
 );
 
-$settings_updated = isset($_GET['settings-updated']) && $_GET['settings-updated'] == 'true';
 // Get current tab
 $active_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'general';
 
@@ -33,15 +32,6 @@ if (!array_key_exists($active_tab, $tabs)) {
 <div class="wrap">
 	<!-- Logo -->
 	<img src="<?php echo RAPIDPRESS_PLUGIN_URL . '/admin/images/rapidpress-logo.svg'; ?>" alt="RapidPress Logo" class="rapidpress-logo" width="190">
-
-	<?php if ($settings_updated) : ?>
-		<?php error_log("Settings saved."); ?>
-		<div class="notice notice-success is-dismissible" style="display: block !important;">
-			<p><strong>Settings saved.</strong></p>
-		</div>
-	<?php endif; ?>
-	<?php settings_errors(); ?>
-
 	<div class="rapidpress-admin-content">
 		<h2 class="nav-tab-wrapper">
 			<?php
@@ -52,10 +42,10 @@ if (!array_key_exists($active_tab, $tabs)) {
 			?>
 		</h2>
 
-		<form id="rapidpress-settings-form" method="post" action="options.php">
+		<form id="rapidpress-settings-form" method="post">
 			<?php settings_fields('rapidpress_options'); ?>
 			<?php do_settings_sections('rapidpress_options'); ?>
-			<?php wp_nonce_field('rapidpress_options_verify'); ?>
+			<?php wp_nonce_field('rapidpress_options_verify', 'rapidpress_nonce'); ?>
 			<input type="hidden" id="rapidpress_active_tab" name="rapidpress_active_tab" value="<?php echo esc_attr($active_tab); ?>">
 
 			<div class="tab-content">
