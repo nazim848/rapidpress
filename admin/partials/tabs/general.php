@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 use RapidPress\RP_Options;
 
 ?>
-
+Test
 <div id="<?php echo esc_attr($tab_id); ?>" class="tab-pane">
 	<h2 class="content-title"> <span class="dashicons dashicons-dashboard"></span> General</h2>
 	<div class="rapidpress-card">
