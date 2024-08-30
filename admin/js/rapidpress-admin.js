@@ -379,7 +379,6 @@ class RapidPressAdmin {
 				type: "POST",
 				data: formData,
 				success: response => {
-					console.log("AJAX Response:", response);
 					this.hideLoadingIndicator();
 					if (response.success) {
 						this.showNotice(response.data, "success");
@@ -388,11 +387,9 @@ class RapidPressAdmin {
 							response.data ||
 							"Failed to save settings. Please try again.";
 						this.showNotice(errorMessage, "error");
-						console.error("Error details:", errorMessage);
 					}
 				},
 				error: (jqXHR, textStatus, errorThrown) => {
-					console.error("AJAX Error:", textStatus, errorThrown);
 					this.hideLoadingIndicator();
 					this.showNotice("An error occurred. Please try again.", "error");
 				}

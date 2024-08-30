@@ -240,13 +240,6 @@ class Admin {
 						}
 						break;
 				}
-			} else {
-				// Convert '0' and '1' strings to booleans for checkbox values
-				if ($rule === '0' || $rule === '1') {
-					$sanitized_options[$option] = (bool)$rule;
-				} else {
-					$sanitized_options[$option] = sanitize_text_field($rule);
-				}
 			}
 		}
 
