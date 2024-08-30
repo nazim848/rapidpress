@@ -10,6 +10,9 @@ class Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
+		// Process form submission
+		add_action('admin_init', array($this, 'process_form_submission'));
+
 		add_action('admin_notices', array($this, 'activation_notice'));
 		add_action('admin_menu', array($this, 'add_plugin_settings_menu'));
 		add_action('admin_init', array($this, 'register_settings'));
@@ -36,6 +39,17 @@ class Admin {
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('rapidpress_admin_nonce')
 		));
+	}
+
+	// Process Form
+	public function process_form_submission() {
+		if (isset($_POST['rapidpress_options']) && check_admin_referer('rapidpress_options_verify')) {
+			$options = $_POST['rapidpress_options'];
+			$sanitized_options = $this->sanitize_options($options);
+			update_option('rapidpress_options', $sanitized_options);
+			wp_safe_redirect(add_query_arg('settings-updated', 'true', wp_get_referer()));
+			exit;
+		}
 	}
 
 	public function activation_notice() {
