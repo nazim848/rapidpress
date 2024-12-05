@@ -380,7 +380,6 @@ class Core_Tweaks {
 		remove_action('xmlrpc_rsd_apis', 'rest_output_rsd', 10);
 	}
 
-
 	// Limit Post Revisions
 	private function limit_post_revisions() {
 		if (defined('WP_POST_REVISIONS')) {
