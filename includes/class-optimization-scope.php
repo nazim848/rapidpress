@@ -5,7 +5,7 @@ namespace RapidPress;
 class Optimization_Scope {
 
 	public static function should_optimize() {
-		$scope = get_option('rapidpress_optimization_scope', 'entire_site');
+		$scope = RP_Options::get_option('optimization_scope', 'entire_site');
 		$current_url = self::get_current_relative_url();
 
 		switch ($scope) {
@@ -21,13 +21,13 @@ class Optimization_Scope {
 	}
 
 	private static function should_optimize_entire_site($current_url) {
-		$enable_exclusions = get_option('rapidpress_enable_scope_exclusions', '0');
+		$enable_exclusions = RP_Options::get_option('enable_optimization_scope_exclusions', '0');
 
-		if ($enable_exclusions !== '1') {
+		if ($enable_exclusions != '1') {
 			return true;
 		}
 
-		$excluded_pages = get_option('rapidpress_optimization_excluded_pages', '');
+		$excluded_pages = RP_Options::get_option('optimization_excluded_pages', '');
 		$excluded_pages = array_filter(array_map('trim', explode("\n", $excluded_pages)));
 
 		if (empty($excluded_pages)) {
@@ -48,7 +48,7 @@ class Optimization_Scope {
 	}
 
 	private static function should_optimize_specific_pages($current_url) {
-		$optimized_pages = get_option('rapidpress_optimized_pages', '');
+		$optimized_pages = RP_Options::get_option('optimized_pages', '');
 		$pages = array_filter(array_map('trim', explode("\n", $optimized_pages)));
 
 		foreach ($pages as $page) {

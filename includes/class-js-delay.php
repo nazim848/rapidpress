@@ -4,14 +4,14 @@ namespace RapidPress;
 
 class JS_Delay {
 	public function apply_js_delay($html) {
-		if (is_admin() || !get_option('rapidpress_js_delay') || !\RapidPress\Optimization_Scope::should_optimize()) {
+		if (is_admin() || !RP_Options::get_option('js_delay') || !\RapidPress\Optimization_Scope::should_optimize()) {
 			return $html;
 		}
 
-		$delay_type = get_option('rapidpress_js_delay_type', 'all');
+		$delay_type = RP_Options::get_option('js_delay_type', 'all');
 		$specific_files = $delay_type === 'specific' ? $this->get_specific_files() : array();
-		$exclusions = ($delay_type === 'all' && get_option('rapidpress_enable_js_delay_exclusions')) ? $this->get_exclusions() : array();
-		$delay_duration = get_option('rapidpress_js_delay_duration', '1');
+		$exclusions = ($delay_type === 'all' && RP_Options::get_option('enable_js_delay_exclusions')) ? $this->get_exclusions() : array();
+		$delay_duration = RP_Options::get_option('js_delay_duration', '1');
 
 		if (empty($html)) {
 			return $html;
@@ -62,7 +62,7 @@ class JS_Delay {
 	}
 
 	private function get_exclusions() {
-		$exclusions_string = get_option('rapidpress_js_delay_exclusions', '');
+		$exclusions_string = RP_Options::get_option('js_delay_exclusions', '');
 		return array_filter(array_map('trim', explode("\n", $exclusions_string)));
 	}
 
@@ -76,7 +76,7 @@ class JS_Delay {
 	}
 
 	private function get_specific_files() {
-		$specific_files_string = get_option('rapidpress_js_delay_specific_files', '');
+		$specific_files_string = RP_Options::get_option('js_delay_specific_files', '');
 		return array_filter(array_map('trim', explode("\n", $specific_files_string)));
 	}
 

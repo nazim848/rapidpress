@@ -19,6 +19,8 @@ class RapidPress {
 
 	private function load_dependencies() {
 		require_once RAPIDPRESS_PATH . 'includes/class-loader.php';
+		require_once RAPIDPRESS_PATH . 'includes/class-rapidpress-options.php';
+		require_once RAPIDPRESS_PATH . 'includes/class-core-tweaks.php';
 		require_once RAPIDPRESS_PATH . 'includes/class-html-minifier.php';
 		require_once RAPIDPRESS_PATH . 'includes/class-css-minifier.php';
 		require_once RAPIDPRESS_PATH . 'includes/class-css-combiner.php';
@@ -39,6 +41,7 @@ class RapidPress {
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
 
+		new \RapidPress\Core_Tweaks();
 		new \RapidPress\Optimization_Scope();
 		new \RapidPress\HTML_Minifier();
 		new \RapidPress\CSS_Combiner();

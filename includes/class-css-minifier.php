@@ -29,9 +29,4 @@ class CSS_Minifier {
 
 		return $html;
 	}
-
-	public function minify_css_files() {
-		// This is a placeholder for future implementation
-		// Here we would scan for CSS files, minify them, and cache the results
-	}
 }

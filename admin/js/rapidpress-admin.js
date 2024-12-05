@@ -9,6 +9,40 @@ class RapidPressAdmin {
 		this.initializeTabs();
 		this.restoreAccordionState();
 		this.initializeRuleManagement();
+		this.setupResetSettings();
+	}
+
+	setupResetSettings() {
+		this.$("#rapidpress-reset-settings").on("click", e => {
+			e.preventDefault();
+			if (
+				confirm(
+					"Are you sure you want to reset all RapidPress settings? This action cannot be undone."
+				)
+			) {
+				this.$.ajax({
+					url: rapidpress_admin.ajax_url,
+					type: "POST",
+					data: {
+						action: "rapidpress_reset_settings",
+						nonce: rapidpress_admin.nonce
+					},
+					success: response => {
+						if (response.success) {
+							alert(
+								"Settings reset successfully. The page will now reload."
+							);
+							location.reload();
+						} else {
+							alert("Failed to reset settings. Please try again.");
+						}
+					},
+					error: () => {
+						alert("An error occurred. Please try again.");
+					}
+				});
+			}
+		});
 	}
 
 	// Helper methods
@@ -79,33 +113,29 @@ class RapidPressAdmin {
 		const timestamp = Date.now();
 		const commonFields = `
 			 <td>
-				  <select name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][scope]" class="${ruleName}-disable-scope">
+			 <select name="rapidpress_options[${ruleName}_disable_rules][new_${timestamp}][scope]" class="${ruleName}-disable-scope">
 						<option value="entire_site">Entire Site</option>
 						<option value="front_page">Front Page</option>
 						<option value="specific_pages">Specific Pages</option>
-				  </select>
-				 
-                    <label class="${ruleName}-exclude-pages-wrapper" style="display:inline-block;"><input type="checkbox" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_enabled]" class="${ruleName}-exclude-enabled" value="1"> Exclude pages?</label>
-                    <textarea cols="63" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][exclude_pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-exclude-pages" style="display:none;"></textarea>
-                  
-				  <textarea cols="63" rows="3" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
+				  </select><div class="checkbox-radio"><label class="${ruleName}-exclude-pages-wrapper" style="display:inline-block;"><input type="checkbox" name="rapidpress_options[${ruleName}_disable_rules][new_${timestamp}][exclude_enabled]" class="${ruleName}-exclude-enabled" value="1"> Exclude pages?</label></div>
+				 <textarea cols="63" rows="3" name="rapidpress_options[${ruleName}_disable_rules][new_${timestamp}][exclude_pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-exclude-pages" style="display:none;"></textarea>
+				 <textarea cols="63" rows="3" name="rapidpress_options[${ruleName}_disable_rules][new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
      </td>
      <td>
-	  <div class="checkbox-btn"><label><input type="checkbox" name="rapidpress_${ruleName}_disable_rules[new_${timestamp}][is_active]" value="1" checked><span>Active</span></label></div>
+	  <div class="checkbox-btn"><label><input type="checkbox" name="rapidpress_options[${ruleName}_disable_rules][new_${timestamp}][is_active]" value="1" checked><span>Active</span></label></div>
          <button type="button" class="button remove-${ruleName}-rule">Remove</button>
      </td>
 		`;
-
 		if (ruleName === "js") {
 			return `
 				  <tr>
-						<td><textarea cols="63" rows="3" name="rapidpress_js_disable_rules[new_${timestamp}][scripts]" placeholder="Script URL or Handle (one per line)"></textarea></td>
+						<td><textarea cols="63" rows="3" name="rapidpress_options[js_disable_rules][new_${timestamp}][scripts]" placeholder="Script URL or Handle (one per line)"></textarea></td>
 						${commonFields}
 				  </tr>`;
 		} else if (ruleName === "css") {
 			return `
 				  <tr>
-						<td><textarea cols="63" rows="3" name="rapidpress_css_disable_rules[new_${timestamp}][styles]" placeholder="CSS URL or Handle (one per line)"></textarea></td>
+						<td><textarea cols="63" rows="3" name="rapidpress_options[css_disable_rules][new_${timestamp}][styles]" placeholder="CSS URL or Handle (one per line)"></textarea></td>
 						${commonFields}
 				  </tr>`;
 		}
@@ -326,39 +356,91 @@ class RapidPressAdmin {
 		this.$("form").on("submit", e => {
 			e.preventDefault();
 			let form = this.$(e.currentTarget);
-			let activeTab = this.$("#rapidpress_active_tab").val();
 
-			this.$.post(form.attr("action"), form.serialize(), response => {
-				let newUrl = this.updateQueryStringParameter(
-					window.location.href,
-					"tab",
-					activeTab
-				);
-				newUrl = this.updateQueryStringParameter(
-					newUrl,
-					"settings-updated",
-					"true"
-				);
-				window.location.href = newUrl;
+			// Serialize the form data
+			let formData = form.serializeArray();
+
+			// Add unchecked checkboxes to the formData
+			form.find("input[type=checkbox]:not(:checked)").each(function () {
+				formData.push({ name: this.name, value: "0" });
+			});
+
+			// Convert formData to a string
+			formData = jQuery.param(formData);
+
+			formData += "&action=rapidpress_save_settings";
+			formData += "&rapidpress_nonce=" + rapidpress_admin.nonce;
+
+			// Show loading indicator
+			this.showLoadingIndicator();
+
+			jQuery.ajax({
+				url: rapidpress_admin.ajax_url,
+				type: "POST",
+				data: formData,
+				success: response => {
+					this.hideLoadingIndicator();
+					if (response.success) {
+						this.showNotice(response.data, "success");
+					} else {
+						let errorMessage =
+							response.data ||
+							"Failed to save settings. Please try again.";
+						this.showNotice(errorMessage, "error");
+					}
+				},
+				error: (jqXHR, textStatus, errorThrown) => {
+					this.hideLoadingIndicator();
+					this.showNotice("An error occurred. Please try again.", "error");
+				}
 			});
 		});
+	}
 
-		// Save accordion state before form submission
-		this.$("form").on("submit", () => this.saveAccordionState());
+	showNotice(message, type) {
+		// Remove any existing notices
+		this.$(".rapidpress-inline-notice").remove();
+
+		let noticeClass = type === "success" ? "notice-success" : "notice-error";
+		let notice = this.$(
+			`<span class="rapidpress-inline-notice ${noticeClass}">${message}</span>`
+		);
+
+		// Insert the notice after the submit button
+		this.$("#submit").after(notice);
+
+		// Automatically remove the notice after 3 seconds
+		setTimeout(() => {
+			notice.fadeOut(300, function () {
+				jQuery(this).remove();
+			});
+		}, 3000);
+	}
+
+	showLoadingIndicator() {
+		// Add a loading indicator to the submit button
+		const submitButton = this.$("#submit");
+		submitButton.val("Saving...");
+	}
+
+	hideLoadingIndicator() {
+		// Remove the loading indicator from the submit button
+		const submitButton = this.$("#submit");
+		submitButton.val("Save Changes");
 	}
 
 	setupSubmitButtonVisibility() {
-		this.$(".nav-tab-wrapper .nav-tab").on("click", e => {
-			e.preventDefault();
-			const tabId = this.$(e.currentTarget).attr("href").substring(1);
-			this.$("#submit-button").toggle(tabId !== "dashboard");
-		});
+		// this.$(".nav-tab-wrapper .nav-tab").on("click", e => {
+		// 	e.preventDefault();
+		// 	const tabId = this.$(e.currentTarget).attr("href").substring(1);
+		// 	this.$("#submit-button").toggle(tabId !== "general");
+		// });
 	}
 
 	// Initialization methods
 	initializeTabs() {
 		const urlParams = new URLSearchParams(window.location.search);
-		const activeTab = urlParams.get("tab") || "dashboard";
+		const activeTab = urlParams.get("tab") || "general";
 		this.setActiveTab(activeTab);
 	}
 
@@ -387,6 +469,22 @@ jQuery(function ($) {
 
 	// Initialize tabs
 	const urlParams = new URLSearchParams(window.location.search);
-	const activeTab = urlParams.get("tab") || "dashboard";
+	const activeTab = urlParams.get("tab") || "general";
 	setActiveTab(activeTab);
+
+	// Make submit button visible after all the tabs are loaded
+	setTimeout(function () {
+		let submitButton = document.getElementById("submit-button");
+		if (submitButton) {
+			submitButton.style.display = "block";
+		}
+	}, 50); // Delay of 50 milliseconds
+
+	// Hide save changes notification after few seconds
+	setTimeout(function () {
+		let notice = $(".notice-success");
+		if (notice) {
+			notice.slideToggle();
+		}
+	}, 1500); // Delay of 1.5 seconds
 });

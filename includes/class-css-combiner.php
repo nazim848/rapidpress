@@ -11,6 +11,9 @@ class CSS_Combiner {
 	private $last_modified = 0;
 	private $excluded_files = array();
 	private $combined_handles = array();
+	private $file_prefix = 'combined-';
+	private $file_extension = '.css';
+	private $max_files_to_keep = 3;
 
 	public function __construct() {
 		add_action('wp_print_styles', array($this, 'combine_css'), 100);
@@ -21,19 +24,18 @@ class CSS_Combiner {
 
 	private function set_excluded_files() {
 
-		$enable_exclusions = get_option('rapidpress_enable_combine_css_exclusions', '0');
-		if ($enable_exclusions !== '1') {
+		$enable_exclusions = RP_Options::get_option('enable_combine_css_exclusions', '0');
+		if ($enable_exclusions != '1') {
 			return true;
 		}
-
-		$exclusions = get_option('rapidpress_combine_css_exclusions', '');
+		$exclusions = RP_Options::get_option('combine_css_exclusions', '');
 		$this->excluded_files = array_filter(array_map('trim', explode("\n", $exclusions)));
 	}
 
 	public function combine_css() {
 
 		// Exclude admin, POST requests, and pages not in the optimization scope
-		if (!get_option('rapidpress_combine_css') || is_admin() || !\RapidPress\Optimization_Scope::should_optimize()) {
+		if (!RP_Options::get_option('combine_css') || is_admin() || !\RapidPress\Optimization_Scope::should_optimize()) {
 			$this->debug_log[] = "CSS combination is disabled, is admin page, or not in optimization scope.";
 			return;
 		}
@@ -64,13 +66,16 @@ class CSS_Combiner {
 			}
 
 			$styles_to_combine[] = $style;
-			$styles_hash .= $src;
+			$file_path = $this->url_to_path($src);
+			$last_modified = $this->get_file_last_modified($file_path);
+			$styles_hash .= $src . $last_modified;
 			$this->combined_handles[] = $handle;
+			$this->last_modified = max($this->last_modified, $last_modified);
 		}
 
 		if (!empty($styles_to_combine)) {
 			$styles_hash = md5($styles_hash);
-			$this->combined_filename = "combined-{$styles_hash}.css";
+			$this->combined_filename = "{$this->file_prefix}{$styles_hash}{$this->file_extension}";
 
 			if (!$this->is_cached_file_valid($styles_hash)) {
 				foreach ($styles_to_combine as $style) {
@@ -79,6 +84,7 @@ class CSS_Combiner {
 
 				$this->combined_css = $this->minify_css($this->combined_css);
 				$this->save_combined_css($styles_hash);
+				$this->cleanup_old_files();
 			}
 
 			// Dequeue original styles
@@ -90,6 +96,37 @@ class CSS_Combiner {
 			wp_enqueue_style('rapidpress-combined-css', $this->get_combined_css_url(), array(), null);
 		} else {
 			$this->debug_log[] = "No styles to combine.";
+		}
+	}
+
+	private function get_file_last_modified($file_path) {
+		return file_exists($file_path) ? filemtime($file_path) : 0;
+	}
+
+	private function cleanup_old_files() {
+		$upload_dir = wp_upload_dir();
+		$combined_dir = trailingslashit($upload_dir['basedir']) . 'rapidpress-combined';
+
+		if (!is_dir($combined_dir)) {
+			return;
+		}
+
+		$files = glob($combined_dir . '/' . $this->file_prefix . '*' . $this->file_extension);
+
+		if (count($files) <= $this->max_files_to_keep) {
+			return;
+		}
+
+		usort($files, function ($a, $b) {
+			return filemtime($b) - filemtime($a);
+		});
+
+		$files_to_delete = array_slice($files, $this->max_files_to_keep);
+
+		foreach ($files_to_delete as $file) {
+			if (is_file($file)) {
+				unlink($file);
+			}
 		}
 	}
 
@@ -164,14 +201,16 @@ class CSS_Combiner {
 		$cache_meta = array(
 			'hash' => $styles_hash,
 			'expires' => time() + $this->cache_expiration,
+			'last_modified' => $this->last_modified,
 		);
-		update_option('rapidpress_css_cache_meta', $cache_meta);
+
+		RP_Options::update_option('css_cache_meta', $cache_meta);
 	}
 
 	private function is_cached_file_valid($styles_hash) {
-		$cache_meta = get_option('rapidpress_css_cache_meta', array());
+		$cache_meta = RP_Options::get_option('css_cache_meta', array());
 		if (isset($cache_meta['hash']) && $cache_meta['hash'] === $styles_hash) {
-			if (isset($cache_meta['expires']) && $cache_meta['expires'] > time()) {
+			if (isset($cache_meta['last_modified']) && $cache_meta['last_modified'] >= $this->last_modified) {
 				return true;
 			}
 		}
