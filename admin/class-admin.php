@@ -251,76 +251,6 @@ class Admin {
 		));
 	}
 
-	public function sanitize_options($options) {
-		if (!is_array($options)) {
-			return array();
-		}
-		$sanitized_options = array();
-		$sanitization_rules = array(
-			'disable_comments'                     => 'boolean',
-			'remove_comment_urls'                  => 'boolean',
-			'disable_dashicons'                    => 'boolean',
-			'disable_embeds'                    	=> 'boolean',
-			'disable_xmlrpc'                    	=> 'boolean',
-			'disable_emojis'                   	 	=> 'boolean',
-			'remove_jquery_migrate'                => 'boolean',
-			'disable_rss_feeds'                    => 'boolean',
-			'remove_rsd_link'                    	=> 'boolean',
-			'hide_wp_version'                    	=> 'boolean',
-			'remove_global_styles'                 => 'boolean',
-			'separate_block_styles'                => 'boolean',
-			'disable_self_pingbacks'               => 'boolean',
-			'disable_google_maps'                  => 'boolean',
-			'remove_shortlink'                    	=> 'boolean',
-			'disable_rest_api'							=> 'text_field',
-			'remove_rest_api_links'                => 'boolean',
-			'limit_post_revisions'                 => 'limit_post_revisions',
-			'optimization_scope'                   => 'text_field',
-			'optimized_pages'                      => 'optimized_pages',
-			'enable_optimization_scope_exclusions' => 'boolean',
-			'optimization_excluded_pages'          => 'optimization_excluded_pages',
-			'html_minify'                          => 'boolean',
-			'css_minify'                           => 'boolean',
-			'combine_css'                          => 'boolean',
-			'enable_combine_css_exclusions'        => 'boolean',
-			'combine_css_exclusions'               => 'combine_css_exclusions',
-			'js_minify'                            => 'boolean',
-			'js_defer'                             => 'boolean',
-			'enable_js_defer_exclusions'           => 'boolean',
-			'js_defer_exclusions'                  => 'js_defer_exclusions',
-			'js_delay'                             => 'boolean',
-			'js_delay_type'                        => 'js_delay_type',
-			'js_delay_duration'                    => 'js_delay_duration',
-			'js_delay_specific_files'              => 'js_delay_specific_files',
-			'enable_js_delay_exclusions'           => 'boolean',
-			'js_delay_exclusions'                  => 'js_delay_exclusions',
-			'js_disable_rules'                     => 'js_disable_rules',
-			'css_disable_rules'                    => 'css_disable_rules',
-			'clean_uninstall'                      => 'boolean',
-		);
-
-		foreach ($sanitization_rules as $option => $rule) {
-			if (isset($options[$option])) {
-				switch ($rule) {
-					case 'boolean':
-						$sanitized_options[$option] = rest_sanitize_boolean($options[$option]);
-						break;
-					case 'text_field':
-						$sanitized_options[$option] = sanitize_text_field($options[$option]);
-						break;
-					default:
-						$method = "sanitize_{$rule}";
-						if (method_exists($this, $method)) {
-							$sanitized_options[$option] = $this->$method($options[$option]);
-						}
-						break;
-				}
-			}
-		}
-
-		return $sanitized_options;
-	}
-
 	// public function sanitize_options($options) {
 	// 	$sanitized_options = array();
 
@@ -435,6 +365,76 @@ class Admin {
 
 	// 	return $sanitized_options;
 	// }
+
+	public function sanitize_options($options) {
+		if (!is_array($options)) {
+			return array();
+		}
+		$sanitized_options = array();
+		$sanitization_rules = array(
+			'disable_comments'                     => 'boolean',
+			'remove_comment_urls'                  => 'boolean',
+			'disable_dashicons'                    => 'boolean',
+			'disable_embeds'                    	=> 'boolean',
+			'disable_xmlrpc'                    	=> 'boolean',
+			'disable_emojis'                   	 	=> 'boolean',
+			'remove_jquery_migrate'                => 'boolean',
+			'disable_rss_feeds'                    => 'boolean',
+			'remove_rsd_link'                    	=> 'boolean',
+			'hide_wp_version'                    	=> 'boolean',
+			'remove_global_styles'                 => 'boolean',
+			'separate_block_styles'                => 'boolean',
+			'disable_self_pingbacks'               => 'boolean',
+			'disable_google_maps'                  => 'boolean',
+			'remove_shortlink'                    	=> 'boolean',
+			'disable_rest_api'							=> 'text_field',
+			'remove_rest_api_links'                => 'boolean',
+			'limit_post_revisions'                 => 'limit_post_revisions',
+			'optimization_scope'                   => 'text_field',
+			'optimized_pages'                      => 'optimized_pages',
+			'enable_optimization_scope_exclusions' => 'boolean',
+			'optimization_excluded_pages'          => 'optimization_excluded_pages',
+			'html_minify'                          => 'boolean',
+			'css_minify'                           => 'boolean',
+			'combine_css'                          => 'boolean',
+			'enable_combine_css_exclusions'        => 'boolean',
+			'combine_css_exclusions'               => 'combine_css_exclusions',
+			'js_minify'                            => 'boolean',
+			'js_defer'                             => 'boolean',
+			'enable_js_defer_exclusions'           => 'boolean',
+			'js_defer_exclusions'                  => 'js_defer_exclusions',
+			'js_delay'                             => 'boolean',
+			'js_delay_type'                        => 'js_delay_type',
+			'js_delay_duration'                    => 'js_delay_duration',
+			'js_delay_specific_files'              => 'js_delay_specific_files',
+			'enable_js_delay_exclusions'           => 'boolean',
+			'js_delay_exclusions'                  => 'js_delay_exclusions',
+			'js_disable_rules'                     => 'js_disable_rules',
+			'css_disable_rules'                    => 'css_disable_rules',
+			'clean_uninstall'                      => 'boolean',
+		);
+
+		foreach ($sanitization_rules as $option => $rule) {
+			if (isset($options[$option])) {
+				switch ($rule) {
+					case 'boolean':
+						$sanitized_options[$option] = rest_sanitize_boolean($options[$option]);
+						break;
+					case 'text_field':
+						$sanitized_options[$option] = sanitize_text_field($options[$option]);
+						break;
+					default:
+						$method = "sanitize_{$rule}";
+						if (method_exists($this, $method)) {
+							$sanitized_options[$option] = $this->$method($options[$option]);
+						}
+						break;
+				}
+			}
+		}
+
+		return $sanitized_options;
+	}
 
 	public function reset_settings() {
 		check_ajax_referer('rapidpress_admin_nonce', 'nonce');
