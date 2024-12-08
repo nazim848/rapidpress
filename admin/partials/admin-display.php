@@ -4,8 +4,13 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 // Verify user capabilities
 if (!current_user_can('manage_options')) {
-	wp_die(__('You do not have sufficient permissions to access this page.'));
+	wp_die(
+		esc_html__('You do not have sufficient permissions to access this page.', 'rapidpress'),
+		'',
+		array('response' => 403)
+	);
 }
+
 
 // Define tabs
 $tabs = array(
@@ -31,13 +36,13 @@ if (!array_key_exists($active_tab, $tabs)) {
 
 <div class="wrap">
 	<!-- Logo -->
-	<img src="<?php echo RAPIDPRESS_PLUGIN_URL . '/admin/images/rapidpress-logo.svg'; ?>" alt="RapidPress Logo" class="rapidpress-logo" width="190">
+	<div class="rapidpress-logo"></div>
 	<div class="rapidpress-admin-content">
 		<h2 class="nav-tab-wrapper">
 			<?php
 			foreach ($tabs as $tab_id => $tab_name) {
 				$class = ($tab_id === $active_tab) ? ' nav-tab-active' : '';
-				echo '<a href="#' . esc_attr($tab_id) . '" class="nav-tab' . $class . '">' . esc_html($tab_name) . '</a>';
+				echo '<a href="#' . esc_attr($tab_id) . '" class="nav-tab' . esc_attr($class) . '">' . esc_html($tab_name) . '</a>';
 			}
 			?>
 		</h2>

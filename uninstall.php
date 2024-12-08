@@ -33,7 +33,7 @@ if ($clean_uninstall == '1') {
 
 	// Delete any files or directories created by the plugin
 	$upload_dir = wp_upload_dir();
-	$combined_dir = trailingslashit($upload_dir['basedir']) . 'rapidpress-combined';
+	$combined_dir = trailingslashit($upload_dir['basedir']) . 'rapidpress';
 
 	if (is_dir($combined_dir)) {
 		rapidpress_remove_directory($combined_dir);
@@ -47,21 +47,18 @@ if ($clean_uninstall == '1') {
  * @return bool True on success, false on failure
  */
 function rapidpress_remove_directory($dir) {
-	if (!is_dir($dir)) {
+	require_once(ABSPATH . 'wp-admin/includes/file.php');
+	WP_Filesystem();
+	global $wp_filesystem;
+
+	if (!$wp_filesystem->is_dir($dir)) {
 		return false;
 	}
 
-	$files = array_diff(scandir($dir), array('.', '..'));
-
-	foreach ($files as $file) {
-		$path = $dir . '/' . $file;
-
-		if (is_dir($path)) {
-			rapidpress_remove_directory($path);
-		} else {
-			unlink($path);
-		}
+	// Delete directory contents recursively
+	if (!$wp_filesystem->delete($dir, true)) {
+		return false;
 	}
 
-	return rmdir($dir);
+	return true;
 }

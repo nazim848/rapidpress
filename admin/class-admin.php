@@ -40,25 +40,91 @@ class Admin {
 		));
 	}
 
+	// public function ajax_save_settings() {
+	// 	if (!current_user_can('manage_options')) {
+	// 		wp_send_json_error('Insufficient permissions');
+	// 	}
+
+	// 	if (
+	// 		!isset($_POST['rapidpress_nonce']) ||
+	// 		!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['rapidpress_nonce'])), 'rapidpress_options_verify')
+	// 	) {
+	// 		wp_send_json_error('Invalid nonce');
+	// 	}
+
+	// 	$new_options = isset($_POST['rapidpress_options']) ? $this->sanitize_options(map_deep(wp_unslash($_POST['rapidpress_options']), 'sanitize_text_field')) : array();
+
+	// 	$old_options = get_option('rapidpress_options', array());
+
+	// 	// Special handling for js_disable_rules and css_disable_rules
+	// 	if (isset($new_options['js_disable_rules']) && $new_options['js_disable_rules'] === 'js_disable_rules') {
+	// 		$new_options['js_disable_rules'] = isset($old_options['js_disable_rules']) ? $old_options['js_disable_rules'] : array();
+	// 	}
+	// 	if (isset($new_options['css_disable_rules']) && $new_options['css_disable_rules'] === 'css_disable_rules') {
+	// 		$new_options['css_disable_rules'] = isset($old_options['css_disable_rules']) ? $old_options['css_disable_rules'] : array();
+	// 	}
+
+	// 	// Compare new options with old options
+	// 	$changed = false;
+	// 	foreach ($new_options as $key => $value) {
+	// 		if (!isset($old_options[$key]) || $old_options[$key] !== $value) {
+	// 			$changed = true;
+	// 			break;
+	// 		}
+	// 	}
+
+	// 	if (!$changed) {
+	// 		wp_send_json_success('Settings are up to date');
+	// 		return;
+	// 	}
+
+	// 	// Merge new options with old options to preserve any settings not included in the current form
+	// 	$updated_options = array_merge($old_options, $new_options);
+	// 	$update_result = update_option('rapidpress_options', $updated_options);
+
+	// 	if ($update_result) {
+	// 		wp_send_json_success('Settings saved successfully');
+	// 	} else {
+	// 		// Check if the options are actually the same
+	// 		$current_options = get_option('rapidpress_options', array());
+	// 		if ($current_options == $updated_options) {
+	// 			wp_send_json_success('Settings are up to date');
+	// 		} else {
+	// 			wp_send_json_error('Failed to update options in the database.');
+	// 		}
+	// 	}
+	// }
+
 	public function ajax_save_settings() {
 		if (!current_user_can('manage_options')) {
 			wp_send_json_error('Insufficient permissions');
 		}
 
-		if (!isset($_POST['rapidpress_nonce']) || !wp_verify_nonce($_POST['rapidpress_nonce'], 'rapidpress_options_verify')) {
+		if (
+			!isset($_POST['rapidpress_nonce']) ||
+			!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['rapidpress_nonce'])), 'rapidpress_options_verify')
+		) {
 			wp_send_json_error('Invalid nonce');
 		}
 
-		$new_options = isset($_POST['rapidpress_options']) ? $this->sanitize_options($_POST['rapidpress_options']) : array();
+		$new_options = isset($_POST['rapidpress_options']) ? $this->sanitize_options(map_deep(wp_unslash($_POST['rapidpress_options']), 'sanitize_text_field')) : array();
 		$old_options = get_option('rapidpress_options', array());
 
-		// Special handling for js_disable_rules and css_disable_rules
-		if (isset($new_options['js_disable_rules']) && $new_options['js_disable_rules'] === 'js_disable_rules') {
-			$new_options['js_disable_rules'] = isset($old_options['js_disable_rules']) ? $old_options['js_disable_rules'] : array();
+		// Handle JS and CSS disable rules
+		if (!isset($new_options['js_disable_rules'])) {
+			$new_options['js_disable_rules'] = array();
 		}
-		if (isset($new_options['css_disable_rules']) && $new_options['css_disable_rules'] === 'css_disable_rules') {
-			$new_options['css_disable_rules'] = isset($old_options['css_disable_rules']) ? $old_options['css_disable_rules'] : array();
+		if (!isset($new_options['css_disable_rules'])) {
+			$new_options['css_disable_rules'] = array();
 		}
+
+		// Remove the special handling that was preserving old rules
+		// if (isset($new_options['js_disable_rules']) && $new_options['js_disable_rules'] === 'js_disable_rules') {
+		//     $new_options['js_disable_rules'] = isset($old_options['js_disable_rules']) ? $old_options['js_disable_rules'] : array();
+		// }
+		// if (isset($new_options['css_disable_rules']) && $new_options['css_disable_rules'] === 'css_disable_rules') {
+		//     $new_options['css_disable_rules'] = isset($old_options['css_disable_rules']) ? $old_options['css_disable_rules'] : array();
+		// }
 
 		// Compare new options with old options
 		$changed = false;
@@ -74,16 +140,15 @@ class Admin {
 			return;
 		}
 
-		// Merge new options with old options to preserve any settings not included in the current form
-		$updated_options = array_merge($old_options, $new_options);
-		$update_result = update_option('rapidpress_options', $updated_options);
+		// Update with new options directly instead of merging
+		$update_result = update_option('rapidpress_options', $new_options);
 
 		if ($update_result) {
 			wp_send_json_success('Settings saved successfully');
 		} else {
 			// Check if the options are actually the same
 			$current_options = get_option('rapidpress_options', array());
-			if ($current_options == $updated_options) {
+			if ($current_options == $new_options) {
 				wp_send_json_success('Settings are up to date');
 			} else {
 				wp_send_json_error('Failed to update options in the database.');
@@ -95,9 +160,9 @@ class Admin {
 		if (get_transient('rapidpress_activation_notice')) {
 ?>
 			<div class="updated notice is-dismissible">
-				<p><?php _e('Thank you for installing RapidPress! Please visit the ', 'rapidpress'); ?>
-					<a href="<?php echo admin_url('options-general.php?page=rapidpress'); ?>"><?php _e('settings page', 'rapidpress'); ?></a>
-					<?php _e('to configure the plugin.', 'rapidpress'); ?>
+				<p><?php esc_html_e('Thank you for installing RapidPress! Please visit the ', 'rapidpress'); ?>
+					<a href="<?php echo esc_url(admin_url('options-general.php?page=rapidpress')); ?>"><?php esc_html_e('settings page', 'rapidpress'); ?></a>
+					<?php esc_html_e('to configure the plugin.', 'rapidpress'); ?>
 				</p>
 			</div>
 <?php
@@ -158,15 +223,25 @@ class Admin {
 	}
 
 	public function display_plugin_setup_page() {
-		$active_tab = '#general'; // Default to general
+		// $active_tab = '#general'; // Default to general
+		// if (isset($_GET['tab'])) {
+		// 	$active_tab = '#' . sanitize_text_field(wp_unslash($_GET['tab']));
+		// }
 
-		if (isset($_GET['tab'])) {
-			$active_tab = '#' . sanitize_text_field($_GET['tab']);
+		if (!isset($_GET['_wpnonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'rapidpress_tab_nonce')) {
+			$active_tab = '#general';
+		} else {
+			$active_tab = isset($_GET['tab']) ? '#' . sanitize_text_field(wp_unslash($_GET['tab'])) : '#general';
 		}
 
 		include_once 'partials/admin-display.php';
 
-		echo "<script>jQuery(document).ready(function($) { setActiveTab('$active_tab'); });</script>";
+		// echo "<script>jQuery(document).ready(function($) { setActiveTab('$active_tab'); });</script>";
+
+		// printf(
+		// 	'<script>jQuery(document).ready(function($) { setActiveTab(%s); });</script>',
+		// 	wp_json_encode($active_tab)
+		// );
 	}
 
 	public function register_settings() {
@@ -562,19 +637,23 @@ class Admin {
 		// Clear the CSS cache after saving settings
 		$this->clear_css_cache();
 
-		if (isset($_POST['rapidpress_active_tab']) && isset($_POST['rapidpress_nonce']) && wp_verify_nonce($_POST['rapidpress_nonce'], 'rapidpress_settings')) {
-			$tab = sanitize_key(ltrim($_POST['rapidpress_active_tab'], '#'));
+		if (
+			isset($_POST['rapidpress_active_tab'], $_POST['rapidpress_nonce']) &&
+			wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['rapidpress_nonce'])), 'rapidpress_settings')
+		) {
+			$tab = sanitize_key(ltrim(sanitize_text_field(wp_unslash($_POST['rapidpress_active_tab'])), '#'));
 			add_filter('wp_redirect', function ($location) use ($tab) {
 				return add_query_arg('tab', $tab, $location);
 			});
 		}
+
 
 		return $value;
 	}
 
 	public function clear_css_cache() {
 		$upload_dir = wp_upload_dir();
-		$combined_dir = trailingslashit($upload_dir['basedir']) . 'rapidpress-combined';
+		$combined_dir = trailingslashit($upload_dir['basedir']) . 'rapidpress';
 
 		if (is_dir($combined_dir)) {
 			array_map('unlink', glob("$combined_dir/*.*"));

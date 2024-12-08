@@ -160,15 +160,18 @@ class Core_Tweaks {
 	}
 
 	public function block_xmlrpc_requests() {
-		// Check if the current request is for xmlrpc.php
-		if (strpos($_SERVER['REQUEST_URI'], 'xmlrpc.php') !== false) {
-			// Set headers
+		if (!isset($_SERVER['REQUEST_URI'])) {
+			return;
+		}
+
+		$request_uri = sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI']));
+
+		if (strpos($request_uri, 'xmlrpc.php') !== false) {
 			header('HTTP/1.1 403 Forbidden');
 			header('Status: 403 Forbidden');
 			header('Connection: Close');
-
 			// Output message
-			echo 'XML-RPC services are disabled on this site.';
+			echo esc_html__('XML-RPC services are disabled on this site.', 'rapidpress');
 			exit;
 		}
 	}
@@ -233,7 +236,7 @@ class Core_Tweaks {
 
 	public function disable_rss_feed() {
 		wp_die(
-			__('RSS feeds are disabled.', 'rapidpress'),
+			esc_html(__('RSS feeds are disabled.', 'rapidpress')),
 			'',
 			['response' => 403]
 		);
@@ -396,8 +399,8 @@ class Core_Tweaks {
 	public function admin_notice_post_revisions() {
 		echo "<div class='notice notice-error'>";
 		echo "<p>";
-		echo "<strong>" . __('RapidPress Warning', 'rapidpress') . ":</strong> ";
-		echo __('WP_POST_REVISIONS is already enabled somewhere else on your site. We suggest only enabling this feature in one place.', 'rapidpress');
+		echo "<strong>" . esc_html(__('RapidPress Warning', 'rapidpress')) . ":</strong> ";
+		echo esc_html(__('WP_POST_REVISIONS is already enabled somewhere else on your site. We suggest only enabling this feature in one place.', 'rapidpress'));
 		echo "</p>";
 		echo "</div>";
 	}
