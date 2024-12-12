@@ -483,6 +483,28 @@ class Admin {
 		return intval($value);
 	}
 
+	// public function sanitize_css_disable_rules($input) {
+	// 	$sanitized_rules = array();
+	// 	if (is_array($input)) {
+	// 		foreach ($input as $rule) {
+	// 			if (!empty($rule['styles'])) {
+	// 				$sanitized_rule = array(
+	// 					'styles' => $this->sanitize_scripts_or_styles($rule['styles']),
+	// 					'scope' => sanitize_text_field($rule['scope']),
+	// 					'exclude_enabled' => isset($rule['exclude_enabled']) ? '1' : '0',
+	// 					'exclude_pages' => $this->sanitize_pages($rule['exclude_pages']),
+	// 					'pages' => $this->sanitize_pages($rule['pages']),
+	// 					'is_active' => isset($rule['is_active']) ? '1' : '0',
+	// 				);
+	// 				if (!empty($sanitized_rule['styles'])) {
+	// 					$sanitized_rules[] = $sanitized_rule;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// 	return $sanitized_rules;
+	// }
+
 	public function sanitize_css_disable_rules($input) {
 		$sanitized_rules = array();
 		if (is_array($input)) {
@@ -491,10 +513,10 @@ class Admin {
 					$sanitized_rule = array(
 						'styles' => $this->sanitize_scripts_or_styles($rule['styles']),
 						'scope' => sanitize_text_field($rule['scope']),
-						'exclude_enabled' => isset($rule['exclude_enabled']) ? '1' : '0',
+						'exclude_enabled' => isset($rule['exclude_enabled']) && $rule['exclude_enabled'] === '1' ? '1' : '0',
 						'exclude_pages' => $this->sanitize_pages($rule['exclude_pages']),
 						'pages' => $this->sanitize_pages($rule['pages']),
-						'is_active' => isset($rule['is_active']) ? '1' : '0',
+						'is_active' => isset($rule['is_active']) && $rule['is_active'] === '1' ? '1' : '0',
 					);
 					if (!empty($sanitized_rule['styles'])) {
 						$sanitized_rules[] = $sanitized_rule;
@@ -604,26 +626,48 @@ class Admin {
 		return implode("\n", array_filter($sanitized));
 	}
 
+	// public function sanitize_js_disable_rules($input) {
+	// 	$sanitized_rules = array();
+	// 	if (is_array($input)) {
+	// 		foreach ($input as $rule) {
+	// 			if (!empty($rule['scripts'])) {
+	// 				$sanitized_rule = array(
+	// 					'scripts' => is_array($rule['scripts'])
+	// 						? array_filter(array_map('trim', $rule['scripts']))
+	// 						: array_filter(array_map('trim', explode("\n", sanitize_textarea_field($rule['scripts'])))),
+	// 					'scope' => sanitize_text_field($rule['scope']),
+	// 					'exclude_enabled' => isset($rule['exclude_enabled']) ? '1' : '0',
+	// 					'exclude_pages' => isset($rule['exclude_pages']) ? sanitize_textarea_field($rule['exclude_pages']) : '',
+	// 					'pages' => array(),
+	// 					'is_active' => isset($rule['is_active']) ? '1' : '0',
+	// 				);
+	// 				if ($sanitized_rule['scope'] === 'specific_pages' && !empty($rule['pages'])) {
+	// 					$sanitized_rule['pages'] = is_array($rule['pages'])
+	// 						? array_filter(array_map('trailingslashit', array_map('esc_url_raw', $rule['pages'])))
+	// 						: array_filter(array_map('trailingslashit', array_map('esc_url_raw', explode("\n", sanitize_textarea_field($rule['pages'])))));
+	// 				}
+	// 				if (!empty($sanitized_rule['scripts'])) {
+	// 					$sanitized_rules[] = $sanitized_rule;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// 	return $sanitized_rules;
+	// }
+
 	public function sanitize_js_disable_rules($input) {
 		$sanitized_rules = array();
 		if (is_array($input)) {
 			foreach ($input as $rule) {
 				if (!empty($rule['scripts'])) {
 					$sanitized_rule = array(
-						'scripts' => is_array($rule['scripts'])
-							? array_filter(array_map('trim', $rule['scripts']))
-							: array_filter(array_map('trim', explode("\n", sanitize_textarea_field($rule['scripts'])))),
+						'scripts' => $this->sanitize_scripts_or_styles($rule['scripts']),
 						'scope' => sanitize_text_field($rule['scope']),
-						'exclude_enabled' => isset($rule['exclude_enabled']) ? '1' : '0',
-						'exclude_pages' => isset($rule['exclude_pages']) ? sanitize_textarea_field($rule['exclude_pages']) : '',
-						'pages' => array(),
-						'is_active' => isset($rule['is_active']) ? '1' : '0',
+						'exclude_enabled' => isset($rule['exclude_enabled']) && $rule['exclude_enabled'] === '1' ? '1' : '0',
+						'exclude_pages' => $this->sanitize_pages($rule['exclude_pages']),
+						'pages' => $this->sanitize_pages($rule['pages']),
+						'is_active' => isset($rule['is_active']) && $rule['is_active'] === '1' ? '1' : '0',
 					);
-					if ($sanitized_rule['scope'] === 'specific_pages' && !empty($rule['pages'])) {
-						$sanitized_rule['pages'] = is_array($rule['pages'])
-							? array_filter(array_map('trailingslashit', array_map('esc_url_raw', $rule['pages'])))
-							: array_filter(array_map('trailingslashit', array_map('esc_url_raw', explode("\n", sanitize_textarea_field($rule['pages'])))));
-					}
 					if (!empty($sanitized_rule['scripts'])) {
 						$sanitized_rules[] = $sanitized_rule;
 					}
