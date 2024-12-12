@@ -72,6 +72,16 @@ function rapidpress_activate() {
 // Deactivation code
 function rapidpress_deactivate() {
 	// Deactivation code here
+
+	// Delete all plugin options
+	// $options_to_delete = [
+	// 	'rapidpress_options',
+	// 	'rapidpress_version',
+	// ];
+
+	// foreach ($options_to_delete as $option) {
+	// 	delete_option($option);
+	// }
 }
 
 // Uninstall code
