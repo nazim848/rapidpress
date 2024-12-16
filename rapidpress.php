@@ -35,10 +35,16 @@ if (!defined('WPINC')) {
 	die;
 }
 
+require __DIR__ . '/includes/class-rapidpress-options.php';
+
+use RapidPress\RP_Options;
+
 define('RAPIDPRESS_VERSION', '1.0');
 define('RAPIDPRESS_PATH', plugin_dir_path(__FILE__));
 define('RAPIDPRESS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('RAPIDPRESS_PLUGIN_FILE', __FILE__);
+
+
 
 // Load the main plugin class
 require plugin_dir_path(__FILE__) . 'includes/class-rapidpress.php';
@@ -74,7 +80,7 @@ function rapidpress_deactivate() {
 	// Check if clean deactivate is enabled
 	$clean_deactivate = RP_Options::get_option('clean_deactivate');
 
-	if ($clean_uninstall == '1') {
+	if ($clean_deactivate == '1') {
 		// Delete all plugin options
 		$options_to_delete = [
 			'rapidpress_options',
