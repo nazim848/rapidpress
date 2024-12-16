@@ -6,8 +6,8 @@
  * Version: 1.0
  * Author: Nazim Husain
  * Author URI: https://nazimansari.com
- * License: GPL-2.0+
- * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+ * License: GPLv3 or later
+ * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: rapidpress
  * Domain Path: /languages
  */
@@ -35,10 +35,16 @@ if (!defined('WPINC')) {
 	die;
 }
 
+require __DIR__ . '/includes/class-rapidpress-options.php';
+
+use RapidPress\RP_Options;
+
 define('RAPIDPRESS_VERSION', '1.0');
 define('RAPIDPRESS_PATH', plugin_dir_path(__FILE__));
 define('RAPIDPRESS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('RAPIDPRESS_PLUGIN_FILE', __FILE__);
+
+
 
 // Load the main plugin class
 require plugin_dir_path(__FILE__) . 'includes/class-rapidpress.php';
@@ -71,7 +77,20 @@ function rapidpress_activate() {
 
 // Deactivation code
 function rapidpress_deactivate() {
-	// Deactivation code here
+	// Check if clean deactivate is enabled
+	$clean_deactivate = RP_Options::get_option('clean_deactivate');
+
+	if ($clean_deactivate == '1') {
+		// Delete all plugin options
+		$options_to_delete = [
+			'rapidpress_options',
+			'rapidpress_version',
+		];
+
+		foreach ($options_to_delete as $option) {
+			delete_option($option);
+		}
+	}
 }
 
 // Uninstall code

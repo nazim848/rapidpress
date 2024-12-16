@@ -21,7 +21,7 @@ class HTML_Minifier {
 
 	public function process_html($html) {
 		// Exclude admin, POST requests, and pages not in the optimization scope
-		if (is_admin() || $_SERVER['REQUEST_METHOD'] == 'POST' || !\RapidPress\Optimization_Scope::should_optimize()) {
+		if (is_admin() || isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST' || !\RapidPress\Optimization_Scope::should_optimize()) {
 			return $html;
 		}
 

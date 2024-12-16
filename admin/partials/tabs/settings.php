@@ -20,6 +20,17 @@ use RapidPress\RP_Options;
 				</td>
 			</tr>
 			<tr valign="top">
+				<th scope="row">Clean Deactivate</th>
+				<td>
+					<div class="checkbox-radio">
+						<label>
+							<input type="checkbox" name="rapidpress_options[clean_deactivate]" value="1" <?php checked(RP_Options::get_option('clean_deactivate'), '1'); ?> />
+						</label>
+						<span class="dashicons dashicons-editor-help" data-title="When enabled, all RapidPress settings and data will be deleted from the database when the plugin is deactivated!"></span>
+					</div>
+				</td>
+			</tr>
+			<tr valign="top">
 				<th scope="row">Clean Uninstall</th>
 				<td>
 					<div class="checkbox-radio">

@@ -58,7 +58,11 @@ class CSS_Combiner {
 				continue;
 			}
 
-			$src = $this->get_full_url($style->src);
+			// Store original src with query string for versioning
+			$original_src = $style->src;
+
+			// Remove query string for processing
+			$src = preg_replace('/\?.*/', '', $this->get_full_url($style->src));
 
 			if ($this->is_external_file($src) || $this->is_excluded_file($src)) {
 				$this->debug_log[] = "Skipped {$src}: External or excluded file.";
@@ -68,7 +72,9 @@ class CSS_Combiner {
 			$styles_to_combine[] = $style;
 			$file_path = $this->url_to_path($src);
 			$last_modified = $this->get_file_last_modified($file_path);
-			$styles_hash .= $src . $last_modified;
+
+			// Include original src with query string in hash calculation
+			$styles_hash .= $original_src . $last_modified;
 			$this->combined_handles[] = $handle;
 			$this->last_modified = max($this->last_modified, $last_modified);
 		}
@@ -92,8 +98,8 @@ class CSS_Combiner {
 				wp_dequeue_style($handle);
 			}
 
-			// Enqueue combined style
-			wp_enqueue_style('rapidpress-combined-css', $this->get_combined_css_url(), array(), null);
+			// Enqueue combined style with versioning
+			wp_enqueue_style('rapidpress-combined-css', $this->get_combined_css_url(), array(), $this->last_modified);
 		} else {
 			$this->debug_log[] = "No styles to combine.";
 		}
@@ -105,7 +111,7 @@ class CSS_Combiner {
 
 	private function cleanup_old_files() {
 		$upload_dir = wp_upload_dir();
-		$combined_dir = trailingslashit($upload_dir['basedir']) . 'rapidpress-combined';
+		$combined_dir = trailingslashit($upload_dir['basedir']) . 'rapidpress';
 
 		if (!is_dir($combined_dir)) {
 			return;
@@ -125,7 +131,7 @@ class CSS_Combiner {
 
 		foreach ($files_to_delete as $file) {
 			if (is_file($file)) {
-				unlink($file);
+				wp_delete_file($file);
 			}
 		}
 	}
@@ -136,7 +142,15 @@ class CSS_Combiner {
 	}
 
 	private function is_excluded_file($src) {
+
+		// Remove query strings for comparison
+		$src = preg_replace('/\?.*/', '', $src);
+
 		foreach ($this->excluded_files as $excluded_file) {
+
+			// Remove query strings from excluded file patterns
+			$excluded_file = preg_replace('/\?.*/', '', $excluded_file);
+
 			if (strpos($src, $excluded_file) !== false) {
 				return true;
 			}
@@ -145,6 +159,10 @@ class CSS_Combiner {
 	}
 
 	private function get_full_url($src) {
+
+		// Remove query strings for consistent URL handling
+		$src = preg_replace('/\?.*/', '', $src);
+
 		if (strpos($src, '//') === 0) {
 			return 'https:' . $src;
 		}
@@ -166,11 +184,34 @@ class CSS_Combiner {
 		}
 	}
 
+	// private function get_file_content($src) {
+	// 	$file_path = $this->url_to_path($src);
+	// 	if (file_exists($file_path)) {
+	// 		return file_get_contents($file_path);
+	// 	}
+	// 	return false;
+	// }
+
 	private function get_file_content($src) {
+		if (strpos($src, '://') !== false) {
+			$response = wp_remote_get($src);
+			if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
+				return wp_remote_retrieve_body($response);
+			}
+			return false;
+		}
+
 		$file_path = $this->url_to_path($src);
 		if (file_exists($file_path)) {
-			return file_get_contents($file_path);
+			// WP_Filesystem for local files
+			global $wp_filesystem;
+			if (empty($wp_filesystem)) {
+				require_once ABSPATH . '/wp-admin/includes/file.php';
+				WP_Filesystem();
+			}
+			return $wp_filesystem->get_contents($file_path);
 		}
+
 		return false;
 	}
 
@@ -190,13 +231,43 @@ class CSS_Combiner {
 		return trim($css);
 	}
 
+	// private function save_combined_css($styles_hash) {
+	// 	$upload_dir = wp_upload_dir();
+	// 	$combined_dir = $upload_dir['basedir'] . '/rapidpress';
+	// 	wp_mkdir_p($combined_dir);
+
+	// 	$combined_file = $combined_dir . '/' . $this->combined_filename;
+	// 	file_put_contents($combined_file, $this->combined_css);
+
+	// 	$cache_meta = array(
+	// 		'hash' => $styles_hash,
+	// 		'expires' => time() + $this->cache_expiration,
+	// 		'last_modified' => $this->last_modified,
+	// 	);
+
+	// 	RP_Options::update_option('css_cache_meta', $cache_meta);
+	// }
+
 	private function save_combined_css($styles_hash) {
+		global $wp_filesystem;
+
+		if (!function_exists('WP_Filesystem')) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+
+		WP_Filesystem();
+
 		$upload_dir = wp_upload_dir();
-		$combined_dir = $upload_dir['basedir'] . '/rapidpress-combined';
+		$combined_dir = $upload_dir['basedir'] . '/rapidpress';
 		wp_mkdir_p($combined_dir);
 
 		$combined_file = $combined_dir . '/' . $this->combined_filename;
-		file_put_contents($combined_file, $this->combined_css);
+
+		$wp_filesystem->put_contents(
+			$combined_file,
+			$this->combined_css,
+			FS_CHMOD_FILE
+		);
 
 		$cache_meta = array(
 			'hash' => $styles_hash,
@@ -219,12 +290,18 @@ class CSS_Combiner {
 
 	private function get_combined_css_url() {
 		$upload_dir = wp_upload_dir();
-		return $upload_dir['baseurl'] . '/rapidpress-combined/' . $this->combined_filename;
+		return $upload_dir['baseurl'] . '/rapidpress/' . $this->combined_filename;
 	}
 
 	public function print_combined_css() {
 		if (!empty($this->combined_css)) {
-			echo "<link rel='stylesheet' id='rapidpress-combined-css' href='" . esc_url($this->get_combined_css_url()) . "' type='text/css' media='all' />\n";
+			wp_enqueue_style('rapidpress-combined-css', $this->get_combined_css_url(), array(), $this->last_modified, 'all');
 		}
 	}
+
+	// public function print_combined_css() {
+	// 	if (!empty($this->combined_css)) {
+	// 		echo "<link rel='stylesheet' id='rapidpress-combined-css' href='" . esc_url($this->get_combined_css_url()) . "' type='text/css' media='all' />\n";
+	// 	}
+	// }
 }

@@ -144,7 +144,6 @@ use RapidPress\RP_Options;
 						<option value="specific" <?php selected(RP_Options::get_option('js_delay_type'), 'specific'); ?>>Specific JavaScripts</option>
 					</select>
 
-
 					<div id="rapidpress_js_delay_duration" style="margin-top: 10px;">
 						<select name="rapidpress_options[js_delay_duration]">
 							<option value="1" <?php selected(RP_Options::get_option('js_delay_duration'), '1'); ?>>1 second</option>
