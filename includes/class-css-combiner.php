@@ -58,7 +58,11 @@ class CSS_Combiner {
 				continue;
 			}
 
-			$src = $this->get_full_url($style->src);
+			// Store original src with query string for versioning
+			$original_src = $style->src;
+
+			// Remove query string for processing
+			$src = preg_replace('/\?.*/', '', $this->get_full_url($style->src));
 
 			if ($this->is_external_file($src) || $this->is_excluded_file($src)) {
 				$this->debug_log[] = "Skipped {$src}: External or excluded file.";
@@ -68,7 +72,9 @@ class CSS_Combiner {
 			$styles_to_combine[] = $style;
 			$file_path = $this->url_to_path($src);
 			$last_modified = $this->get_file_last_modified($file_path);
-			$styles_hash .= $src . $last_modified;
+
+			// Include original src with query string in hash calculation
+			$styles_hash .= $original_src . $last_modified;
 			$this->combined_handles[] = $handle;
 			$this->last_modified = max($this->last_modified, $last_modified);
 		}
@@ -136,7 +142,15 @@ class CSS_Combiner {
 	}
 
 	private function is_excluded_file($src) {
+
+		// Remove query strings for comparison
+		$src = preg_replace('/\?.*/', '', $src);
+
 		foreach ($this->excluded_files as $excluded_file) {
+
+			// Remove query strings from excluded file patterns
+			$excluded_file = preg_replace('/\?.*/', '', $excluded_file);
+
 			if (strpos($src, $excluded_file) !== false) {
 				return true;
 			}
@@ -145,6 +159,10 @@ class CSS_Combiner {
 	}
 
 	private function get_full_url($src) {
+
+		// Remove query strings for consistent URL handling
+		$src = preg_replace('/\?.*/', '', $src);
+
 		if (strpos($src, '//') === 0) {
 			return 'https:' . $src;
 		}
