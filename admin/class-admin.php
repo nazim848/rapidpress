@@ -391,24 +391,24 @@ class Admin {
 			'remove_rest_api_links'                => 'boolean',
 			'limit_post_revisions'                 => 'limit_post_revisions',
 			'optimization_scope'                   => 'text_field',
-			'optimized_pages'                      => 'optimized_pages',
+			'optimized_pages'                      => 'multiline_urls',
 			'enable_optimization_scope_exclusions' => 'boolean',
-			'optimization_excluded_pages'          => 'optimization_excluded_pages',
+			'optimization_excluded_pages'          => 'multiline_urls',
 			'html_minify'                          => 'boolean',
 			'css_minify'                           => 'boolean',
 			'combine_css'                          => 'boolean',
 			'enable_combine_css_exclusions'        => 'boolean',
-			'combine_css_exclusions'               => 'combine_css_exclusions',
+			'combine_css_exclusions'               => 'multiline_urls',
 			'js_minify'                            => 'boolean',
 			'js_defer'                             => 'boolean',
 			'enable_js_defer_exclusions'           => 'boolean',
-			'js_defer_exclusions'                  => 'js_defer_exclusions',
+			'js_defer_exclusions'                  => 'multiline_urls',
 			'js_delay'                             => 'boolean',
 			'js_delay_type'                        => 'js_delay_type',
 			'js_delay_duration'                    => 'js_delay_duration',
-			'js_delay_specific_files'              => 'js_delay_specific_files',
+			'js_delay_specific_files'              => 'multiline_urls',
 			'enable_js_delay_exclusions'           => 'boolean',
-			'js_delay_exclusions'                  => 'js_delay_exclusions',
+			'js_delay_exclusions'                  => 'multiline_urls',
 			'js_disable_rules'                     => 'js_disable_rules',
 			'css_disable_rules'                    => 'css_disable_rules',
 			'clean_uninstall'                      => 'boolean',
@@ -420,9 +420,15 @@ class Admin {
 					case 'boolean':
 						$sanitized_options[$option] = rest_sanitize_boolean($options[$option]);
 						break;
+
+					case 'multiline_urls':
+						$sanitized_options[$option] = $this->sanitize_multiline_urls($options[$option]);
+						break;
+
 					case 'text_field':
 						$sanitized_options[$option] = sanitize_text_field($options[$option]);
 						break;
+
 					default:
 						$method = "sanitize_{$rule}";
 						if (method_exists($this, $method)) {
@@ -434,6 +440,49 @@ class Admin {
 		}
 
 		return $sanitized_options;
+	}
+
+
+	// Sanitizes textarea input containing multiple URLs (one per line)
+
+	private function sanitize_multiline_urls($input) {
+		if (empty($input)) {
+			return '';
+		}
+
+		// If input is already an array, convert to string
+		if (is_array($input)) {
+			$input = implode("\n", $input);
+		}
+
+		// First, decode any URL-encoded spaces
+		$input = urldecode($input);
+
+		// Split the input by any combination of delimiters (spaces, commas, or newlines)
+		$urls = preg_split('/[\s,]+/', $input);
+
+		// Sanitize each URL and filter empty ones
+		$sanitized_urls = array_filter(array_map(function ($url) {
+			$url = trim($url);
+			if (empty($url)) {
+				return '';
+			}
+
+			// Handle wildcards and relative paths
+			if (strpos($url, '*') !== false || strpos($url, '/') === 0) {
+				return sanitize_text_field($url);
+			}
+
+			// Ensure URL has protocol
+			if (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
+				$url = 'https://' . $url;
+			}
+
+			return esc_url_raw($url);
+		}, $urls));
+
+		// Return URLs with one per line
+		return implode("\n", array_filter($sanitized_urls));
 	}
 
 	public function reset_settings() {
@@ -505,17 +554,39 @@ class Admin {
 	// 	return $sanitized_rules;
 	// }
 
+	// public function sanitize_css_disable_rules($input) {
+	// 	$sanitized_rules = array();
+	// 	if (is_array($input)) {
+	// 		foreach ($input as $rule) {
+	// 			if (!empty($rule['styles'])) {
+	// 				$sanitized_rule = array(
+	// 					'styles' => $this->sanitize_scripts_or_styles($rule['styles']),
+	// 					'scope' => sanitize_text_field($rule['scope']),
+	// 					'exclude_enabled' => isset($rule['exclude_enabled']) && $rule['exclude_enabled'] === '1' ? '1' : '0',
+	// 					'exclude_pages' => $this->sanitize_pages($rule['exclude_pages']),
+	// 					'pages' => $this->sanitize_pages($rule['pages']),
+	// 					'is_active' => isset($rule['is_active']) && $rule['is_active'] === '1' ? '1' : '0',
+	// 				);
+	// 				if (!empty($sanitized_rule['styles'])) {
+	// 					$sanitized_rules[] = $sanitized_rule;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// 	return $sanitized_rules;
+	// }
+
 	public function sanitize_css_disable_rules($input) {
 		$sanitized_rules = array();
 		if (is_array($input)) {
 			foreach ($input as $rule) {
 				if (!empty($rule['styles'])) {
 					$sanitized_rule = array(
-						'styles' => $this->sanitize_scripts_or_styles($rule['styles']),
+						'styles' => $this->sanitize_multiline_urls($rule['styles']),
 						'scope' => sanitize_text_field($rule['scope']),
 						'exclude_enabled' => isset($rule['exclude_enabled']) && $rule['exclude_enabled'] === '1' ? '1' : '0',
-						'exclude_pages' => $this->sanitize_pages($rule['exclude_pages']),
-						'pages' => $this->sanitize_pages($rule['pages']),
+						'exclude_pages' => $this->sanitize_multiline_urls($rule['exclude_pages']),
+						'pages' => $this->sanitize_multiline_urls($rule['pages']),
 						'is_active' => isset($rule['is_active']) && $rule['is_active'] === '1' ? '1' : '0',
 					);
 					if (!empty($sanitized_rule['styles'])) {
@@ -545,86 +616,80 @@ class Admin {
 		return array();
 	}
 
-	public function sanitize_optimization_excluded_pages($input) {
-		$pages = explode("\n", $input);
-		$sanitized_pages = array();
-		foreach ($pages as $page) {
-			$sanitized_pages[] = esc_url_raw(trim($page));
-		}
-		return implode("\n", array_filter($sanitized_pages));
-	}
-
-	public function sanitize_optimized_pages($input) {
-		$pages = explode("\n", $input);
-		$sanitized_pages = array();
-		foreach ($pages as $page) {
-			$sanitized_pages[] = esc_url_raw(trim($page));
-		}
-		return implode("\n", array_filter($sanitized_pages));
-	}
-
-	public function sanitize_combine_css_exclusions($input) {
-		$sanitized = array();
-		$lines = explode("\n", $input);
-		foreach ($lines as $line) {
-			$sanitized[] = esc_url_raw(trim($line));
-		}
-
-		return implode("\n", array_filter($sanitized));
-	}
-
-	// private function sanitize_combine_css_exclusions($input) {
-	// 	$sanitized = sanitize_textarea_field($input);
-	// 	error_log("Sanitized CSS Exclusions: " . $sanitized);
-	// 	return $sanitized;
+	// public function sanitize_optimization_excluded_pages($input) {
+	// 	$pages = explode("\n", $input);
+	// 	$sanitized_pages = array();
+	// 	foreach ($pages as $page) {
+	// 		$sanitized_pages[] = esc_url_raw(trim($page));
+	// 	}
+	// 	return implode("\n", array_filter($sanitized_pages));
 	// }
 
-	public function sanitize_js_defer_exclusions($input) {
-		if (!is_string($input)) {
-			return '';
-		}
-		$exclusions = explode("\n", $input);
-		$sanitized = array();
-		foreach ($exclusions as $exclusion) {
-			$sanitized[] = esc_url_raw(trim($exclusion));
-		}
+	// public function sanitize_optimized_pages($input) {
+	// 	$pages = explode("\n", $input);
+	// 	$sanitized_pages = array();
+	// 	foreach ($pages as $page) {
+	// 		$sanitized_pages[] = esc_url_raw(trim($page));
+	// 	}
+	// 	return implode("\n", array_filter($sanitized_pages));
+	// }
 
-		return implode("\n", array_filter($sanitized));
-	}
+	// public function sanitize_combine_css_exclusions($input) {
+	// 	$sanitized = array();
+	// 	$lines = explode("\n", $input);
+	// 	foreach ($lines as $line) {
+	// 		$sanitized[] = esc_url_raw(trim($line));
+	// 	}
+
+	// 	return implode("\n", array_filter($sanitized));
+	// }
+
+	// public function sanitize_js_defer_exclusions($input) {
+	// 	if (!is_string($input)) {
+	// 		return '';
+	// 	}
+	// 	$exclusions = explode("\n", $input);
+	// 	$sanitized = array();
+	// 	foreach ($exclusions as $exclusion) {
+	// 		$sanitized[] = esc_url_raw(trim($exclusion));
+	// 	}
+
+	// 	return implode("\n", array_filter($sanitized));
+	// }
 
 	public function sanitize_js_delay_duration($input) {
 		$valid_options = array('1', '2', '3', 'interaction');
 		return in_array($input, $valid_options) ? $input : '1';
 	}
 
-	public function sanitize_js_delay_exclusions($input) {
-		if (!is_string($input)) {
-			return '';
-		}
-		$exclusions = explode("\n", $input);
-		$sanitized = array();
-		foreach ($exclusions as $exclusion) {
-			$sanitized[] = esc_url_raw(trim($exclusion));
-		}
-		return implode("\n", array_filter($sanitized));
-	}
+	// public function sanitize_js_delay_exclusions($input) {
+	// 	if (!is_string($input)) {
+	// 		return '';
+	// 	}
+	// 	$exclusions = explode("\n", $input);
+	// 	$sanitized = array();
+	// 	foreach ($exclusions as $exclusion) {
+	// 		$sanitized[] = esc_url_raw(trim($exclusion));
+	// 	}
+	// 	return implode("\n", array_filter($sanitized));
+	// }
 
 	public function sanitize_js_delay_type($input) {
 		$valid_options = array('all', 'specific');
 		return in_array($input, $valid_options) ? $input : 'all';
 	}
 
-	public function sanitize_js_delay_specific_files($input) {
-		if (!is_string($input)) {
-			return '';
-		}
-		$files = explode("\n", $input);
-		$sanitized = array();
-		foreach ($files as $file) {
-			$sanitized[] = esc_url_raw(trim($file));
-		}
-		return implode("\n", array_filter($sanitized));
-	}
+	// public function sanitize_js_delay_specific_files($input) {
+	// 	if (!is_string($input)) {
+	// 		return '';
+	// 	}
+	// 	$files = explode("\n", $input);
+	// 	$sanitized = array();
+	// 	foreach ($files as $file) {
+	// 		$sanitized[] = esc_url_raw(trim($file));
+	// 	}
+	// 	return implode("\n", array_filter($sanitized));
+	// }
 
 	// public function sanitize_js_disable_rules($input) {
 	// 	$sanitized_rules = array();
@@ -655,17 +720,39 @@ class Admin {
 	// 	return $sanitized_rules;
 	// }
 
+	// public function sanitize_js_disable_rules($input) {
+	// 	$sanitized_rules = array();
+	// 	if (is_array($input)) {
+	// 		foreach ($input as $rule) {
+	// 			if (!empty($rule['scripts'])) {
+	// 				$sanitized_rule = array(
+	// 					'scripts' => $this->sanitize_scripts_or_styles($rule['scripts']),
+	// 					'scope' => sanitize_text_field($rule['scope']),
+	// 					'exclude_enabled' => isset($rule['exclude_enabled']) && $rule['exclude_enabled'] === '1' ? '1' : '0',
+	// 					'exclude_pages' => $this->sanitize_pages($rule['exclude_pages']),
+	// 					'pages' => $this->sanitize_pages($rule['pages']),
+	// 					'is_active' => isset($rule['is_active']) && $rule['is_active'] === '1' ? '1' : '0',
+	// 				);
+	// 				if (!empty($sanitized_rule['scripts'])) {
+	// 					$sanitized_rules[] = $sanitized_rule;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// 	return $sanitized_rules;
+	// }
+
 	public function sanitize_js_disable_rules($input) {
 		$sanitized_rules = array();
 		if (is_array($input)) {
 			foreach ($input as $rule) {
 				if (!empty($rule['scripts'])) {
 					$sanitized_rule = array(
-						'scripts' => $this->sanitize_scripts_or_styles($rule['scripts']),
+						'scripts' => $this->sanitize_multiline_urls($rule['scripts']),
 						'scope' => sanitize_text_field($rule['scope']),
 						'exclude_enabled' => isset($rule['exclude_enabled']) && $rule['exclude_enabled'] === '1' ? '1' : '0',
-						'exclude_pages' => $this->sanitize_pages($rule['exclude_pages']),
-						'pages' => $this->sanitize_pages($rule['pages']),
+						'exclude_pages' => $this->sanitize_multiline_urls($rule['exclude_pages']),
+						'pages' => $this->sanitize_multiline_urls($rule['pages']),
 						'is_active' => isset($rule['is_active']) && $rule['is_active'] === '1' ? '1' : '0',
 					);
 					if (!empty($sanitized_rule['scripts'])) {
