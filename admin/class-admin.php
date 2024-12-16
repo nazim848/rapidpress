@@ -242,6 +242,7 @@ class Admin {
 			'js_disable_rules'                     => 'js_disable_rules',
 			'css_disable_rules'                    => 'css_disable_rules',
 			'clean_uninstall'                      => 'boolean',
+			'clean_deactivate'                      => 'boolean',
 		);
 
 		foreach ($sanitization_rules as $option => $rule) {

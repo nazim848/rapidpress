@@ -71,17 +71,20 @@ function rapidpress_activate() {
 
 // Deactivation code
 function rapidpress_deactivate() {
-	// Deactivation code here
+	// Check if clean deactivate is enabled
+	$clean_deactivate = RP_Options::get_option('clean_deactivate');
 
-	// Delete all plugin options
-	// $options_to_delete = [
-	// 	'rapidpress_options',
-	// 	'rapidpress_version',
-	// ];
+	if ($clean_uninstall == '1') {
+		// Delete all plugin options
+		$options_to_delete = [
+			'rapidpress_options',
+			'rapidpress_version',
+		];
 
-	// foreach ($options_to_delete as $option) {
-	// 	delete_option($option);
-	// }
+		foreach ($options_to_delete as $option) {
+			delete_option($option);
+		}
+	}
 }
 
 // Uninstall code
