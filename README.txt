@@ -1,8 +1,8 @@
 === RapidPress ===
 Contributors: nazim848
-Donate link:
+Donate link: https://buymeacoffee.com/nazim848
 Tags: pagespeed, performance, optimization, caching
-Requires at least: 4.5
+Requires at least: 4.7
 Tested up to: 6.7
 Stable tag: 1.0
 Requires PHP: 7.0
