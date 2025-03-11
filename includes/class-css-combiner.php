@@ -32,6 +32,10 @@ class CSS_Combiner {
 		}
 		$exclusions = RP_Options::get_option('combine_css_exclusions', '');
 		$this->excluded_files = array_filter(array_map('trim', explode("\n", $exclusions)));
+
+		if (!empty($this->excluded_files)) {
+			$this->debug_log[] = "CSS exclusions enabled with " . count($this->excluded_files) . " exclusion rules.";
+		}
 	}
 
 	public function combine_css() {
@@ -66,8 +70,10 @@ class CSS_Combiner {
 			// Remove query string for processing
 			$src = preg_replace('/\?.*/', '', $this->get_full_url($style->src));
 
-			if ($this->is_external_file($src) || $this->is_excluded_file($src)) {
-				$this->debug_log[] = "Skipped {$src}: External or excluded file.";
+			$this->debug_log[] = "Processing style: handle={$handle}, src={$src}";
+
+			if ($this->is_external_file($src) || $this->is_excluded_file($src, $handle)) {
+				$this->debug_log[] = "Skipped {$handle}: External or excluded file.";
 				continue;
 			}
 
@@ -147,17 +153,23 @@ class CSS_Combiner {
 		return strpos($src, $wp_base_url) === false && preg_match('/^(https?:)?\/\//i', $src);
 	}
 
-	private function is_excluded_file($src) {
-
+	private function is_excluded_file($src, $handle = '') {
 		// Remove query strings for comparison
 		$src = preg_replace('/\?.*/', '', $src);
 
 		foreach ($this->excluded_files as $excluded_file) {
-
 			// Remove query strings from excluded file patterns
 			$excluded_file = preg_replace('/\?.*/', '', $excluded_file);
 
+			// First check if the exclusion matches the handle (exact match)
+			if (!empty($handle) && $excluded_file === $handle) {
+				$this->debug_log[] = "Excluded {$src} by handle: {$handle}";
+				return true;
+			}
+
+			// Then check if the exclusion matches the URL (partial match)
 			if (strpos($src, $excluded_file) !== false) {
+				$this->debug_log[] = "Excluded {$src} by URL pattern: {$excluded_file}";
 				return true;
 			}
 		}

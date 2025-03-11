@@ -87,7 +87,13 @@ use RapidPress\RP_Options;
 				<th scope="row">CSS Exclusions</th>
 				<td>
 					<textarea name="rapidpress_options[combine_css_exclusions]" rows="3" cols="70" placeholder="Enter CSS file URL/Handle per line"><?php echo esc_textarea(RP_Options::get_option('combine_css_exclusions', '')); ?></textarea>
-					<p class="description">Enter the CSS file URL or Handle you don't want to combine. One per line.</p>
+					<p class="description">Enter the CSS file URL, partial filename, or the registered handle name to exclude from combination. One per line.</p>
+					<p class="description"><small>Examples:</small></p>
+					<ul class="description" style="margin-top: 0; list-style-type: disc; padding-left: 20px;">
+						<li><small><strong>Handle name:</strong> <code>wp-block-library</code> or <code>generate-style</code> (exact handle name, no slashes or dots)</small></li>
+						<li><small><strong>Partial filename:</strong> <code>style.css</code> (matches any URL containing this string)</small></li>
+						<li><small><strong>Full URL:</strong> <code>https://example.com/style.css</code></small></li>
+					</ul>
 				</td>
 			</tr>
 			<tr valign="top">
