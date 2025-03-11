@@ -18,6 +18,8 @@ class CSS_Combiner {
 	public function __construct() {
 		add_action('wp_print_styles', array($this, 'combine_css'), 100);
 		add_action('wp_head', array($this, 'print_combined_css'), 999);
+		add_action('wp_print_styles', array($this, 'final_css_cleanup'), 9999);
+		add_filter('final_output', array($this, 'filter_final_output'), 10, 1);
 		$this->set_excluded_files();
 		$this->excluded_files[] = 'admin-bar.min.css';
 	}
@@ -93,10 +95,14 @@ class CSS_Combiner {
 				$this->cleanup_old_files();
 			}
 
-			// Dequeue original styles
+			// Dequeue and deregister original styles
 			foreach ($this->combined_handles as $handle) {
 				wp_dequeue_style($handle);
+				wp_deregister_style($handle);
 			}
+
+			// Add filter to remove any style tags that might be directly output
+			add_filter('style_loader_tag', array($this, 'remove_combined_style_tags'), 10, 2);
 
 			// Enqueue combined style with versioning
 			wp_enqueue_style('rapidpress-combined-css', $this->get_combined_css_url(), array(), $this->last_modified);
@@ -304,4 +310,154 @@ class CSS_Combiner {
 	// 		echo "<link rel='stylesheet' id='rapidpress-combined-css' href='" . esc_url($this->get_combined_css_url()) . "' type='text/css' media='all' />\n";
 	// 	}
 	// }
+
+	/**
+	 * Remove style tags for styles that have been combined
+	 */
+	public function remove_combined_style_tags($tag, $handle) {
+		// If this handle was combined, remove the tag
+		if (in_array($handle, $this->combined_handles)) {
+			return '';
+		}
+
+		// Also check if the URL of the style is in our combined handles
+		foreach ($this->combined_handles as $combined_handle) {
+			// Get the source URL of the combined handle
+			global $wp_styles;
+			if (
+				isset($wp_styles->registered[$combined_handle]) &&
+				isset($wp_styles->registered[$combined_handle]->src) &&
+				strpos($tag, $wp_styles->registered[$combined_handle]->src) !== false
+			) {
+				return '';
+			}
+		}
+
+		return $tag;
+	}
+
+	/**
+	 * Final cleanup to catch any styles that might be registered after our combine_css method runs
+	 */
+	public function final_css_cleanup() {
+		// Only run if CSS combination is enabled and we have combined handles
+		if (!RP_Options::get_option('combine_css') || empty($this->combined_handles) || is_admin() || !\RapidPress\Optimization_Scope::should_optimize()) {
+			return;
+		}
+
+		global $wp_styles;
+
+		if (!is_object($wp_styles)) {
+			return;
+		}
+
+		// Check for any styles that should have been combined but were registered late
+		foreach ($wp_styles->queue as $handle) {
+			if (in_array($handle, $this->combined_handles)) {
+				wp_dequeue_style($handle);
+				wp_deregister_style($handle);
+			}
+
+			// Also check by URL for styles that might have been registered with a different handle
+			if (isset($wp_styles->registered[$handle]) && isset($wp_styles->registered[$handle]->src)) {
+				$src = $wp_styles->registered[$handle]->src;
+
+				foreach ($this->combined_handles as $combined_handle) {
+					global $wp_styles;
+					if (
+						isset($wp_styles->registered[$combined_handle]) &&
+						isset($wp_styles->registered[$combined_handle]->src) &&
+						$this->get_base_url($src) === $this->get_base_url($wp_styles->registered[$combined_handle]->src)
+					) {
+						wp_dequeue_style($handle);
+						wp_deregister_style($handle);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get the base URL without query string or protocol
+	 */
+	private function get_base_url($url) {
+		// Remove protocol
+		$url = preg_replace('/^https?:/', '', $url);
+		// Remove query string
+		$url = preg_replace('/\?.*/', '', $url);
+		return $url;
+	}
+
+	/**
+	 * Filter the final HTML output to remove any style tags that correspond to styles we've already combined
+	 */
+	public function filter_final_output($html) {
+		// Only run if CSS combination is enabled and we have combined handles
+		if (!RP_Options::get_option('combine_css') || empty($this->combined_handles) || is_admin() || !\RapidPress\Optimization_Scope::should_optimize()) {
+			return $html;
+		}
+
+		// Get all the source URLs of the combined styles
+		$combined_srcs = array();
+		global $wp_styles;
+
+		foreach ($this->combined_handles as $handle) {
+			if (isset($wp_styles->registered[$handle]) && isset($wp_styles->registered[$handle]->src)) {
+				$src = $wp_styles->registered[$handle]->src;
+				// Store both the full URL and the base URL without query string
+				$combined_srcs[] = $src;
+				$combined_srcs[] = $this->get_base_url($src);
+
+				// Also store the relative path
+				$site_url = site_url();
+				if (strpos($src, $site_url) === 0) {
+					$combined_srcs[] = substr($src, strlen($site_url));
+				}
+
+				// Also store the path without the protocol and domain
+				if (preg_match('/^https?:\/\/[^\/]+(.+)$/', $src, $matches)) {
+					$combined_srcs[] = $matches[1];
+				}
+			}
+		}
+
+		// If we have no source URLs, return the original HTML
+		if (empty($combined_srcs)) {
+			return $html;
+		}
+
+		// Use a callback function with preg_replace_callback to remove style tags
+		$html = preg_replace_callback('/<link[^>]*(?:href=[\'"]([^\'"]+)[\'"][^>]*rel=[\'"]stylesheet[\'"]|rel=[\'"]stylesheet[\'"][^>]*href=[\'"]([^\'"]+)[\'"])[^>]*>/i', function ($matches) use ($combined_srcs) {
+			$tag = $matches[0];
+			$href = !empty($matches[1]) ? $matches[1] : $matches[2]; // Get the href from whichever group matched
+
+			// Check if this style tag corresponds to a style we've already combined
+			foreach ($combined_srcs as $src) {
+				// Check if the href contains the source URL
+				if (strpos($href, $src) !== false || strpos($src, $href) !== false) {
+					return ''; // Remove the tag
+				}
+
+				// Check for filename match (for cases where paths might be different but filename is the same)
+				$href_filename = basename(parse_url($href, PHP_URL_PATH));
+				$src_filename = basename(parse_url($src, PHP_URL_PATH));
+
+				if (!empty($href_filename) && !empty($src_filename) && $href_filename === $src_filename) {
+					// Additional check to avoid false positives - compare parent directory
+					$href_dir = dirname(parse_url($href, PHP_URL_PATH));
+					$src_dir = dirname(parse_url($src, PHP_URL_PATH));
+
+					// If the parent directories match or one is a subdirectory of the other
+					if ($href_dir === $src_dir || strpos($href_dir, $src_dir) === 0 || strpos($src_dir, $href_dir) === 0) {
+						return ''; // Remove the tag
+					}
+				}
+			}
+
+			return $tag; // Keep the tag
+		}, $html);
+
+		return $html;
+	}
 }
