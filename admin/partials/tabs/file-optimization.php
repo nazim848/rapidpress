@@ -62,7 +62,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[css_minify]" value="1" <?php checked(1, RP_Options::get_option('css_minify'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Minify CSS files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Minify all the CSS files"></span>
 					</div>
 				</td>
 			</tr>
@@ -73,7 +73,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[combine_css]" id="rapidpress_combine_css" value="1" <?php checked(1, RP_Options::get_option('combine_css'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Combine CSS files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Combine all the CSS files into one file"></span>
 					</div>
 					<div class="checkbox-btn" id="rapidpress_enable_combine_css_exclusions_btn">
 						<label>
@@ -86,8 +86,8 @@ use RapidPress\RP_Options;
 			<tr valign="top" id="rapidpress_combine_css_exclusions_row" style="display: none;">
 				<th scope="row">CSS Exclusions</th>
 				<td>
-					<textarea name="rapidpress_options[combine_css_exclusions]" rows="3" cols="70" placeholder="Enter one CSS file URL per line"><?php echo esc_textarea(RP_Options::get_option('combine_css_exclusions', '')); ?></textarea>
-					<p class="description">Enter the URLs of CSS files you want to exclude from combination, one per line.</p>
+					<textarea name="rapidpress_options[combine_css_exclusions]" rows="3" cols="70" placeholder="Enter CSS file URL/Handle per line"><?php echo esc_textarea(RP_Options::get_option('combine_css_exclusions', '')); ?></textarea>
+					<p class="description">Enter the CSS file URL or Handle you don't want to combine. One per line.</p>
 				</td>
 			</tr>
 			<tr valign="top">
