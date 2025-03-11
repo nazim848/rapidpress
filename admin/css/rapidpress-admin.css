@@ -409,3 +409,7 @@
 	color: #a94442;
 	border: 1px solid #ebccd1;
 }
+
+.rapidpress-admin-content #submit-button {
+	margin-top: 5px;
+}
