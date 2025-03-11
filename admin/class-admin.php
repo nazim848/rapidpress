@@ -315,7 +315,7 @@ class Admin {
 	}
 
 	public function reset_settings() {
-		check_ajax_referer('rapidpress_admin_nonce', 'nonce');
+		check_ajax_referer('rapidpress_options_verify', 'nonce');
 
 		if (!current_user_can('manage_options')) {
 			wp_send_json_error('Insufficient permissions');
