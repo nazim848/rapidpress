@@ -3,7 +3,7 @@
 /**
  * Plugin Name: RapidPress
  * Description: A lightweight and robust WordPress speed optimization plugin with granular control over your website.
- * Version: 1.0
+ * Version: 1.0.0
  * Author: Nazim Husain
  * Author URI: https://nazimansari.com
  * License: GPLv3 or later
@@ -13,7 +13,7 @@
  */
 
 /**
- * @copyright 2024  Nazim Husain  https://nazimansari.com
+ * @copyright 2025  Nazim Husain  https://nazimansari.com
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
