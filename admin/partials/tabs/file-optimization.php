@@ -127,8 +127,14 @@ use RapidPress\RP_Options;
 			<tr valign="top" id="rapidpress_js_defer_exclusions_row" style="display: none;">
 				<th scope="row">JavaScript Defer Exclusions</th>
 				<td>
-					<textarea name="rapidpress_options[js_defer_exclusions]" rows="3" cols="70" placeholder="Enter one JavaScript file URL per line"><?php echo esc_textarea(RP_Options::get_option('js_defer_exclusions', '')); ?></textarea>
-					<p class="description">Enter the URLs of JavaScript files you want to exclude from deferring, one per line.</p>
+					<textarea name="rapidpress_options[js_defer_exclusions]" rows="3" cols="70" placeholder="Enter JavaScript file URL/Handle per line"><?php echo esc_textarea(RP_Options::get_option('js_defer_exclusions', '')); ?></textarea>
+					<p class="description">Enter the JavaScript file URL, partial filename, or the registered handle name to exclude from deferring. One per line.</p>
+					<p class="description"><small>Examples:</small></p>
+					<ul class="description" style="margin-top: 0; list-style-type: disc; padding-left: 20px;">
+						<li><small><strong>Handle name:</strong> <code>jquery-core</code> or <code>generate-menu</code> (exact handle name, no slashes or dots)</small></li>
+						<li><small><strong>Partial filename:</strong> <code>jquery.min.js</code> (matches any URL containing this string)</small></li>
+						<li><small><strong>Full URL:</strong> <code>https://example.com/script.js</code></small></li>
+					</ul>
 				</td>
 			</tr>
 			<tr valign="top">
