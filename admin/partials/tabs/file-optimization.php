@@ -197,7 +197,7 @@ use RapidPress\RP_Options;
 					<p class="description">Enter the JavaScript file URL, partial filename, or the registered handle name to exclude from delay. One per line.</p>
 					<p class="description"><small>Examples:</small></p>
 					<ul class="description" style="margin-top: 0; list-style-type: disc; padding-left: 20px;">
-						<li><small><strong>Handle name:</strong> <code>jquery-core</code> or <code>wp-embed</code> (exact handle name, no slashes or dots)</small></li>
+						<li><small><strong>Handle name:</strong> <code>jquery-core</code> or <code>generate-menu</code> (exact handle name, no slashes or dots)</small></li>
 						<li><small><strong>Partial filename:</strong> <code>jquery.min.js</code> (matches any URL containing this string)</small></li>
 						<li><small><strong>Full URL:</strong> <code>https://example.com/script.js</code></small></li>
 					</ul>

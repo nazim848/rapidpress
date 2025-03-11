@@ -7,7 +7,8 @@ class JS_Delay {
 
 	public function __construct() {
 		// Hook into wp_enqueue_scripts to capture script handles and their URLs
-		add_action('wp_print_scripts', array($this, 'capture_script_handles'), 999);
+		// Use a lower priority to capture scripts before they're printed
+		add_action('wp_enqueue_scripts', array($this, 'capture_script_handles'), 9999);
 	}
 
 	public function capture_script_handles() {
@@ -17,9 +18,10 @@ class JS_Delay {
 			return;
 		}
 
-		foreach ($wp_scripts->queue as $handle) {
-			if (isset($wp_scripts->registered[$handle]) && isset($wp_scripts->registered[$handle]->src)) {
-				$src = $wp_scripts->registered[$handle]->src;
+		// Capture all registered scripts, not just queued ones
+		foreach ($wp_scripts->registered as $handle => $script) {
+			if (isset($script->src) && !empty($script->src)) {
+				$src = $script->src;
 
 				// Convert relative URLs to absolute
 				if (strpos($src, '//') === 0) {
@@ -28,7 +30,14 @@ class JS_Delay {
 					$src = site_url($src);
 				}
 
+				// Store both with and without version query string
 				$this->script_handles[$src] = $handle;
+
+				// Also store the base URL without query string
+				$base_src = preg_replace('/\?.*$/', '', $src);
+				if ($base_src !== $src) {
+					$this->script_handles[$base_src] = $handle;
+				}
 
 				// Add a comment for debugging
 				if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -65,13 +74,47 @@ class JS_Delay {
 		}
 
 		// Use a regular expression to find and modify script tags
-		$pattern = '/<script\b[^>]*src=["\']([^"\']+)["\'][^>]*>/i';
+		// Capture both src and id attributes
+		$pattern = '/<script\b([^>]*)src=["\']([^"\']+)["\']([^>]*)>/i';
 		$html = preg_replace_callback($pattern, function ($matches) use ($delay_type, $specific_files, $exclusions, $delay_duration) {
-			$src = $matches[1];
+			$before_src = $matches[1];
+			$src = $matches[2];
+			$after_src = $matches[3];
+
+			// Extract ID attribute if present
+			$id = '';
+			if (preg_match('/id=["\']([^"\']+)["\']/i', $before_src . ' ' . $after_src, $id_matches)) {
+				$id = $id_matches[1];
+
+				// If ID ends with -js, it's likely a WordPress handle with -js suffix
+				if (preg_match('/-js$/', $id)) {
+					$possible_handle = str_replace('-js', '', $id);
+					if (defined('WP_DEBUG') && WP_DEBUG) {
+						error_log("RapidPress JS Delay: Found ID attribute: '{$id}', possible handle: '{$possible_handle}'");
+					}
+
+					// Check if this ID-based handle is in our exclusions or specific files
+					if ($delay_type === 'specific' && in_array($possible_handle, $specific_files)) {
+						if (defined('WP_DEBUG') && WP_DEBUG) {
+							error_log("RapidPress JS Delay: Delaying script with ID-based handle: '{$possible_handle}'");
+						}
+						return $this->get_delay_script_tag($src, $delay_duration);
+					}
+
+					if ($delay_type === 'all' && in_array($possible_handle, $exclusions)) {
+						if (defined('WP_DEBUG') && WP_DEBUG) {
+							error_log("RapidPress JS Delay: Not delaying script with ID-based handle: '{$possible_handle}'");
+						}
+						return $matches[0];
+					}
+				}
+			}
+
+			// Try to get the handle from our mapping
 			$handle = $this->get_handle_for_src($src);
 
 			if (defined('WP_DEBUG') && WP_DEBUG) {
-				error_log("RapidPress JS Delay: Processing script with src '{$src}' and handle '{$handle}'");
+				error_log("RapidPress JS Delay: Processing script with src '{$src}', ID '{$id}', and handle '{$handle}'");
 			}
 
 			if (($delay_type === 'specific' && $this->is_specific_file($src, $specific_files, $handle)) ||
@@ -93,7 +136,10 @@ class JS_Delay {
 	}
 
 	private function get_handle_for_src($src) {
-		// Try to find an exact match first
+		// Remove query string for comparison
+		$base_src = preg_replace('/\?.*$/', '', $src);
+
+		// Try to find an exact match first (with or without query string)
 		if (isset($this->script_handles[$src])) {
 			$handle = $this->script_handles[$src];
 			if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -102,10 +148,19 @@ class JS_Delay {
 			return $handle;
 		}
 
+		// Try with base URL (without query string)
+		if (isset($this->script_handles[$base_src])) {
+			$handle = $this->script_handles[$base_src];
+			if (defined('WP_DEBUG') && WP_DEBUG) {
+				error_log("RapidPress JS Delay: Found base URL handle match: '{$handle}' for src '{$src}'");
+			}
+			return $handle;
+		}
+
 		// If no exact match, try to find a partial match
 		foreach ($this->script_handles as $registered_src => $handle) {
 			// Extract the filename from both URLs for comparison
-			$src_filename = basename(parse_url($src, PHP_URL_PATH));
+			$src_filename = basename(parse_url($base_src, PHP_URL_PATH));
 			$registered_filename = basename(parse_url($registered_src, PHP_URL_PATH));
 
 			if ($src_filename === $registered_filename) {
@@ -114,6 +169,15 @@ class JS_Delay {
 				}
 				return $handle;
 			}
+		}
+
+		// Check if the script has an ID attribute that matches a known handle pattern
+		if (preg_match('/-js$/', $src)) {
+			$possible_handle = str_replace('-js', '', basename($base_src, '.js'));
+			if (defined('WP_DEBUG') && WP_DEBUG) {
+				error_log("RapidPress JS Delay: Trying to match ID-based handle: '{$possible_handle}' for src '{$src}'");
+			}
+			return $possible_handle;
 		}
 
 		if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -173,6 +237,17 @@ class JS_Delay {
 				}
 				return true;
 			}
+
+			// Check for WordPress ID-based handles (e.g., jquery-core for jquery-core-js)
+			if (preg_match('/-js$/', $src)) {
+				$id_based_handle = str_replace('-js', '', basename(parse_url($src, PHP_URL_PATH), '.js'));
+				if ($exclusion === $id_based_handle) {
+					if (defined('WP_DEBUG') && WP_DEBUG) {
+						error_log("RapidPress JS Delay: Excluded script by ID-based handle: '{$id_based_handle}' matches exclusion '{$exclusion}'");
+					}
+					return true;
+				}
+			}
 		}
 		return false;
 	}
@@ -198,6 +273,17 @@ class JS_Delay {
 					error_log("RapidPress JS Delay: Specific script by URL: '{$src}' contains '{$file}'");
 				}
 				return true;
+			}
+
+			// Check for WordPress ID-based handles (e.g., jquery-core for jquery-core-js)
+			if (preg_match('/-js$/', $src)) {
+				$id_based_handle = str_replace('-js', '', basename(parse_url($src, PHP_URL_PATH), '.js'));
+				if ($file === $id_based_handle) {
+					if (defined('WP_DEBUG') && WP_DEBUG) {
+						error_log("RapidPress JS Delay: Specific script by ID-based handle: '{$id_based_handle}' matches file '{$file}'");
+					}
+					return true;
+				}
 			}
 		}
 		return false;
