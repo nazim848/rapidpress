@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name: RapidPress
- * Description: A lightweight and robust WordPress speed optimization plugin with granual control over your website.
+ * Description: A lightweight and robust WordPress speed optimization plugin with granular control over your website.
  * Version: 1.0
  * Author: Nazim Husain
  * Author URI: https://nazimansari.com
@@ -43,8 +43,6 @@ define('RAPIDPRESS_VERSION', '1.0');
 define('RAPIDPRESS_PATH', plugin_dir_path(__FILE__));
 define('RAPIDPRESS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('RAPIDPRESS_PLUGIN_FILE', __FILE__);
-
-
 
 // Load the main plugin class
 require plugin_dir_path(__FILE__) . 'includes/class-rapidpress.php';
