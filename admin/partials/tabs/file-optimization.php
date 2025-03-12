@@ -19,6 +19,7 @@ use RapidPress\RP_Options;
 						<option value="front_page" <?php selected(RP_Options::get_option('optimization_scope'), 'front_page'); ?>>Front Page</option>
 						<option value="specific_pages" <?php selected(RP_Options::get_option('optimization_scope'), 'specific_pages'); ?>>Specific Pages</option>
 					</select>
+					<span class="dashicons dashicons-editor-help" data-title="Choose where to apply file optimization: 'Entire Site' applies to all pages, 'Front Page' only optimizes your homepage, and 'Specific Pages' lets you select individual URLs to optimize."></span>
 					<div class="checkbox-radio" style="margin-left: 10px;" id="rapidpress_enable_scope_exclusions_label">
 						<label>
 							<input type="checkbox" name="rapidpress_options[enable_optimization_scope_exclusions]" id="rapidpress_enable_scope_exclusions" value="1" <?php checked(RP_Options::get_option('enable_optimization_scope_exclusions'), '1'); ?> />
