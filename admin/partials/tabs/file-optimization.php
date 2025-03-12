@@ -52,7 +52,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[html_minify]" value="1" <?php checked(1, RP_Options::get_option('html_minify'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Minify HTML files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Removes unnecessary whitespace, comments, and other redundant HTML code to reduce file size and improve page load times. This can reduce HTML file size by 10-20%."></span>
 					</div>
 				</td>
 			</tr>
@@ -63,7 +63,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[css_minify]" value="1" <?php checked(1, RP_Options::get_option('css_minify'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Minify all the CSS files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Compresses CSS files by removing whitespace, comments, and optimizing code syntax. This reduces file size and improves load times without affecting how styles are rendered."></span>
 					</div>
 				</td>
 			</tr>
@@ -74,7 +74,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[combine_css]" id="rapidpress_combine_css" value="1" <?php checked(1, RP_Options::get_option('combine_css'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Combine all the CSS files into one file"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Merges multiple CSS files into a single file, reducing HTTP requests and improving page load speed. Particularly effective for sites with many small stylesheets."></span>
 					</div>
 					<div class="checkbox-btn" id="rapidpress_enable_combine_css_exclusions_btn">
 						<label>
@@ -104,7 +104,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[js_minify]" value="1" <?php checked(1, RP_Options::get_option('js_minify'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Minify JavaScript files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Reduces JavaScript file size by removing comments, whitespace, and unnecessary characters. This optimization can decrease file size by 30-50% without affecting functionality."></span>
 					</div>
 				</td>
 			</tr>
@@ -115,7 +115,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[js_defer]" id="rapidpress_js_defer" value="1" <?php checked(1, RP_Options::get_option('js_defer'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Defer JavaScript files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Adds 'defer' attribute to script tags, allowing JavaScript to load without blocking page rendering. This improves initial page load speed and Core Web Vitals scores while ensuring scripts execute in the correct order."></span>
 					</div>
 					<div class="checkbox-btn" id="rapidpress_enable_js_defer_exclusions_btn">
 						<label>
@@ -145,7 +145,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[js_delay]" id="rapidpress_js_delay" value="1" <?php checked(1, RP_Options::get_option('js_delay'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Delay JavaScript files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Postpones JavaScript execution until after the page has loaded or user interaction occurs. This dramatically improves initial page load speed and Core Web Vitals metrics by prioritizing content rendering over script execution."></span>
 					</div>
 				</td>
 			</tr>
