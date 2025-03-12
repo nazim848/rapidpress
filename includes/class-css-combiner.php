@@ -452,13 +452,13 @@ class CSS_Combiner {
 				}
 
 				// Check for filename match (for cases where paths might be different but filename is the same)
-				$href_filename = basename(parse_url($href, PHP_URL_PATH));
-				$src_filename = basename(parse_url($src, PHP_URL_PATH));
+				$href_filename = basename(wp_parse_url($href, PHP_URL_PATH));
+				$src_filename = basename(wp_parse_url($src, PHP_URL_PATH));
 
 				if (!empty($href_filename) && !empty($src_filename) && $href_filename === $src_filename) {
 					// Additional check to avoid false positives - compare parent directory
-					$href_dir = dirname(parse_url($href, PHP_URL_PATH));
-					$src_dir = dirname(parse_url($src, PHP_URL_PATH));
+					$href_dir = dirname(wp_parse_url($href, PHP_URL_PATH));
+					$src_dir = dirname(wp_parse_url($src, PHP_URL_PATH));
 
 					// If the parent directories match or one is a subdirectory of the other
 					if ($href_dir === $src_dir || strpos($href_dir, $src_dir) === 0 || strpos($src_dir, $href_dir) === 0) {

@@ -61,7 +61,7 @@ class Optimization_Scope {
 	}
 
 	private static function get_current_relative_url() {
-		// $home_path = parse_url(home_url(), PHP_URL_PATH);
+		// $home_path = wp_parse_url(home_url(), PHP_URL_PATH);
 		$home_path = wp_parse_url(home_url(), PHP_URL_PATH);
 		$home_path = $home_path ? trim($home_path, '/') : '';
 
@@ -84,8 +84,8 @@ class Optimization_Scope {
 			$page_url = home_url($page_url);
 		}
 
-		// $current_parts = parse_url(home_url($current_url));
-		// $page_parts = parse_url($page_url);
+		// $current_parts = wp_parse_url(home_url($current_url));
+		// $page_parts = wp_parse_url($page_url);
 		$current_parts = wp_parse_url(home_url($current_url));
 		$page_parts = wp_parse_url($page_url);
 

@@ -135,8 +135,8 @@ class JS_Delay {
 		// If no exact match, try to find a partial match
 		foreach ($this->script_handles as $registered_src => $handle) {
 			// Extract the filename from both URLs for comparison
-			$src_filename = basename(parse_url($base_src, PHP_URL_PATH));
-			$registered_filename = basename(parse_url($registered_src, PHP_URL_PATH));
+			$src_filename = basename(wp_parse_url($base_src, PHP_URL_PATH));
+			$registered_filename = basename(wp_parse_url($registered_src, PHP_URL_PATH));
 
 			if ($src_filename === $registered_filename) {
 				return $handle;
@@ -200,7 +200,7 @@ class JS_Delay {
 
 			// Check for WordPress ID-based handles (e.g., jquery-core for jquery-core-js)
 			if (preg_match('/-js$/', $src)) {
-				$id_based_handle = str_replace('-js', '', basename(parse_url($src, PHP_URL_PATH), '.js'));
+				$id_based_handle = str_replace('-js', '', basename(wp_parse_url($src, PHP_URL_PATH), '.js'));
 				if ($exclusion === $id_based_handle) {
 					return true;
 				}
@@ -228,7 +228,7 @@ class JS_Delay {
 
 			// Check for WordPress ID-based handles (e.g., jquery-core for jquery-core-js)
 			if (preg_match('/-js$/', $src)) {
-				$id_based_handle = str_replace('-js', '', basename(parse_url($src, PHP_URL_PATH), '.js'));
+				$id_based_handle = str_replace('-js', '', basename(wp_parse_url($src, PHP_URL_PATH), '.js'));
 				if ($file === $id_based_handle) {
 					return true;
 				}
