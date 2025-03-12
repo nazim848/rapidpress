@@ -8,16 +8,16 @@ use RapidPress\RP_Options;
 
 <div id="<?php echo esc_attr($tab_id); ?>" class="tab-pane">
 	<h2 class="content-title"><span class="dashicons dashicons-hidden"></span> Disable Assets</h2>
-	<p class="desc">Disable specific assets (CSS and JS) from loading on your site. This can help improve page load times and reduce server load.</p>
+	<p class="desc">Disable specific assets (CSS and JS) from loading on your site. This can help improve page load times and reduce server load by disabling assets that are not needed for that page.</p>
 	<div class="accordion-item">
 		<div class="accordion-header">JavaScript</div>
 		<div class="accordion-content">
 			<div class="rapidpress-card">
 				<table class="form-table" id="js-asset-management">
 					<tr class="table-head">
-						<th style="width: 40%;">Script URL or Handle (one per line) <span class="dashicons dashicons-editor-help" data-title="Enter the URL or handle of the script you want to disable. You can enter multiple URLs or handles by separating them with a new line."></span></th>
+						<th style="width: 40%;">Script URL or Handle (one per line) <span class="dashicons dashicons-editor-help" data-title="Enter the script file URL, partial filename, or the registered handle name of the script you want to disable. You can enter multiple URLs, partial filenames, or handles by separating them with a new line."></span></th>
 						<th style="width: 40%;">Disable Scope <span class="dashicons dashicons-editor-help" data-title="Choose where to disable the script: 'Entire Site' applies to all pages, 'Front Page' only disables on your homepage, and 'Specific Pages' lets you select individual URLs to disable on."></span></th>
-						<th style="width: 12%;">Status / Action</th>
+						<th style="width: 12%;">Actions <span class="dashicons dashicons-editor-help" data-title="Enable, disable, or remove a script disable rule."></span></th>
 					</tr>
 					<?php
 					$js_rules = RP_Options::get_option('js_disable_rules', array());
@@ -82,7 +82,7 @@ use RapidPress\RP_Options;
 										<textarea cols="63" rows="3" name="rapidpress_options[js_disable_rules][%1$s][pages]" placeholder="%13$s" class="js-disable-pages" style="display:%16$s">%17$s</textarea>
 								  </td>
 								  <td>
-										<div class="checkbox-btn">
+										<div class="checkbox-btn status">
 											 <label>
 												  <input type="checkbox" name="rapidpress_options[js_disable_rules][%1$s][is_active]" value="1" %18$s>
 												  <span>%19$s</span>
@@ -127,9 +127,10 @@ use RapidPress\RP_Options;
 			<div class="rapidpress-card">
 				<table class="form-table" id="css-asset-management">
 					<tr class="table-head">
-						<th style="width: 40%;">CSS URL or Handle (one per line) <span class="dashicons dashicons-editor-help" data-title="Enter the URL or handle of the CSS you want to disable. You can enter multiple URLs or handles by separating them with a new line."></span></th>
+						<th style="width: 40%;">CSS URL or Handle (one per line) <span class="dashicons dashicons-editor-help" data-title="Enter the CSS file URL, partial filename, or the registered handle name of the CSS you want to disable. You can enter multiple URLs, partial filenames, or handles by separating them with a new line."></span></th>
 						<th style="width: 40%;">Disable Scope <span class="dashicons dashicons-editor-help" data-title="Choose where to disable the CSS: 'Entire Site' applies to all pages, 'Front Page' only disables on your homepage, and 'Specific Pages' lets you select individual URLs to disable on."></span></th>
-						<th style="width: 12%;">Status / Action</th>
+
+						<th style="width: 12%;">Actions <span class="dashicons dashicons-editor-help" data-title="Enable, disable, or remove a CSS disable rule."></span></th>
 					</tr>
 					<?php
 					$css_rules = RP_Options::get_option('css_disable_rules', array());

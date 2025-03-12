@@ -122,7 +122,7 @@ class RapidPressAdmin {
 				 <textarea cols="63" rows="3" name="rapidpress_options[${ruleName}_disable_rules][new_${timestamp}][pages]" placeholder="https://example.com/page1/&#10;https://example.com/page2/" class="${ruleName}-disable-pages" style="display:none;"></textarea>
      </td>
      <td>
-	  <div class="checkbox-btn"><label><input type="checkbox" name="rapidpress_options[${ruleName}_disable_rules][new_${timestamp}][is_active]" value="1" checked><span>Active</span></label></div>
+	  <div class="checkbox-btn status"><label><input type="checkbox" name="rapidpress_options[${ruleName}_disable_rules][new_${timestamp}][is_active]" value="1" checked><span>Active</span></label></div>
          <button type="button" class="button remove-${ruleName}-rule">Remove</button>
      </td>
 		`;
