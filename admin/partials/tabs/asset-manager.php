@@ -8,14 +8,15 @@ use RapidPress\RP_Options;
 
 <div id="<?php echo esc_attr($tab_id); ?>" class="tab-pane">
 	<h2 class="content-title"><span class="dashicons dashicons-hidden"></span> Disable Assets</h2>
+	<p class="desc">Disable specific assets (CSS and JS) from loading on your site. This can help improve page load times and reduce server load.</p>
 	<div class="accordion-item">
 		<div class="accordion-header">JavaScript</div>
 		<div class="accordion-content">
 			<div class="rapidpress-card">
 				<table class="form-table" id="js-asset-management">
 					<tr class="table-head">
-						<th style="width: 40%;">Script URL or Handle (one per line)</th>
-						<th style="width: 40%;">Disable Scope</th>
+						<th style="width: 40%;">Script URL or Handle (one per line) <span class="dashicons dashicons-editor-help" data-title="Enter the URL or handle of the script you want to disable. You can enter multiple URLs or handles by separating them with a new line."></span></th>
+						<th style="width: 40%;">Disable Scope <span class="dashicons dashicons-editor-help" data-title="Choose where to disable the script: 'Entire Site' applies to all pages, 'Front Page' only disables on your homepage, and 'Specific Pages' lets you select individual URLs to disable on."></span></th>
 						<th style="width: 12%;">Status / Action</th>
 					</tr>
 					<?php
@@ -126,8 +127,8 @@ use RapidPress\RP_Options;
 			<div class="rapidpress-card">
 				<table class="form-table" id="css-asset-management">
 					<tr class="table-head">
-						<th style="width: 40%;">CSS URL or Handle (one per line)</th>
-						<th style="width: 40%;">Disable Scope</th>
+						<th style="width: 40%;">CSS URL or Handle (one per line) <span class="dashicons dashicons-editor-help" data-title="Enter the URL or handle of the CSS you want to disable. You can enter multiple URLs or handles by separating them with a new line."></span></th>
+						<th style="width: 40%;">Disable Scope <span class="dashicons dashicons-editor-help" data-title="Choose where to disable the CSS: 'Entire Site' applies to all pages, 'Front Page' only disables on your homepage, and 'Specific Pages' lets you select individual URLs to disable on."></span></th>
 						<th style="width: 12%;">Status / Action</th>
 					</tr>
 					<?php
