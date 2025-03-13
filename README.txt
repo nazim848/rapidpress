@@ -1,7 +1,7 @@
 === RapidPress - Turbocharge Website Performance ===
 Contributors: nazim848
 Donate link: https://buymeacoffee.com/nazim848
-Tags: pagespeed, performance, optimization, caching, minification, defer javascript, combine css
+Tags: pagespeed, performance, optimization, speed, minification
 Requires at least: 5.0
 Tested up to: 6.7
 Stable tag: 1.0.0
