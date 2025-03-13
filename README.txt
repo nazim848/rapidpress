@@ -1,4 +1,4 @@
-=== RapidPress - WordPress Speed Optimization ===
+=== RapidPress - Turbocharge Website Performance ===
 Contributors: nazim848
 Donate link: https://buymeacoffee.com/nazim848
 Tags: pagespeed, performance, optimization, caching, minification, defer javascript, combine css
@@ -6,7 +6,7 @@ Requires at least: 5.0
 Tested up to: 6.7
 Stable tag: 1.0.0
 Requires PHP: 7.2
-License: GPLv3 or later
+License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 Boost your WordPress site speed by 2x-5x with advanced optimization techniques including minification, asset management, and performance tweaks.
@@ -32,6 +32,7 @@ RapidPress is a lightweight yet powerful WordPress speed optimization plugin des
 * **Granular Control** - Enable/disable specific optimizations as needed
 * **No Conflicts** - Designed to work alongside other WordPress plugins
 * **Regular Updates** - Continuously improved to support the latest WordPress versions
+* **Translation-Ready** - Fully internationalized and ready for localization
 
 == Who Should Use RapidPress? ==
 
@@ -74,6 +75,10 @@ RapidPress includes a performance dashboard that shows key metrics. We also reco
 
 Yes, RapidPress works with WordPress multisite installations. Each site in the network can have its own optimization settings.
 
+= Is RapidPress translation-ready? =
+
+Yes, RapidPress is fully internationalized and ready for translation. The plugin includes a POT file in the languages directory that you can use as a template for translations. We welcome contributions of new translations!
+
 == Screenshots ==
 
 1. RapidPress main dashboard
@@ -91,6 +96,7 @@ Yes, RapidPress works with WordPress multisite installations. Each site in the n
 * Core WordPress performance tweaks
 * Performance dashboard
 * Optimization scoping system
+* Full internationalization support
 
 == Upgrade Notice ==
 
