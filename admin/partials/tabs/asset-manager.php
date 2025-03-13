@@ -197,7 +197,7 @@ use RapidPress\RP_Options;
 										<textarea cols="63" rows="3" name="rapidpress_options[css_disable_rules][%1$s][pages]" placeholder="%13$s" class="css-disable-pages" style="display:%16$s">%17$s</textarea>
 								  </td>
 								  <td>
-										<div class="checkbox-btn">
+										<div class="checkbox-btn status">
 											 <label>
 												  <input type="checkbox" name="rapidpress_options[css_disable_rules][%1$s][is_active]" value="1" %18$s>
 												  <span>%19$s</span>
