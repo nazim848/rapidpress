@@ -180,13 +180,6 @@ class Admin {
 		}
 
 		include_once 'partials/admin-display.php';
-
-		// echo "<script>jQuery(document).ready(function($) { setActiveTab('$active_tab'); });</script>";
-
-		// printf(
-		// 	'<script>jQuery(document).ready(function($) { setActiveTab(%s); });</script>',
-		// 	wp_json_encode($active_tab)
-		// );
 	}
 
 	public function register_settings() {
