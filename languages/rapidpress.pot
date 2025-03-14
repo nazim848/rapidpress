@@ -1,0 +1,131 @@
+# Copyright (C) 2025 Nazim Husain
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: RapidPress - Turbocharge Website Performance 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/rapidpress\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-03-14T01:09:12+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.11.0\n"
+"X-Domain: rapidpress\n"
+
+#. Plugin Name of the plugin
+#: rapidpress.php
+msgid "RapidPress - Turbocharge Website Performance"
+msgstr ""
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+#: rapidpress.php
+msgid "https://nazimansari.com"
+msgstr ""
+
+#. Description of the plugin
+#: rapidpress.php
+msgid "Boost your WordPress site speed by 2x-5x with advanced optimization techniques including minification, asset management, and performance tweaks."
+msgstr ""
+
+#. Author of the plugin
+#: rapidpress.php
+msgid "Nazim Husain"
+msgstr ""
+
+#: admin/class-admin.php:108
+msgid "Thank you for installing RapidPress! Please visit the "
+msgstr ""
+
+#: admin/class-admin.php:109
+msgid "settings page"
+msgstr ""
+
+#: admin/class-admin.php:110
+msgid "to configure the plugin."
+msgstr ""
+
+#: admin/class-admin.php:119
+#: admin/class-admin.php:153
+msgid "Settings"
+msgstr ""
+
+#: admin/class-admin.php:144
+msgid "RapidPress"
+msgstr ""
+
+#: admin/class-admin.php:150
+msgid "General"
+msgstr ""
+
+#: admin/class-admin.php:151
+msgid "File Optimization"
+msgstr ""
+
+#: admin/class-admin.php:152
+msgid "Asset Manager"
+msgstr ""
+
+#: admin/partials/admin-display.php:8
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:95
+msgid "Script URL or Handle (one per line)"
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:98
+#: admin/partials/tabs/asset-manager.php:213
+msgid "Entire Site"
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:100
+#: admin/partials/tabs/asset-manager.php:215
+msgid "Front Page"
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:102
+#: admin/partials/tabs/asset-manager.php:217
+msgid "Specific Pages"
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:105
+#: admin/partials/tabs/asset-manager.php:220
+msgid "Exclude pages?"
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:113
+#: admin/partials/tabs/asset-manager.php:228
+msgid "Active"
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:114
+#: admin/partials/tabs/asset-manager.php:229
+msgid "Remove"
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:210
+msgid "CSS URL or Handle (one per line)"
+msgstr ""
+
+#: includes/class-core-tweaks.php:174
+msgid "XML-RPC services are disabled on this site."
+msgstr ""
+
+#: includes/class-core-tweaks.php:239
+msgid "RSS feeds are disabled."
+msgstr ""
+
+#: includes/class-core-tweaks.php:368
+msgid "Sorry, you do not have permission to make REST API requests."
+msgstr ""
+
+#: includes/class-core-tweaks.php:402
+msgid "RapidPress Warning"
+msgstr ""
+
+#: includes/class-core-tweaks.php:403
+msgid "WP_POST_REVISIONS is already enabled somewhere else on your site. We suggest only enabling this feature in one place."
+msgstr ""

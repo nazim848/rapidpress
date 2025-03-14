@@ -12,7 +12,6 @@ class RapidPress {
 		$this->version = RAPIDPRESS_VERSION;
 		$this->plugin_name = 'rapidpress';
 		$this->load_dependencies();
-		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 	}
@@ -55,20 +54,6 @@ class RapidPress {
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
 		$this->loader->add_action('admin_init', $plugin_admin, 'register_settings');
-	}
-
-
-
-	private function set_locale() {
-		add_action('plugins_loaded', array($this, 'load_plugin_textdomain'));
-	}
-
-	public function load_plugin_textdomain() {
-		load_plugin_textdomain(
-			'rapidpress',
-			false,
-			dirname(dirname(plugin_basename(__FILE__))) . '/languages/'
-		);
 	}
 
 	public function run() {

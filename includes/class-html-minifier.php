@@ -44,6 +44,10 @@ class HTML_Minifier {
 		if (RP_Options::get_option('js_minify')) {
 			$html = $this->js_minifier->minify_inline_js($html);
 		}
+
+		// Apply final output filter for other optimizations
+		$html = apply_filters('final_output', $html);
+
 		return $html;
 	}
 

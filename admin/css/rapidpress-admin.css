@@ -108,16 +108,13 @@
 	position: relative;
 	top: 1px;
 }
-
-.accordion-header.active,
-.accordion-header.active:hover {
-	/* background-color: #e4e4e4; */
-	background-color: #fff;
-	border-bottom: none;
+.accordion-header:hover,
+.accordion-header.active {
+	background-color: #f4f8ff;
 }
 
-.accordion-header:hover {
-	background-color: #fafafa;
+.accordion-header.active {
+	border-bottom: none;
 }
 
 .accordion-header.active:before {
@@ -202,6 +199,11 @@
 	font-size: 13px;
 	padding: 6px 8px;
 	background-color: #f6f7f7;
+}
+
+#asset-manager .checkbox-btn.status label span {
+	color: #bbb;
+	border-color: #bbb;
 }
 
 #asset-manager .checkbox-btn label span:hover {
@@ -408,4 +410,8 @@
 	background-color: #f2dede;
 	color: #a94442;
 	border: 1px solid #ebccd1;
+}
+
+.rapidpress-admin-content #submit-button {
+	margin-top: 5px;
 }

@@ -16,7 +16,7 @@ class JS_Defer {
 		$enable_exclusions = RP_Options::get_option('enable_js_defer_exclusions', '0');
 		if ($enable_exclusions == '1') {
 			$exclusions = $this->get_exclusions();
-			if ($this->is_excluded($src, $exclusions)) {
+			if ($this->is_excluded($src, $exclusions, $handle)) {
 				return $tag;
 			}
 		}
@@ -33,13 +33,19 @@ class JS_Defer {
 		return array_filter(array_map('trim', explode("\n", $exclusions_string)));
 	}
 
-	private function is_excluded($src, $exclusions) {
+	private function is_excluded($src, $exclusions, $handle = '') {
 		foreach ($exclusions as $exclusion) {
 			$enable_exclusions = RP_Options::get_option('enable_js_defer_exclusions', '0');
 			if ($enable_exclusions != '1') {
 				return true;
 			}
 
+			// Check if the exclusion matches the handle (exact match)
+			if (!empty($handle) && $exclusion === $handle) {
+				return true;
+			}
+
+			// Check if the exclusion matches the URL (partial match)
 			if (strpos($src, $exclusion) !== false) {
 				return true;
 			}

@@ -180,13 +180,6 @@ class Admin {
 		}
 
 		include_once 'partials/admin-display.php';
-
-		// echo "<script>jQuery(document).ready(function($) { setActiveTab('$active_tab'); });</script>";
-
-		// printf(
-		// 	'<script>jQuery(document).ready(function($) { setActiveTab(%s); });</script>',
-		// 	wp_json_encode($active_tab)
-		// );
 	}
 
 	public function register_settings() {
@@ -273,7 +266,7 @@ class Admin {
 		return $sanitized_options;
 	}
 
-	// Sanitizes textarea input containing multiple URLs (one per line)
+	// Sanitizes textarea input containing multiple URLs or handles (one per line)
 	private function sanitize_multiline_urls($input) {
 		if (empty($input)) {
 			return '';
@@ -290,7 +283,7 @@ class Admin {
 		// Split the input by any combination of delimiters (spaces, commas, or newlines)
 		$urls = preg_split('/[\s,]+/', $input);
 
-		// Sanitize each URL and filter empty ones
+		// Sanitize each URL/handle and filter empty ones
 		$sanitized_urls = array_filter(array_map(function ($url) {
 			$url = trim($url);
 			if (empty($url)) {
@@ -302,8 +295,21 @@ class Admin {
 				return sanitize_text_field($url);
 			}
 
-			// Ensure URL has protocol
-			if (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
+			// Check if this looks like a handle (no slashes, dots, or protocols)
+			if (!preg_match('~[/.]|(?:f|ht)tps?://~i', $url)) {
+				// This is likely a handle, just sanitize it as text
+				return sanitize_text_field($url);
+			}
+
+			// Check if this is a partial URL (contains .css or .js extension)
+			if (preg_match('~\.(css|js)($|\?)~i', $url) && !preg_match('~^(?:f|ht)tps?://|//~i', $url)) {
+				// This is likely a partial URL, just sanitize it as text
+				return sanitize_text_field($url);
+			}
+
+			// Ensure URL has protocol (only for full URLs)
+			if (!preg_match('~^(?:f|ht)tps?://~i', $url) && strpos($url, '.') !== false && strpos($url, '.') < strpos($url, '/')) {
+				// This looks like a domain (has a dot before any slash), add protocol
 				$url = 'https://' . $url;
 			}
 
@@ -315,7 +321,7 @@ class Admin {
 	}
 
 	public function reset_settings() {
-		check_ajax_referer('rapidpress_admin_nonce', 'nonce');
+		check_ajax_referer('rapidpress_options_verify', 'nonce');
 
 		if (!current_user_can('manage_options')) {
 			wp_send_json_error('Insufficient permissions');

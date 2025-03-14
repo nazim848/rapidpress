@@ -19,6 +19,7 @@ use RapidPress\RP_Options;
 						<option value="front_page" <?php selected(RP_Options::get_option('optimization_scope'), 'front_page'); ?>>Front Page</option>
 						<option value="specific_pages" <?php selected(RP_Options::get_option('optimization_scope'), 'specific_pages'); ?>>Specific Pages</option>
 					</select>
+					<span class="dashicons dashicons-editor-help" data-title="Choose where to apply file optimization: 'Entire Site' applies to all pages, 'Front Page' only optimizes your homepage, and 'Specific Pages' lets you select individual URLs to optimize."></span>
 					<div class="checkbox-radio" style="margin-left: 10px;" id="rapidpress_enable_scope_exclusions_label">
 						<label>
 							<input type="checkbox" name="rapidpress_options[enable_optimization_scope_exclusions]" id="rapidpress_enable_scope_exclusions" value="1" <?php checked(RP_Options::get_option('enable_optimization_scope_exclusions'), '1'); ?> />
@@ -51,7 +52,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[html_minify]" value="1" <?php checked(1, RP_Options::get_option('html_minify'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Minify HTML files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Removes unnecessary whitespace, comments, and other redundant HTML code to reduce file size and improve page load times. This can reduce HTML file size by 10-20%."></span>
 					</div>
 				</td>
 			</tr>
@@ -62,7 +63,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[css_minify]" value="1" <?php checked(1, RP_Options::get_option('css_minify'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Minify CSS files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Compresses CSS files by removing whitespace, comments, and optimizing code syntax. This reduces file size and improves load times without affecting how styles are rendered."></span>
 					</div>
 				</td>
 			</tr>
@@ -73,7 +74,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[combine_css]" id="rapidpress_combine_css" value="1" <?php checked(1, RP_Options::get_option('combine_css'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Combine CSS files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Merges multiple CSS files into a single file, reducing HTTP requests and improving page load speed. Particularly effective for sites with many small stylesheets."></span>
 					</div>
 					<div class="checkbox-btn" id="rapidpress_enable_combine_css_exclusions_btn">
 						<label>
@@ -86,8 +87,14 @@ use RapidPress\RP_Options;
 			<tr valign="top" id="rapidpress_combine_css_exclusions_row" style="display: none;">
 				<th scope="row">CSS Exclusions</th>
 				<td>
-					<textarea name="rapidpress_options[combine_css_exclusions]" rows="3" cols="70" placeholder="Enter one CSS file URL per line"><?php echo esc_textarea(RP_Options::get_option('combine_css_exclusions', '')); ?></textarea>
-					<p class="description">Enter the URLs of CSS files you want to exclude from combination, one per line.</p>
+					<textarea name="rapidpress_options[combine_css_exclusions]" rows="3" cols="70" placeholder="Enter CSS file URL/Handle per line"><?php echo esc_textarea(RP_Options::get_option('combine_css_exclusions', '')); ?></textarea>
+					<p class="description">Enter the CSS file URL, partial filename, or the registered handle name to exclude from combination. One per line.</p>
+					<p class="description"><small>Examples:</small></p>
+					<ul class="description" style="margin-top: 0; list-style-type: disc; padding-left: 20px;">
+						<li><small><strong>Handle name:</strong> <code>wp-block-library</code> or <code>generate-style</code> (exact handle name, no slashes or dots)</small></li>
+						<li><small><strong>Partial filename:</strong> <code>style.css</code> (matches any URL containing this string)</small></li>
+						<li><small><strong>Full URL:</strong> <code>https://example.com/style.css</code></small></li>
+					</ul>
 				</td>
 			</tr>
 			<tr valign="top">
@@ -97,7 +104,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[js_minify]" value="1" <?php checked(1, RP_Options::get_option('js_minify'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Minify JavaScript files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Reduces JavaScript file size by removing comments, whitespace, and unnecessary characters. This optimization can decrease file size by 30-50% without affecting functionality."></span>
 					</div>
 				</td>
 			</tr>
@@ -108,7 +115,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[js_defer]" id="rapidpress_js_defer" value="1" <?php checked(1, RP_Options::get_option('js_defer'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Defer JavaScript files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Adds 'defer' attribute to script tags, allowing JavaScript to load without blocking page rendering. This improves initial page load speed and Core Web Vitals scores while ensuring scripts execute in the correct order."></span>
 					</div>
 					<div class="checkbox-btn" id="rapidpress_enable_js_defer_exclusions_btn">
 						<label>
@@ -121,8 +128,14 @@ use RapidPress\RP_Options;
 			<tr valign="top" id="rapidpress_js_defer_exclusions_row" style="display: none;">
 				<th scope="row">JavaScript Defer Exclusions</th>
 				<td>
-					<textarea name="rapidpress_options[js_defer_exclusions]" rows="3" cols="70" placeholder="Enter one JavaScript file URL per line"><?php echo esc_textarea(RP_Options::get_option('js_defer_exclusions', '')); ?></textarea>
-					<p class="description">Enter the URLs of JavaScript files you want to exclude from deferring, one per line.</p>
+					<textarea name="rapidpress_options[js_defer_exclusions]" rows="3" cols="70" placeholder="Enter JavaScript file URL/Handle per line"><?php echo esc_textarea(RP_Options::get_option('js_defer_exclusions', '')); ?></textarea>
+					<p class="description">Enter the JavaScript file URL, partial filename, or the registered handle name to exclude from deferring. One per line.</p>
+					<p class="description"><small>Examples:</small></p>
+					<ul class="description" style="margin-top: 0; list-style-type: disc; padding-left: 20px;">
+						<li><small><strong>Handle name:</strong> <code>jquery-core</code> or <code>generate-menu</code> (exact handle name, no slashes or dots)</small></li>
+						<li><small><strong>Partial filename:</strong> <code>jquery.min.js</code> (matches any URL containing this string)</small></li>
+						<li><small><strong>Full URL:</strong> <code>https://example.com/script.js</code></small></li>
+					</ul>
 				</td>
 			</tr>
 			<tr valign="top">
@@ -132,7 +145,7 @@ use RapidPress\RP_Options;
 						<label>
 							<input type="checkbox" name="rapidpress_options[js_delay]" id="rapidpress_js_delay" value="1" <?php checked(1, RP_Options::get_option('js_delay'), true); ?> />
 						</label>
-						<span class="dashicons dashicons-editor-help" data-title="Delay JavaScript files"></span>
+						<span class="dashicons dashicons-editor-help" data-title="Postpones JavaScript execution until after the page has loaded or user interaction occurs. This dramatically improves initial page load speed and Core Web Vitals metrics by prioritizing content rendering over script execution."></span>
 					</div>
 				</td>
 			</tr>
@@ -167,17 +180,28 @@ use RapidPress\RP_Options;
 			<tr valign="top" id="rapidpress_js_delay_specific" style="display: none;">
 				<th scope="row">Specific JS Files</th>
 				<td>
-					<textarea name="rapidpress_options[js_delay_specific_files]" rows="3" cols="70" placeholder="Enter one JavaScript file URL per line"><?php echo esc_textarea(RP_Options::get_option('js_delay_specific_files', '')); ?></textarea>
-					<p class="description">Enter the URLs of JavaScript files you want to delay, one per line.</p>
-
+					<textarea name="rapidpress_options[js_delay_specific_files]" rows="3" cols="70" placeholder="Enter JavaScript file URL/Handle per line"><?php echo esc_textarea(RP_Options::get_option('js_delay_specific_files', '')); ?></textarea>
+					<p class="description">Enter the JavaScript file URL, partial filename, or the registered handle name to delay. One per line.</p>
+					<p class="description"><small>Examples:</small></p>
+					<ul class="description" style="margin-top: 0; list-style-type: disc; padding-left: 20px;">
+						<li><small><strong>Handle name:</strong> <code>jquery-core</code> or <code>wp-embed</code> (exact handle name, no slashes or dots)</small></li>
+						<li><small><strong>Partial filename:</strong> <code>jquery.min.js</code> (matches any URL containing this string)</small></li>
+						<li><small><strong>Full URL:</strong> <code>https://example.com/script.js</code></small></li>
+					</ul>
 				</td>
 			</tr>
 
 			<tr valign="top" id="rapidpress_js_delay_exclusions_row" style="display: none;">
 				<th scope="row">JS Delay Exclusions</th>
 				<td>
-					<textarea name="rapidpress_options[js_delay_exclusions]" rows="3" cols="70" placeholder="Enter one JavaScript file URL per line"><?php echo esc_textarea(RP_Options::get_option('js_delay_exclusions', '')); ?></textarea>
-					<p class="description">Enter the URLs of JavaScript files you want to exclude from delay, one per line.</p>
+					<textarea name="rapidpress_options[js_delay_exclusions]" rows="3" cols="70" placeholder="Enter JavaScript file URL/Handle per line"><?php echo esc_textarea(RP_Options::get_option('js_delay_exclusions', '')); ?></textarea>
+					<p class="description">Enter the JavaScript file URL, partial filename, or the registered handle name to exclude from delay. One per line.</p>
+					<p class="description"><small>Examples:</small></p>
+					<ul class="description" style="margin-top: 0; list-style-type: disc; padding-left: 20px;">
+						<li><small><strong>Handle name:</strong> <code>jquery-core</code> or <code>generate-menu</code> (exact handle name, no slashes or dots)</small></li>
+						<li><small><strong>Partial filename:</strong> <code>jquery.min.js</code> (matches any URL containing this string)</small></li>
+						<li><small><strong>Full URL:</strong> <code>https://example.com/script.js</code></small></li>
+					</ul>
 				</td>
 			</tr>
 		</table>

@@ -1,34 +1,32 @@
 <?php
+/*
+Plugin Name: RapidPress - Turbocharge Website Performance
+Plugin URI: https://nazimansari.com
+Description: Boost your WordPress site speed by 2x-5x with advanced optimization techniques including minification, asset management, and performance tweaks.
+Version: 1.0.0
+Author: Nazim Husain
+Author URI: https://nazimansari.com
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: rapidpress
+Domain Path: /languages
+Requires at least: 5.0
+Tested up to: 6.7
+Requires PHP: 7.2
 
-/**
- * Plugin Name: RapidPress
- * Description: A lightweight and robust WordPress speed optimization plugin with granual control over your website.
- * Version: 1.0
- * Author: Nazim Husain
- * Author URI: https://nazimansari.com
- * License: GPLv3 or later
- * License URI: https://www.gnu.org/licenses/gpl-3.0.html
- * Text Domain: rapidpress
- * Domain Path: /languages
- */
+RapidPress is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+any later version.
 
-/**
- * @copyright 2024  Nazim Husain  https://nazimansari.com
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+RapidPress is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with RapidPress. If not, see https://www.gnu.org/licenses/gpl-2.0.html.
+*/
 
 // If this file is called directly, abort.
 if (!defined('WPINC')) {
@@ -43,8 +41,22 @@ define('RAPIDPRESS_VERSION', '1.0');
 define('RAPIDPRESS_PATH', plugin_dir_path(__FILE__));
 define('RAPIDPRESS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('RAPIDPRESS_PLUGIN_FILE', __FILE__);
+define('RAPIDPRESS_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
-
+/**
+ * Load plugin textdomain.
+ *
+ * @since 1.0.0
+ * @return void
+ */
+function rapidpress_load_textdomain() {
+	load_plugin_textdomain(
+		'rapidpress',
+		false,
+		dirname(RAPIDPRESS_PLUGIN_BASENAME) . '/languages/'
+	);
+}
+add_action('plugins_loaded', 'rapidpress_load_textdomain');
 
 // Load the main plugin class
 require plugin_dir_path(__FILE__) . 'includes/class-rapidpress.php';
