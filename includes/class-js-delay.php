@@ -2,20 +2,41 @@
 
 namespace RapidPress;
 
+/**
+ * JS_Delay class for handling JavaScript loading delay
+ * 
+ * This class implements JavaScript delay functionality using WordPress's
+ * proper enqueuing functions instead of direct script tag output
+ */
 class JS_Delay {
 	private $script_handles = array();
+	private $delayed_scripts = array();
 
+	/**
+	 * Constructor
+	 */
 	public function __construct() {
-		// Hook into wp_enqueue_scripts to capture script handles and their URLs
-		// Use a lower priority to capture scripts before they're printed
+		// Hook into WordPress script system at various points to ensure complete coverage
 		add_action('wp_enqueue_scripts', array($this, 'capture_script_handles'), 9999);
+		add_action('wp_enqueue_scripts', array($this, 'register_delayed_scripts'), 10000);
+		
+		// Add script_loader_tag filter to directly modify script tags in the HTML output
+		add_filter('script_loader_tag', array($this, 'filter_script_loader_tag'), 10, 3);
 	}
 
+	/**
+	 * Capture all registered script handles and their URLs
+	 */
 	public function capture_script_handles() {
 		global $wp_scripts;
 
 		if (!is_object($wp_scripts)) {
 			return;
+		}
+
+		// Debug logging for registered scripts
+		if (defined('WP_DEBUG') && WP_DEBUG && isset($_GET['rapidpress_debug'])) {
+			error_log("RapidPress JS Delay: WP Scripts object at capture time: " . print_r(array_keys($wp_scripts->registered), true));
 		}
 
 		// Capture all registered scripts, not just queued ones
@@ -52,7 +73,101 @@ class JS_Delay {
 		}
 	}
 
+	/**
+	 * Register and enqueue delayed scripts
+	 * 
+	 * This method processes all WordPress enqueued scripts and delays them
+	 * according to the plugin settings
+	 */
+	public function register_delayed_scripts() {
+		if (is_admin() || !RP_Options::get_option('js_delay') || !\RapidPress\Optimization_Scope::should_optimize()) {
+			return;
+		}
+
+		// Debug logging for script queue
+		if (defined('WP_DEBUG') && WP_DEBUG && isset($_GET['rapidpress_debug'])) {
+			global $wp_scripts;
+			error_log("RapidPress JS Delay: Script queue before processing: " . print_r($wp_scripts->queue, true));
+		}
+
+		$delay_type = RP_Options::get_option('js_delay_type', 'all');
+		$specific_files = $delay_type === 'specific' ? $this->get_specific_files() : array();
+		$exclusions = ($delay_type === 'all' && RP_Options::get_option('enable_js_delay_exclusions')) ? $this->get_exclusions() : array();
+		$delay_duration = RP_Options::get_option('js_delay_duration', '1');
+
+		// Debug the exclusions and specific files only when detailed debugging is enabled
+		if (defined('WP_DEBUG') && WP_DEBUG && isset($_GET['rapidpress_debug'])) {
+			error_log("RapidPress JS Delay: Delay type: {$delay_type}");
+			error_log("RapidPress JS Delay: Exclusions: " . print_r($exclusions, true));
+			error_log("RapidPress JS Delay: Specific files: " . print_r($specific_files, true));
+		}
+
+		global $wp_scripts;
+
+		if (!is_object($wp_scripts)) {
+			return;
+		}
+
+		// Process all enqueued scripts
+		$scripts_to_delay = array();
+		foreach ($wp_scripts->queue as $key => $handle) {
+			if (!isset($wp_scripts->registered[$handle])) {
+				continue;
+			}
+
+			$script = $wp_scripts->registered[$handle];
+
+			if (!isset($script->src) || empty($script->src)) {
+				continue;
+			}
+
+			$src = $script->src;
+
+			// Convert relative URLs to absolute
+			if (strpos($src, '//') === 0) {
+				$src = 'https:' . $src;
+			} elseif (strpos($src, '/') === 0) {
+				$src = site_url($src);
+			}
+
+			$should_delay = false;
+
+			if ($delay_type === 'specific' && $this->is_specific_file($src, $specific_files, $handle)) {
+				$should_delay = true;
+			} elseif ($delay_type === 'all' && !$this->is_excluded($src, $exclusions, $handle)) {
+				$should_delay = true;
+			}
+
+			if ($should_delay) {
+				$scripts_to_delay[] = array(
+					'handle' => $handle,
+					'src' => $src,
+					'deps' => $script->deps,
+					'ver' => $script->ver,
+					'in_footer' => isset($script->extra['group']) && $script->extra['group'] === 1
+				);
+			}
+		}
+
+		// Dequeue original scripts and register delayed versions
+		foreach ($scripts_to_delay as $script) {
+			wp_dequeue_script($script['handle']);
+			$this->register_delayed_script($script['src'], $delay_duration, $script['handle']);
+		}
+	}
+
+	/**
+	 * Legacy method for backward compatibility
+	 * 
+	 * This method is kept for backward compatibility but now uses the WordPress enqueuing system
+	 * 
+	 * @param string $html The HTML content to process
+	 * @return string The processed HTML content
+	 */
 	public function apply_js_delay($html) {
+		// This method is now primarily handled by register_delayed_scripts
+		// but we keep this for backward compatibility with any code that might call it directly
+		
 		if (is_admin() || !RP_Options::get_option('js_delay') || !\RapidPress\Optimization_Scope::should_optimize()) {
 			return $html;
 		}
@@ -66,48 +181,37 @@ class JS_Delay {
 			return $html;
 		}
 
-		// Debug the exclusions and specific files only when detailed debugging is enabled
-		if (defined('WP_DEBUG') && WP_DEBUG && isset($_GET['rapidpress_debug'])) {
-			error_log("RapidPress JS Delay: Delay type: {$delay_type}");
-			error_log("RapidPress JS Delay: Exclusions: " . print_r($exclusions, true));
-			error_log("RapidPress JS Delay: Specific files: " . print_r($specific_files, true));
-		}
-
-		// Use a regular expression to find and modify script tags
-		// Capture both src and id attributes
+		// Process inline script tags that aren't handled by WordPress
+		// These are typically hardcoded in theme files or added by other plugins
 		$pattern = '/<script\b([^>]*)src=["\']([^"\']+)["\']([^>]*)>/i';
 		$html = preg_replace_callback($pattern, function ($matches) use ($delay_type, $specific_files, $exclusions, $delay_duration) {
 			$before_src = $matches[1];
 			$src = $matches[2];
 			$after_src = $matches[3];
 
-			// Extract ID attribute if present
-			$id = '';
-			if (preg_match('/id=["\']([^"\']+)["\']/i', $before_src . ' ' . $after_src, $id_matches)) {
-				$id = $id_matches[1];
-
-				// If ID ends with -js, it's likely a WordPress handle with -js suffix
-				if (preg_match('/-js$/', $id)) {
-					$possible_handle = str_replace('-js', '', $id);
-
-					// Check if this ID-based handle is in our exclusions or specific files
-					if ($delay_type === 'specific' && in_array($possible_handle, $specific_files)) {
-						return $this->get_delay_script_tag($src, $delay_duration);
-					}
-
-					if ($delay_type === 'all' && in_array($possible_handle, $exclusions)) {
-						return $matches[0];
-					}
-				}
+			// Skip if this is a WordPress enqueued script (they're handled by register_delayed_scripts)
+			if (
+				strpos($before_src . $after_src, 'wp-') !== false ||
+				strpos($before_src . $after_src, 'id="') !== false
+			) {
+				return $matches[0];
 			}
 
 			// Try to get the handle from our mapping
 			$handle = $this->get_handle_for_src($src);
 
+			// Check if this script should be delayed
 			if (($delay_type === 'specific' && $this->is_specific_file($src, $specific_files, $handle)) ||
 				($delay_type === 'all' && !$this->is_excluded($src, $exclusions, $handle))
 			) {
-				return $this->get_delay_script_tag($src, $delay_duration);
+				// Generate a unique ID for this script
+				$script_id = 'rapidpress-delayed-' . md5($src);
+
+				// Register and enqueue the delayed version
+				$this->register_delayed_script($src, $delay_duration, $script_id);
+
+				// Return an empty placeholder where the script tag was
+				return "<!-- RapidPress delayed script: {$src} -->";
 			}
 
 			return $matches[0];
@@ -116,6 +220,12 @@ class JS_Delay {
 		return $html;
 	}
 
+	/**
+	 * Get the handle for a script source URL
+	 * 
+	 * @param string $src The script source URL
+	 * @return string The handle for the script, or empty string if not found
+	 */
 	private function get_handle_for_src($src) {
 		// Remove query string for comparison
 		$base_src = preg_replace('/\?.*$/', '', $src);
@@ -152,48 +262,200 @@ class JS_Delay {
 		return '';
 	}
 
-	private function get_delay_script_tag($src, $delay_duration) {
+	/**
+	 * Register a delayed script with WordPress
+	 *
+	 * @param string $src The script source URL
+	 * @param string $delay_duration The delay duration or 'interaction'
+	 * @param string $original_handle The original script handle (optional)
+	 * @return string The handle of the registered script
+	 */
+	private function register_delayed_script($src, $delay_duration, $original_handle = '') {
+		// Create a unique handle for this delayed script
+		$handle = !empty($original_handle) ? 'rapidpress-delayed-' . $original_handle : 'rapidpress-delayed-' . md5($src);
+
+		// Skip if we've already registered this script
+		if (in_array($handle, $this->delayed_scripts)) {
+			return $handle;
+		}
+
+		// Special handling for jQuery core and migrate
+		$is_jquery = (!empty($original_handle) && (strpos($original_handle, 'jquery') === 0 || strpos($original_handle, 'jquery-core') === 0 || strpos($original_handle, 'jquery-migrate') === 0));
+
+		// Register an empty script that will serve as our container
+		// For jQuery, we need to make sure it loads in the head, not the footer
+		wp_register_script($handle, '', array(), RAPIDPRESS_VERSION, !$is_jquery);
+
+		// Add the delay logic as inline script
 		if ($delay_duration === 'interaction') {
-			return "<script type='text/javascript'>
-                document.addEventListener('DOMContentLoaded', function() {
-                    var loadScript = function() {
-                        var script = document.createElement('script');
-                        script.src = '$src';
-                        document.body.appendChild(script);
-                        ['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {
-                            document.removeEventListener(event, loadScript, {passive: true});
-                        });
-                    };
-                    ['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {
-                        document.addEventListener(event, loadScript, {passive: true});
-                    });
-                });
-            </script>";
+			$inline_script = "document.addEventListener('DOMContentLoaded', function() {\n" .
+				"    var loadScript = function() {\n" .
+				"        var script = document.createElement('script');\n" .
+				"        script.src = '$src';\n" .
+				"        " . ($is_jquery ? "document.head" : "document.body") . ".appendChild(script);\n" .
+				"        ['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {\n" .
+				"            document.removeEventListener(event, loadScript, {passive: true});\n" .
+				"        });\n" .
+				"    };\n" .
+				"    ['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {\n" .
+				"        document.addEventListener(event, loadScript, {passive: true});\n" .
+				"    });\n" .
+				"});";
 		} else {
 			$delay = intval($delay_duration) * 1000;
-			return "<script type='text/javascript'>
-                setTimeout(function() {
-                    var script = document.createElement('script');
-                    script.src = '$src';
-                    document.body.appendChild(script);
-                }, $delay);
-            </script>";
+			$inline_script = "setTimeout(function() {\n" .
+				"    var script = document.createElement('script');\n" .
+				"    script.src = '$src';\n" .
+				"    " . ($is_jquery ? "document.head" : "document.body") . ".appendChild(script);\n" .
+				"}, $delay);";
 		}
+
+		// Add the inline script
+		wp_add_inline_script($handle, $inline_script);
+
+		// Enqueue the script
+		wp_enqueue_script($handle);
+
+		// Remember that we've processed this script
+		$this->delayed_scripts[] = $handle;
+
+		return $handle;
 	}
 
+	/**
+	 * Filter script loader tag to catch any scripts that weren't caught by the enqueue system
+	 * This is our last line of defense for scripts that are hardcoded or added by other plugins
+	 *
+	 * @param string $tag The script tag
+	 * @param string $handle The script handle
+	 * @param string $src The script source
+	 * @return string The modified script tag
+	 */
+	public function filter_script_loader_tag($tag, $handle, $src) {
+		// Skip if optimization is disabled
+		if (is_admin() || !RP_Options::get_option('js_delay') || !\RapidPress\Optimization_Scope::should_optimize()) {
+			return $tag;
+		}
+		
+		// Skip if this is already a delayed script
+		if (strpos($handle, 'rapidpress-delayed-') === 0) {
+			return $tag;
+		}
+		
+		// Get delay settings
+		$delay_type = RP_Options::get_option('js_delay_type', 'all');
+		$specific_files = $delay_type === 'specific' ? $this->get_specific_files() : array();
+		$exclusions = ($delay_type === 'all' && RP_Options::get_option('enable_js_delay_exclusions')) ? $this->get_exclusions() : array();
+		$delay_duration = RP_Options::get_option('js_delay_duration', '1');
+		
+		// Check if this script should be delayed
+		$should_delay = false;
+		
+		// Special handling for jQuery
+		$is_jquery = (strpos($handle, 'jquery') === 0 || strpos($handle, 'jquery-core') === 0 || strpos($handle, 'jquery-migrate') === 0);
+		
+		if ($delay_type === 'specific' && $this->is_specific_file($src, $specific_files, $handle)) {
+			$should_delay = true;
+		} elseif ($delay_type === 'all' && !$this->is_excluded($src, $exclusions, $handle)) {
+			$should_delay = true;
+		}
+		
+		// If this script should be delayed, replace the tag with our delayed version
+		if ($should_delay) {
+			// Debug logging
+			if (defined('WP_DEBUG') && WP_DEBUG && isset($_GET['rapidpress_debug'])) {
+				error_log("RapidPress JS Delay: Delaying script via filter_script_loader_tag: {$handle} - {$src}");
+			}
+			
+			// Extract script ID if it exists
+			$id_attr = '';
+			if (preg_match('/id=[\'\"](.*?)[\'\"]/', $tag, $matches)) {
+				$id_attr = $matches[1];
+			} else {
+				$id_attr = 'rapidpress-script-' . md5($src);
+			}
+			
+			// Create the delayed script
+			if ($delay_duration === 'interaction') {
+				$delayed_tag = "<script id='{$id_attr}' type='text/javascript'>" .
+					"document.addEventListener('DOMContentLoaded', function() {" .
+					"    var loadScript = function() {" .
+					"        var script = document.createElement('script');" .
+					"        script.src = '{$src}';" .
+					"        " . ($is_jquery ? "document.head" : "document.body") . ".appendChild(script);" .
+					"        ['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {" .
+					"            document.removeEventListener(event, loadScript, {passive: true});" .
+					"        });" .
+					"    };" .
+					"    ['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {" .
+					"        document.addEventListener(event, loadScript, {passive: true});" .
+					"    });" .
+					"});" .
+					"</script>";
+			} else {
+				$delay = intval($delay_duration) * 1000;
+				$delayed_tag = "<script id='{$id_attr}' type='text/javascript'>" .
+					"setTimeout(function() {" .
+					"    var script = document.createElement('script');" .
+					"    script.src = '{$src}';" .
+					"    " . ($is_jquery ? "document.head" : "document.body") . ".appendChild(script);" .
+					"}, {$delay});" .
+					"</script>";
+			}
+			
+			return $delayed_tag;
+		}
+		
+		return $tag;
+	}
+
+	/**
+	 * Get the list of exclusions from plugin options
+	 * 
+	 * @return array Array of exclusions
+	 */
 	private function get_exclusions() {
 		$exclusions_string = RP_Options::get_option('js_delay_exclusions', '');
 		return array_filter(array_map('trim', explode("\n", $exclusions_string)));
 	}
 
+	/**
+	 * Check if a script should be excluded from delay
+	 * 
+	 * @param string $src The script source URL
+	 * @param array $exclusions Array of exclusion patterns
+	 * @param string $handle The script handle (optional)
+	 * @return bool True if the script should be excluded, false otherwise
+	 */
 	private function is_excluded($src, $exclusions, $handle = '') {
+		// Identify jQuery scripts by handle or URL
+		$wp_core_scripts = array('jquery', 'jquery-core', 'jquery-migrate');
+		$is_jquery_handle = !empty($handle) && in_array($handle, $wp_core_scripts);
+		$is_jquery_url = false;
+		
+		// Check if the URL contains jquery
+		if (stripos($src, 'jquery') !== false && (stripos($src, 'jquery.js') !== false || stripos($src, 'jquery.min.js') !== false || stripos($src, 'jquery-migrate') !== false)) {
+			$is_jquery_url = true;
+		}
+		
+		// For all exclusions, check both handle and URL
 		foreach ($exclusions as $exclusion) {
-			// Check if the exclusion matches the handle (exact match)
+			// For jQuery scripts, check if the exclusion matches the handle
+			if ($is_jquery_handle && $exclusion === $handle) {
+				return true;
+			}
+			
+			// For jQuery scripts, check if the exclusion is in the URL
+			if ($is_jquery_url && stripos($src, $exclusion) !== false) {
+				return true;
+			}
+			
+			// For all scripts, check if the exclusion matches the handle (exact match)
 			if (!empty($handle) && $exclusion === $handle) {
 				return true;
 			}
 
-			// Check if the exclusion matches the URL (partial match)
+			// For all scripts, check if the exclusion matches the URL (partial match)
 			if (strpos($src, $exclusion) !== false) {
 				return true;
 			}
@@ -206,14 +468,33 @@ class JS_Delay {
 				}
 			}
 		}
+		
+		// Debug logging for jQuery exclusions
+		if (($is_jquery_handle || $is_jquery_url) && defined('WP_DEBUG') && WP_DEBUG && isset($_GET['rapidpress_debug'])) {
+			error_log("RapidPress JS Delay: jQuery script not excluded: {$handle} - {$src}");
+		}
+		
 		return false;
 	}
 
+	/**
+	 * Get the list of specific files to delay from plugin options
+	 * 
+	 * @return array Array of specific files
+	 */
 	private function get_specific_files() {
 		$specific_files_string = RP_Options::get_option('js_delay_specific_files', '');
 		return array_filter(array_map('trim', explode("\n", $specific_files_string)));
 	}
 
+	/**
+	 * Check if a script is in the list of specific files to delay
+	 * 
+	 * @param string $src The script source URL
+	 * @param array $specific_files Array of specific file patterns
+	 * @param string $handle The script handle (optional)
+	 * @return bool True if the script is in the list, false otherwise
+	 */
 	private function is_specific_file($src, $specific_files, $handle = '') {
 		foreach ($specific_files as $file) {
 			// Check if the file matches the handle (exact match)
