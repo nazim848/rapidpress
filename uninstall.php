@@ -1,14 +1,13 @@
 <?php
 
 // If uninstall not called from WordPress, then exit.
+if (!defined('WP_UNINSTALL_PLUGIN')) {
+	exit;
+}
 
 require __DIR__ . '/includes/class-rapidpress-options.php';
 
 use RapidPress\RP_Options;
-
-if (!defined('WP_UNINSTALL_PLUGIN')) {
-	exit;
-}
 
 // Check if clean uninstall is enabled
 $clean_uninstall = RP_Options::get_option('clean_uninstall');
