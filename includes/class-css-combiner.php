@@ -233,12 +233,42 @@ class CSS_Combiner {
 		return false;
 	}
 
+	/**
+	 * Convert a URL to a filesystem path 
+	 *
+	 * @param string $url The URL to convert to a path
+	 * @return string The filesystem path
+	 */
 	private function url_to_path($url) {
-		return str_replace(
-			wp_get_upload_dir()['baseurl'],
-			wp_get_upload_dir()['basedir'],
-			str_replace(content_url(), WP_CONTENT_DIR, $url)
-		);
+		$upload_dir = wp_upload_dir();
+
+		// First check if it's in the uploads directory
+		if (strpos($url, $upload_dir['baseurl']) !== false) {
+			return str_replace($upload_dir['baseurl'], $upload_dir['basedir'], $url);
+		}
+
+		// Check if it's a plugin URL
+		$plugins_url = plugins_url();
+		if (strpos($url, $plugins_url) !== false) {
+			return str_replace($plugins_url, WP_PLUGIN_DIR, $url);
+		}
+
+		// Check if it's a theme URL
+		$theme_url = get_template_directory_uri();
+		if (strpos($url, $theme_url) !== false) {
+			return str_replace($theme_url, get_template_directory(), $url);
+		}
+
+		// For content URLs, use site_url() and ABSPATH to ensure compatibility
+		$site_url = site_url('/');
+		$content_path = 'wp-content/';
+
+		if (strpos($url, $site_url . $content_path) !== false) {
+			return str_replace($site_url . $content_path, ABSPATH . $content_path, $url);
+		}
+
+		// Fallback for other URLs
+		return $url;
 	}
 
 	private function minify_css($css) {
