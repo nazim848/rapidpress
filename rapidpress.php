@@ -68,11 +68,11 @@ if ($rapidpress_version != RAPIDPRESS_VERSION) {
 }
 
 // Run the plugin
-function run_rapidpress() {
+function start_rapidpress() {
 	$plugin = new RapidPress\RapidPress();
 	$plugin->run();
 }
-run_rapidpress();
+start_rapidpress();
 
 // Activation hook
 register_activation_hook(__FILE__, 'rapidpress_activate');

@@ -19,7 +19,7 @@ class CSS_Combiner {
 		add_action('wp_print_styles', array($this, 'combine_css'), 100);
 		add_action('wp_head', array($this, 'print_combined_css'), 999);
 		add_action('wp_print_styles', array($this, 'final_css_cleanup'), 9999);
-		add_filter('final_output', array($this, 'filter_final_output'), 10, 1);
+		add_filter('rapidpress_final_output', array($this, 'filter_final_output'), 10, 1);
 		$this->set_excluded_files();
 		$this->excluded_files[] = 'admin-bar.min.css';
 	}

@@ -46,7 +46,7 @@ class HTML_Minifier {
 		}
 
 		// Apply final output filter for other optimizations
-		$html = apply_filters('final_output', $html);
+		$html = apply_filters('rapidpress_final_output', $html);
 
 		return $html;
 	}
