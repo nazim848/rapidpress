@@ -42,21 +42,6 @@ define('RAPIDPRESS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('RAPIDPRESS_PLUGIN_FILE', __FILE__);
 define('RAPIDPRESS_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
-/**
- * Load plugin textdomain.
- *
- * @since 1.0.0
- * @return void
- */
-function rapidpress_load_textdomain() {
-	load_plugin_textdomain(
-		'rapidpress',
-		false,
-		dirname(RAPIDPRESS_PLUGIN_BASENAME) . '/languages/'
-	);
-}
-add_action('plugins_loaded', 'rapidpress_load_textdomain');
-
 // Load the main plugin class
 require plugin_dir_path(__FILE__) . 'includes/class-rapidpress.php';
 
