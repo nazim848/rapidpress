@@ -186,7 +186,6 @@ class Core_Tweaks {
 		remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
 		remove_filter('the_content_feed', 'wp_staticize_emoji');
 		add_filter('tiny_mce_plugins', [$this, 'disable_emojis_tinymce']);
-		add_filter('wp_resource_hints', [$this, 'disable_emojis_dns_prefetch'], 10, 2);
 		add_filter('emoji_svg_url', '__return_false');
 	}
 
@@ -195,14 +194,6 @@ class Core_Tweaks {
 			return array_diff($plugins, ['wpemoji']);
 		}
 		return [];
-	}
-
-	public function disable_emojis_dns_prefetch($urls, $relation_type) {
-		if ('dns-prefetch' === $relation_type) {
-			$emoji_svg_url = apply_filters('emoji_svg_url', 'https://s.w.org/images/core/emoji/11/svg/');
-			$urls = array_diff($urls, [$emoji_svg_url]);
-		}
-		return $urls;
 	}
 
 	// Remove jQuery Migrate
