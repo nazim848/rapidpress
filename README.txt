@@ -79,13 +79,6 @@ Yes, RapidPress works with WordPress multisite installations. Each site in the n
 
 Yes, RapidPress is fully internationalized and ready for translation. The plugin includes a POT file in the languages directory that you can use as a template for translations. We welcome contributions of new translations!
 
-== Screenshots ==
-
-1. RapidPress main dashboard
-2. Performance optimization settings
-3. Asset management interface
-4. Before and after PageSpeed comparison
-
 == Changelog ==
 
 = 1.0.0 =
