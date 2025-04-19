@@ -69,11 +69,7 @@ While minification is generally safe, some custom code may be affected. RapidPre
 
 = How do I measure the performance improvement? =
 
-RapidPress includes a performance dashboard that shows key metrics. We also recommend using external tools like Google PageSpeed Insights, GTmetrix, or WebPageTest to measure improvements.
-
-= Is RapidPress compatible with multisite installations? =
-
-Yes, RapidPress works with WordPress multisite installations. Each site in the network can have its own optimization settings.
+We recommend using tools like Google PageSpeed Insights, GTmetrix, or WebPageTest to measure the improvements.
 
 = Is RapidPress translation-ready? =
 
