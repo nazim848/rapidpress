@@ -14,15 +14,15 @@ if (!current_user_can('manage_options')) {
 
 // Define tabs
 $tabs = array(
-	'general' => 'General',
-	'file-optimization' => 'File Optimization',
-	'asset-manager' => 'Asset Manager',
-	// 'media' => 'Media',
-	// 'cache' => 'Cache',
-	// 'preloading' => 'Preloading',
-	// 'database' => 'Database',
-	// 'cdn' => 'CDN',
-	'settings' => 'Settings'
+	'general' => esc_html__('General', 'rapidpress'),
+	'file-optimization' => esc_html__('File Optimization', 'rapidpress'),
+	'asset-manager' => esc_html__('Asset Manager', 'rapidpress'),
+	// 'media' => esc_html__('Media', 'rapidpress'),
+	// 'cache' => esc_html__('Cache', 'rapidpress'),
+	// 'preloading' => esc_html__('Preloading', 'rapidpress'),
+	// 'database' => esc_html__('Database', 'rapidpress'),
+	// 'cdn' => esc_html__('CDN', 'rapidpress'),
+	'settings' => esc_html__('Settings', 'rapidpress')
 );
 
 // Get current tab
@@ -61,7 +61,7 @@ if (!array_key_exists($active_tab, $tabs)) {
 					if (file_exists($tab_file)) {
 						include $tab_file;
 					} else {
-						echo '<p>Tab content not found.</p>';
+						echo '<p>' . esc_html__('Tab content not found.', 'rapidpress') . '</p>';
 					}
 				}
 				?>
