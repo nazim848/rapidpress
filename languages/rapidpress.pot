@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: RapidPress - Turbocharge Website Performance 1.0.0\n"
+"Project-Id-Version: RapidPress - Turbocharge Website Performance 1.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/rapidpress\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-03-14T01:09:12+00:00\n"
+"POT-Creation-Date: 2025-05-22T10:51:10+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: rapidpress\n"
@@ -17,12 +17,6 @@ msgstr ""
 #. Plugin Name of the plugin
 #: rapidpress.php
 msgid "RapidPress - Turbocharge Website Performance"
-msgstr ""
-
-#. Plugin URI of the plugin
-#. Author URI of the plugin
-#: rapidpress.php
-msgid "https://nazimansari.com"
 msgstr ""
 
 #. Description of the plugin
@@ -33,6 +27,11 @@ msgstr ""
 #. Author of the plugin
 #: rapidpress.php
 msgid "Nazim Husain"
+msgstr ""
+
+#. Author URI of the plugin
+#: rapidpress.php
+msgid "https://nazimansari.com"
 msgstr ""
 
 #: admin/class-admin.php:108
@@ -49,6 +48,8 @@ msgstr ""
 
 #: admin/class-admin.php:119
 #: admin/class-admin.php:153
+#: admin/partials/admin-display.php:25
+#: admin/partials/tabs/settings.php:10
 msgid "Settings"
 msgstr ""
 
@@ -57,14 +58,19 @@ msgid "RapidPress"
 msgstr ""
 
 #: admin/class-admin.php:150
+#: admin/partials/admin-display.php:17
+#: admin/partials/tabs/general.php:9
 msgid "General"
 msgstr ""
 
 #: admin/class-admin.php:151
+#: admin/partials/admin-display.php:18
+#: admin/partials/tabs/file-optimization.php:10
 msgid "File Optimization"
 msgstr ""
 
 #: admin/class-admin.php:152
+#: admin/partials/admin-display.php:19
 msgid "Asset Manager"
 msgstr ""
 
@@ -72,60 +78,624 @@ msgstr ""
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
-#: admin/partials/tabs/asset-manager.php:95
+#: admin/partials/admin-display.php:64
+msgid "Tab content not found."
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:10
+msgid "Disable Assets"
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:11
+msgid "Disable specific assets (CSS and JS) from loading on your site. This can help improve page load times and reduce server load by disabling assets that are not needed for that page."
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:13
+msgid "JavaScript"
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:18
+#: admin/partials/tabs/asset-manager.php:69
 msgid "Script URL or Handle (one per line)"
 msgstr ""
 
-#: admin/partials/tabs/asset-manager.php:98
-#: admin/partials/tabs/asset-manager.php:213
+#: admin/partials/tabs/asset-manager.php:18
+msgid "Enter the script file URL, partial filename, or the registered handle name of the script you want to disable. You can enter multiple URLs, partial filenames, or handles by separating them with a new line."
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:19
+#: admin/partials/tabs/asset-manager.php:105
+msgid "Disable Scope"
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:19
+msgid "Choose where to disable the script: \"Entire Site\" applies to all pages, \"Front Page\" only disables on your homepage, and \"Specific Pages\" lets you select individual URLs to disable on."
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:20
+#: admin/partials/tabs/asset-manager.php:107
+msgid "Actions"
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:20
+msgid "Enable, disable, or remove a script disable rule."
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:72
+#: admin/partials/tabs/asset-manager.php:159
+#: admin/partials/tabs/file-optimization.php:17
 msgid "Entire Site"
 msgstr ""
 
-#: admin/partials/tabs/asset-manager.php:100
-#: admin/partials/tabs/asset-manager.php:215
+#: admin/partials/tabs/asset-manager.php:74
+#: admin/partials/tabs/asset-manager.php:161
+#: admin/partials/tabs/file-optimization.php:18
 msgid "Front Page"
 msgstr ""
 
-#: admin/partials/tabs/asset-manager.php:102
-#: admin/partials/tabs/asset-manager.php:217
+#: admin/partials/tabs/asset-manager.php:76
+#: admin/partials/tabs/asset-manager.php:163
+#: admin/partials/tabs/file-optimization.php:19
+#: admin/partials/tabs/file-optimization.php:31
 msgid "Specific Pages"
 msgstr ""
 
-#: admin/partials/tabs/asset-manager.php:105
-#: admin/partials/tabs/asset-manager.php:220
+#: admin/partials/tabs/asset-manager.php:79
+#: admin/partials/tabs/asset-manager.php:166
+#: admin/partials/tabs/file-optimization.php:25
 msgid "Exclude pages?"
 msgstr ""
 
-#: admin/partials/tabs/asset-manager.php:113
-#: admin/partials/tabs/asset-manager.php:228
+#: admin/partials/tabs/asset-manager.php:87
+#: admin/partials/tabs/asset-manager.php:174
 msgid "Active"
 msgstr ""
 
-#: admin/partials/tabs/asset-manager.php:114
-#: admin/partials/tabs/asset-manager.php:229
+#: admin/partials/tabs/asset-manager.php:88
+#: admin/partials/tabs/asset-manager.php:175
 msgid "Remove"
 msgstr ""
 
-#: admin/partials/tabs/asset-manager.php:210
+#: admin/partials/tabs/asset-manager.php:94
+msgid "Add JavaScript Rule"
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:99
+msgid "CSS"
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:104
+#: admin/partials/tabs/asset-manager.php:156
 msgid "CSS URL or Handle (one per line)"
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:104
+msgid "Enter the CSS file URL, partial filename, or the registered handle name of the CSS you want to disable. You can enter multiple URLs, partial filenames, or handles by separating them with a new line."
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:105
+msgid "Choose where to disable the CSS: \"Entire Site\" applies to all pages, \"Front Page\" only disables on your homepage, and \"Specific Pages\" lets you select individual URLs to disable on."
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:107
+msgid "Enable, disable, or remove a CSS disable rule."
+msgstr ""
+
+#: admin/partials/tabs/asset-manager.php:181
+msgid "Add CSS Rule"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:14
+msgid "Optimization Scope"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:21
+msgid "Choose where to apply file optimization: \"Entire Site\" applies to all pages, \"Front Page\" only optimizes your homepage, and \"Specific Pages\" lets you select individual URLs to optimize."
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:34
+msgid "Enter the URLs of the pages you want to optimize, one URL per line."
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:38
+msgid "Page Exclusions"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:41
+msgid "Enter the URLs of the pages you want to exclude from optimization, one URL per line."
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:48
+msgid "HTML Minification"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:54
+msgid "Removes unnecessary whitespace, comments, and other redundant HTML code to reduce file size and improve page load times. This can reduce HTML file size by 10-20%."
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:59
+msgid "CSS Minification"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:65
+msgid "Compresses CSS files by removing whitespace, comments, and optimizing code syntax. This reduces file size and improves load times without affecting how styles are rendered."
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:70
+msgid "Combine CSS Files"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:76
+msgid "Merges multiple CSS files into a single file, reducing HTTP requests and improving page load speed. Particularly effective for sites with many small stylesheets."
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:81
+msgid "Enable CSS Exclusions"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:87
+msgid "CSS Exclusions"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:90
+msgid "Enter the CSS file URL, partial filename, or the registered handle name to exclude from combination. One per line."
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:91
+#: admin/partials/tabs/file-optimization.php:132
+#: admin/partials/tabs/file-optimization.php:184
+#: admin/partials/tabs/file-optimization.php:198
+msgid "Examples:"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:93
+#: admin/partials/tabs/file-optimization.php:134
+#: admin/partials/tabs/file-optimization.php:186
+#: admin/partials/tabs/file-optimization.php:200
+msgid "Handle name:"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:93
+msgid "wp-block-library"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:93
+msgid "generate-style"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:93
+#: admin/partials/tabs/file-optimization.php:134
+#: admin/partials/tabs/file-optimization.php:186
+#: admin/partials/tabs/file-optimization.php:200
+msgid "(exact handle name, no slashes or dots)"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:94
+#: admin/partials/tabs/file-optimization.php:135
+#: admin/partials/tabs/file-optimization.php:187
+#: admin/partials/tabs/file-optimization.php:201
+msgid "Partial filename:"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:94
+msgid "style.css"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:94
+#: admin/partials/tabs/file-optimization.php:135
+#: admin/partials/tabs/file-optimization.php:187
+#: admin/partials/tabs/file-optimization.php:201
+msgid "(matches any URL containing this string)"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:95
+#: admin/partials/tabs/file-optimization.php:136
+#: admin/partials/tabs/file-optimization.php:188
+#: admin/partials/tabs/file-optimization.php:202
+msgid "Full URL:"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:95
+msgid "https://example.com/style.css"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:100
+msgid "Minify JavaScript"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:106
+msgid "Reduces JavaScript file size by removing comments, whitespace, and unnecessary characters. This optimization can decrease file size by 30-50% without affecting functionality."
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:111
+msgid "Defer JavaScript"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:117
+msgid "Adds \"defer\" attribute to script tags, allowing JavaScript to load without blocking page rendering. This improves initial page load speed and Core Web Vitals scores while ensuring scripts execute in the correct order."
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:122
+msgid "Enable JS Defer Exclusions"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:128
+msgid "JavaScript Defer Exclusions"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:131
+msgid "Enter the JavaScript file URL, partial filename, or the registered handle name to exclude from deferring. One per line."
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:134
+#: admin/partials/tabs/file-optimization.php:186
+#: admin/partials/tabs/file-optimization.php:200
+msgid "jquery-core"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:134
+#: admin/partials/tabs/file-optimization.php:200
+msgid "generate-menu"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:135
+#: admin/partials/tabs/file-optimization.php:187
+#: admin/partials/tabs/file-optimization.php:201
+msgid "jquery.min.js"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:136
+#: admin/partials/tabs/file-optimization.php:188
+#: admin/partials/tabs/file-optimization.php:202
+msgid "https://example.com/script.js"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:141
+msgid "Delay JavaScript"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:147
+msgid "Postpones JavaScript execution until after the page has loaded or user interaction occurs. This dramatically improves initial page load speed and Core Web Vitals metrics by prioritizing content rendering over script execution."
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:152
+msgid "Delay Options"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:155
+msgid "All JavaScripts"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:156
+msgid "Specific JavaScripts"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:161
+msgid "1 second"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:162
+msgid "2 seconds"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:163
+msgid "3 seconds"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:164
+msgid "Until user interaction"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:172
+msgid "Enable JS Delay Exclusions"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:180
+msgid "Specific JS Files"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:183
+msgid "Enter the JavaScript file URL, partial filename, or the registered handle name to delay. One per line."
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:186
+msgid "wp-embed"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:194
+msgid "JS Delay Exclusions"
+msgstr ""
+
+#: admin/partials/tabs/file-optimization.php:197
+msgid "Enter the JavaScript file URL, partial filename, or the registered handle name to exclude from delay. One per line."
+msgstr ""
+
+#: admin/partials/tabs/general.php:13
+msgid "Disable Comments"
+msgstr ""
+
+#: admin/partials/tabs/general.php:19
+msgid "This will disable comments on all post types and remove comment-related functionality."
+msgstr ""
+
+#: admin/partials/tabs/general.php:24
+msgid "Remove Comment URLs"
+msgstr ""
+
+#: admin/partials/tabs/general.php:30
+msgid "Removes the comment author link and website field from the comment form."
+msgstr ""
+
+#: admin/partials/tabs/general.php:35
+msgid "Disable Dashicons"
+msgstr ""
+
+#: admin/partials/tabs/general.php:41
+msgid "Disables dashicons on the front end."
+msgstr ""
+
+#: admin/partials/tabs/general.php:46
+msgid "Disable Embeds"
+msgstr ""
+
+#: admin/partials/tabs/general.php:52
+msgid "Disable WordPress Embed JavaScript file."
+msgstr ""
+
+#: admin/partials/tabs/general.php:57
+#: admin/partials/tabs/general.php:63
+msgid "Disable XML-RPC"
+msgstr ""
+
+#: admin/partials/tabs/general.php:68
+msgid "Disable Emojis"
+msgstr ""
+
+#: admin/partials/tabs/general.php:74
+msgid "Removes WordPress Emojis and related JavaScript file from the front end."
+msgstr ""
+
+#: admin/partials/tabs/general.php:79
+msgid "Remove jQuery Migrate"
+msgstr ""
+
+#: admin/partials/tabs/general.php:85
+msgid "Removes jQuery Migrate JavaScript file."
+msgstr ""
+
+#: admin/partials/tabs/general.php:90
+msgid "Disable RSS Feeds"
+msgstr ""
+
+#: admin/partials/tabs/general.php:96
+msgid "Disable WordPress generated RSS Feed and related links."
+msgstr ""
+
+#: admin/partials/tabs/general.php:101
+msgid "Remove RSD Link"
+msgstr ""
+
+#: admin/partials/tabs/general.php:107
+msgid "Removes RSD (Real Simple Dicovery) link tag."
+msgstr ""
+
+#: admin/partials/tabs/general.php:112
+msgid "Hide WP Version"
+msgstr ""
+
+#: admin/partials/tabs/general.php:118
+msgid "Removes WordPress version meta tag from front end."
+msgstr ""
+
+#: admin/partials/tabs/general.php:123
+msgid "Remove Global Styles"
+msgstr ""
+
+#: admin/partials/tabs/general.php:129
+msgid "Removes the inline global styles (CSS and SVG)."
+msgstr ""
+
+#: admin/partials/tabs/general.php:134
+msgid "Separate Block Styles"
+msgstr ""
+
+#: admin/partials/tabs/general.php:140
+msgid "Load core block styles only when they are rendered instead of in a global styles."
+msgstr ""
+
+#: admin/partials/tabs/general.php:145
+msgid "Disable Self Pingbacks"
+msgstr ""
+
+#: admin/partials/tabs/general.php:151
+msgid "Disables Self Pingbacks when linking to any internal article."
+msgstr ""
+
+#: admin/partials/tabs/general.php:156
+msgid "Disable Google Maps"
+msgstr ""
+
+#: admin/partials/tabs/general.php:162
+msgid "Removes Google Maps script or iframe loading from the entire website."
+msgstr ""
+
+#: admin/partials/tabs/general.php:167
+msgid "Remove Shortlink"
+msgstr ""
+
+#: admin/partials/tabs/general.php:173
+msgid "Removes Shortlink tag from the front end."
+msgstr ""
+
+#: admin/partials/tabs/general.php:179
+msgid "Disable Rest API"
+msgstr ""
+
+#: admin/partials/tabs/general.php:182
+msgid "Default (Enabled)"
+msgstr ""
+
+#: admin/partials/tabs/general.php:183
+msgid "Disable for Non-Admins"
+msgstr ""
+
+#: admin/partials/tabs/general.php:185
+msgid "Disable Rest API requests."
+msgstr ""
+
+#: admin/partials/tabs/general.php:189
+msgid "Remove REST API Links"
+msgstr ""
+
+#: admin/partials/tabs/general.php:195
+msgid "Remove REST API link tag from the header."
+msgstr ""
+
+#: admin/partials/tabs/general.php:199
+msgid "Disable Heartbeat"
+msgstr ""
+
+#: admin/partials/tabs/general.php:202
+msgid "Default"
+msgstr ""
+
+#: admin/partials/tabs/general.php:203
+msgid "Disable Everywhere"
+msgstr ""
+
+#: admin/partials/tabs/general.php:204
+msgid "Only Allow When Editing Posts/Pages"
+msgstr ""
+
+#: admin/partials/tabs/general.php:206
+msgid "Disables WordPress Heartbeat (used for auto saving & revision tracking)."
+msgstr ""
+
+#: admin/partials/tabs/general.php:210
+msgid "Heartbeat Frequency"
+msgstr ""
+
+#: admin/partials/tabs/general.php:213
+msgid "15 Seconds (Default)"
+msgstr ""
+
+#: admin/partials/tabs/general.php:214
+msgid "30 Seconds"
+msgstr ""
+
+#: admin/partials/tabs/general.php:215
+msgid "45 Seconds"
+msgstr ""
+
+#: admin/partials/tabs/general.php:216
+msgid "60 Seconds"
+msgstr ""
+
+#: admin/partials/tabs/general.php:218
+msgid "Controls how often the WordPress Heartbeat API is allowed to run."
+msgstr ""
+
+#: admin/partials/tabs/general.php:222
+msgid "Limit Post Revisions"
+msgstr ""
+
+#: admin/partials/tabs/general.php:225
+msgid "Default (Unlimited)"
+msgstr ""
+
+#: admin/partials/tabs/general.php:226
+msgid "Disable Post Revisions"
+msgstr ""
+
+#: admin/partials/tabs/general.php:236
+msgid "Limits the number of revisions that are allowed for posts and pages."
+msgstr ""
+
+#: admin/partials/tabs/general.php:240
+msgid "Autosave Interval"
+msgstr ""
+
+#: admin/partials/tabs/general.php:243
+msgid "1 Minute (Default)"
+msgstr ""
+
+#: admin/partials/tabs/general.php:244
+msgid "Disable Autosave Interval"
+msgstr ""
+
+#: admin/partials/tabs/general.php:245
+msgid "2 Minutes"
+msgstr ""
+
+#: admin/partials/tabs/general.php:246
+msgid "3 Minutes"
+msgstr ""
+
+#: admin/partials/tabs/general.php:247
+msgid "4 Minutes"
+msgstr ""
+
+#: admin/partials/tabs/general.php:248
+msgid "5 Minutes"
+msgstr ""
+
+#: admin/partials/tabs/general.php:249
+msgid "10 Minutes"
+msgstr ""
+
+#: admin/partials/tabs/general.php:250
+msgid "15 Minutes"
+msgstr ""
+
+#: admin/partials/tabs/general.php:251
+msgid "20 Minutes"
+msgstr ""
+
+#: admin/partials/tabs/general.php:253
+msgid "Controls how often WordPress auto save posts and pages while editing."
+msgstr ""
+
+#: admin/partials/tabs/settings.php:14
+#: admin/partials/tabs/settings.php:17
+msgid "Reset Settings"
+msgstr ""
+
+#: admin/partials/tabs/settings.php:18
+msgid "Reset all plugin settings to their default values"
+msgstr ""
+
+#: admin/partials/tabs/settings.php:23
+msgid "Clean Deactivate"
+msgstr ""
+
+#: admin/partials/tabs/settings.php:29
+msgid "When enabled, all RapidPress settings and data will be deleted from the database when the plugin is deactivated!"
+msgstr ""
+
+#: admin/partials/tabs/settings.php:34
+msgid "Clean Uninstall"
+msgstr ""
+
+#: admin/partials/tabs/settings.php:40
+msgid "When enabled, all RapidPress settings and data will be deleted from the database when the plugin is uninstalled!"
 msgstr ""
 
 #: includes/class-core-tweaks.php:174
 msgid "XML-RPC services are disabled on this site."
 msgstr ""
 
-#: includes/class-core-tweaks.php:239
+#: includes/class-core-tweaks.php:230
 msgid "RSS feeds are disabled."
 msgstr ""
 
-#: includes/class-core-tweaks.php:368
+#: includes/class-core-tweaks.php:359
 msgid "Sorry, you do not have permission to make REST API requests."
 msgstr ""
 
-#: includes/class-core-tweaks.php:402
+#: includes/class-core-tweaks.php:393
 msgid "RapidPress Warning"
 msgstr ""
 
-#: includes/class-core-tweaks.php:403
+#: includes/class-core-tweaks.php:394
 msgid "WP_POST_REVISIONS is already enabled somewhere else on your site. We suggest only enabling this feature in one place."
 msgstr ""
