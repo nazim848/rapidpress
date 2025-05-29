@@ -179,7 +179,7 @@ class Admin {
 			$active_tab = isset($_GET['tab']) ? '#' . sanitize_text_field(wp_unslash($_GET['tab'])) : '#general';
 		}
 
-		include_once 'partials/admin-display.php';
+		include_once 'partials/admin-page.php';
 	}
 
 	public function register_settings() {
