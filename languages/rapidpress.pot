@@ -680,22 +680,22 @@ msgstr ""
 msgid "When enabled, all RapidPress settings and data will be deleted from the database when the plugin is uninstalled!"
 msgstr ""
 
-#: includes/class-core-tweaks.php:174
+#: inc/class-core-tweaks.php:174
 msgid "XML-RPC services are disabled on this site."
 msgstr ""
 
-#: includes/class-core-tweaks.php:230
+#: inc/class-core-tweaks.php:230
 msgid "RSS feeds are disabled."
 msgstr ""
 
-#: includes/class-core-tweaks.php:359
+#: inc/class-core-tweaks.php:359
 msgid "Sorry, you do not have permission to make REST API requests."
 msgstr ""
 
-#: includes/class-core-tweaks.php:393
+#: inc/class-core-tweaks.php:393
 msgid "RapidPress Warning"
 msgstr ""
 
-#: includes/class-core-tweaks.php:394
+#: inc/class-core-tweaks.php:394
 msgid "WP_POST_REVISIONS is already enabled somewhere else on your site. We suggest only enabling this feature in one place."
 msgstr ""

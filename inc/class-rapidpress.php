@@ -17,19 +17,19 @@ class RapidPress {
 	}
 
 	private function load_dependencies() {
-		require_once RAPIDPRESS_PATH . 'includes/class-loader.php';
-		require_once RAPIDPRESS_PATH . 'includes/class-rapidpress-options.php';
-		require_once RAPIDPRESS_PATH . 'includes/class-core-tweaks.php';
-		require_once RAPIDPRESS_PATH . 'includes/class-html-minifier.php';
-		require_once RAPIDPRESS_PATH . 'includes/class-css-minifier.php';
-		require_once RAPIDPRESS_PATH . 'includes/class-css-combiner.php';
-		require_once RAPIDPRESS_PATH . 'includes/class-js-minifier.php';
-		require_once RAPIDPRESS_PATH . 'includes/class-js-defer.php';
-		require_once RAPIDPRESS_PATH . 'includes/class-js-delay.php';
-		require_once RAPIDPRESS_PATH . 'includes/class-optimization-scope.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-loader.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-rapidpress-options.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-core-tweaks.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-html-minifier.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-css-minifier.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-css-combiner.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-js-minifier.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-js-defer.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-js-delay.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-optimization-scope.php';
 		require_once RAPIDPRESS_PATH . 'admin/class-admin.php';
 		require_once RAPIDPRESS_PATH . 'public/class-public.php';
-		require_once RAPIDPRESS_PATH . 'includes/class-asset-manager.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-asset-manager.php';
 
 		$this->loader = new \RapidPress\Loader();
 	}

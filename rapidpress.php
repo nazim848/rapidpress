@@ -32,7 +32,7 @@ if (!defined('WPINC')) {
 	die;
 }
 
-require __DIR__ . '/includes/class-rapidpress-options.php';
+require __DIR__ . '/inc/class-rapidpress-options.php';
 
 use RapidPress\RP_Options;
 
@@ -43,7 +43,7 @@ define('RAPIDPRESS_PLUGIN_FILE', __FILE__);
 define('RAPIDPRESS_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
 // Load the main plugin class
-require plugin_dir_path(__FILE__) . 'includes/class-rapidpress.php';
+require plugin_dir_path(__FILE__) . 'inc/class-rapidpress.php';
 
 // Check if the plugin version is different from the current version
 $rapidpress_version = get_option('rapidpress_version');

@@ -224,7 +224,7 @@ class CSS_Combiner {
 			// WP_Filesystem for local files
 			global $wp_filesystem;
 			if (empty($wp_filesystem)) {
-				require_once ABSPATH . '/wp-admin/includes/file.php';
+				require_once ABSPATH . '/wp-admin/inc/file.php';
 				WP_Filesystem();
 			}
 			return $wp_filesystem->get_contents($file_path);
@@ -300,7 +300,7 @@ class CSS_Combiner {
 		global $wp_filesystem;
 
 		if (!function_exists('WP_Filesystem')) {
-			require_once ABSPATH . 'wp-admin/includes/file.php';
+			require_once ABSPATH . 'wp-admin/inc/file.php';
 		}
 
 		WP_Filesystem();

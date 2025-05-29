@@ -5,7 +5,7 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
 	exit;
 }
 
-require __DIR__ . '/includes/class-rapidpress-options.php';
+require __DIR__ . '/inc/class-rapidpress-options.php';
 
 use RapidPress\RP_Options;
 
@@ -46,7 +46,7 @@ if ($clean_uninstall == '1') {
  * @return bool True on success, false on failure
  */
 function rapidpress_remove_directory($dir) {
-	require_once(ABSPATH . 'wp-admin/includes/file.php');
+	require_once(ABSPATH . 'wp-admin/inc/file.php');
 	WP_Filesystem();
 	global $wp_filesystem;
 

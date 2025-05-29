@@ -26,14 +26,14 @@ class Admin {
 		if ('settings_page_rapidpress' !== $hook) {
 			return;
 		}
-		wp_enqueue_style('rapidpress-admin', plugin_dir_url(__FILE__) . 'css/rapidpress-admin.css', array(), $this->version, 'all');
+		wp_enqueue_style('rapidpress-admin', plugin_dir_url(__FILE__) . 'assets/css/rapidpress-admin.css', array(), $this->version, 'all');
 	}
 
 	public function enqueue_scripts($hook) {
 		if ('settings_page_rapidpress' !== $hook) {
 			return;
 		}
-		wp_enqueue_script('rapidpress-admin', plugin_dir_url(__FILE__) . 'js/rapidpress-admin.js', array('jquery'), $this->version, false);
+		wp_enqueue_script('rapidpress-admin', plugin_dir_url(__FILE__) . 'assets/js/rapidpress-admin.js', array('jquery'), $this->version, false);
 		wp_localize_script('rapidpress-admin', 'rapidpress_admin', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce' => wp_create_nonce('rapidpress_options_verify')
