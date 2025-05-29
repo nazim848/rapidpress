@@ -63,14 +63,6 @@ class Admin {
 			$new_options['css_disable_rules'] = array();
 		}
 
-		// Remove the special handling that was preserving old rules
-		// if (isset($new_options['js_disable_rules']) && $new_options['js_disable_rules'] === 'js_disable_rules') {
-		//     $new_options['js_disable_rules'] = isset($old_options['js_disable_rules']) ? $old_options['js_disable_rules'] : array();
-		// }
-		// if (isset($new_options['css_disable_rules']) && $new_options['css_disable_rules'] === 'css_disable_rules') {
-		//     $new_options['css_disable_rules'] = isset($old_options['css_disable_rules']) ? $old_options['css_disable_rules'] : array();
-		// }
-
 		// Compare new options with old options
 		$changed = false;
 		foreach ($new_options as $key => $value) {

@@ -15,14 +15,14 @@ if (!current_user_can('manage_options')) {
 // Define tabs
 $tabs = array(
 	'general' => esc_html__('General', 'rapidpress'),
+	'cache' => esc_html__('Cache', 'rapidpress'),
 	'file-optimization' => esc_html__('File Optimization', 'rapidpress'),
+	'media' => esc_html__('Media', 'rapidpress'),
 	'asset-manager' => esc_html__('Asset Manager', 'rapidpress'),
-	// 'media' => esc_html__('Media', 'rapidpress'),
-	// 'cache' => esc_html__('Cache', 'rapidpress'),
 	// 'preloading' => esc_html__('Preloading', 'rapidpress'),
 	// 'database' => esc_html__('Database', 'rapidpress'),
 	// 'cdn' => esc_html__('CDN', 'rapidpress'),
-	'settings' => esc_html__('Settings', 'rapidpress')
+	'tools' => esc_html__('Tools', 'rapidpress')
 );
 
 // Get current tab

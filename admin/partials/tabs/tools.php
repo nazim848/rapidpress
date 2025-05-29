@@ -7,7 +7,7 @@ use RapidPress\RP_Options;
 ?>
 
 <div id="<?php echo esc_attr($tab_id); ?>" class="tab-pane">
-	<h2 class="content-title"><span class="dashicons dashicons-admin-tools"></span> <?php esc_html_e('Settings', 'rapidpress'); ?></h2>
+	<h2 class="content-title"><span class="dashicons dashicons-admin-tools"></span> <?php esc_html_e('Tools', 'rapidpress'); ?></h2>
 	<div class="rapidpress-card">
 		<table class="form-table">
 			<tr valign="top">
