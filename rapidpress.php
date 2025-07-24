@@ -32,6 +32,7 @@ if (!defined('WPINC')) {
 	die;
 }
 
+
 require __DIR__ . '/inc/class-rapidpress-options.php';
 
 use RapidPress\RP_Options;
