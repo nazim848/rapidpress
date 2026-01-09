@@ -226,6 +226,13 @@ class Admin {
 			'js_delay_exclusions'                  => 'multiline_urls',
 			'js_disable_rules'                     => 'js_disable_rules',
 			'css_disable_rules'                    => 'css_disable_rules',
+			'lazy_load_images'                     => 'boolean',
+			'lazy_load_skip_first'                 => 'lazy_load_skip_first',
+			'lazy_load_fallback'                   => 'boolean',
+			'lazy_load_threshold'                  => 'lazy_load_threshold',
+			'lazy_load_placeholder'                => 'lazy_load_placeholder',
+			'lazy_load_exclusions'                 => 'multiline_urls',
+			'add_missing_dimensions'               => 'boolean',
 			'clean_uninstall'                      => 'boolean',
 			'clean_deactivate'                      => 'boolean',
 		);
@@ -429,6 +436,39 @@ class Admin {
 			}
 		}
 		return $sanitized_rules;
+	}
+
+	/**
+	 * Sanitize lazy load skip first setting
+	 *
+	 * @param mixed $input The input value
+	 * @return int Sanitized value between 0 and 10
+	 */
+	public function sanitize_lazy_load_skip_first($input) {
+		$value = intval($input);
+		return max(0, min(10, $value));
+	}
+
+	/**
+	 * Sanitize lazy load threshold setting
+	 *
+	 * @param mixed $input The input value
+	 * @return int Sanitized value between 0 and 1000
+	 */
+	public function sanitize_lazy_load_threshold($input) {
+		$value = intval($input);
+		return max(0, min(1000, $value));
+	}
+
+	/**
+	 * Sanitize lazy load placeholder setting
+	 *
+	 * @param mixed $input The input value
+	 * @return string Sanitized placeholder type
+	 */
+	public function sanitize_lazy_load_placeholder($input) {
+		$valid_options = array('transparent', 'blur');
+		return in_array($input, $valid_options) ? $input : 'transparent';
 	}
 
 	public function save_settings_with_tab($value, $old_value, $option) {

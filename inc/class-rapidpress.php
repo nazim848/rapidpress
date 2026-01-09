@@ -27,6 +27,7 @@ class RapidPress {
 		require_once RAPIDPRESS_PATH . 'inc/class-js-defer.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-js-delay.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-optimization-scope.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-image-lazy-loading.php';
 		require_once RAPIDPRESS_PATH . 'admin/class-admin.php';
 		require_once RAPIDPRESS_PATH . 'public/class-public.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-asset-manager.php';
@@ -46,6 +47,7 @@ class RapidPress {
 		new \RapidPress\CSS_Combiner();
 		new \RapidPress\JS_Defer();
 		new \RapidPress\Asset_Manager();
+		new \RapidPress\Image_Lazy_Loading();
 	}
 
 	private function define_admin_hooks() {
