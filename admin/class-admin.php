@@ -233,6 +233,7 @@ class Admin {
 			'lazy_load_placeholder'                => 'lazy_load_placeholder',
 			'lazy_load_exclusions'                 => 'multiline_urls',
 			'add_missing_dimensions'               => 'boolean',
+			'enable_cache'                         => 'boolean',
 			'clean_uninstall'                      => 'boolean',
 			'clean_deactivate'                      => 'boolean',
 		);
@@ -365,6 +366,7 @@ class Admin {
 
 		return intval($value);
 	}
+
 
 	public function sanitize_css_disable_rules($input) {
 		$sanitized_rules = array();

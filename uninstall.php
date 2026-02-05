@@ -33,9 +33,14 @@ if ($clean_uninstall == '1') {
 	// Delete any files or directories created by the plugin
 	$upload_dir = wp_upload_dir();
 	$combined_dir = trailingslashit($upload_dir['basedir']) . 'rapidpress';
+	$cache_dir = trailingslashit($upload_dir['basedir']) . 'rapidpress-cache';
 
 	if (is_dir($combined_dir)) {
 		rapidpress_remove_directory($combined_dir);
+	}
+
+	if (is_dir($cache_dir)) {
+		rapidpress_remove_directory($cache_dir);
 	}
 }
 
