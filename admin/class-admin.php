@@ -204,7 +204,10 @@ class Admin {
 			'remove_shortlink'                    	=> 'boolean',
 			'disable_rest_api'							=> 'text_field',
 			'remove_rest_api_links'                => 'boolean',
+			'disable_heartbeat'                    => 'disable_heartbeat',
+			'heartbeat_frequency'                  => 'heartbeat_frequency',
 			'limit_post_revisions'                 => 'limit_post_revisions',
+			'autosave_interval'                    => 'autosave_interval',
 			'optimization_scope'                   => 'text_field',
 			'optimized_pages'                      => 'multiline_urls',
 			'enable_optimization_scope_exclusions' => 'boolean',
@@ -365,6 +368,30 @@ class Admin {
 		}
 
 		return intval($value);
+	}
+
+	private function sanitize_disable_heartbeat($value) {
+		$valid = array('disable_everywhere', 'allow_posts');
+		return in_array($value, $valid, true) ? $value : '';
+	}
+
+	private function sanitize_heartbeat_frequency($value) {
+		$valid = array('30', '45', '60');
+		return in_array((string) $value, $valid, true) ? (string) $value : '';
+	}
+
+	private function sanitize_autosave_interval($value) {
+		if ($value === '' || $value === null) {
+			return '';
+		}
+
+		$value = intval($value);
+		if ($value === 172800) {
+			return $value;
+		}
+
+		$valid = array(2, 3, 4, 5, 10, 15, 20);
+		return in_array($value, $valid, true) ? $value : '';
 	}
 
 

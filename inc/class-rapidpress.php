@@ -30,6 +30,8 @@ class RapidPress {
 		require_once RAPIDPRESS_PATH . 'inc/class-image-lazy-loading.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-image-dimensions.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-page-cache.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-heartbeat-control.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-autosave-control.php';
 		require_once RAPIDPRESS_PATH . 'admin/class-admin.php';
 		require_once RAPIDPRESS_PATH . 'public/class-public.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-asset-manager.php';
@@ -52,6 +54,8 @@ class RapidPress {
 		new \RapidPress\Image_Lazy_Loading();
 		new \RapidPress\Image_Dimensions();
 		new \RapidPress\Page_Cache();
+		new \RapidPress\Heartbeat_Control();
+		new \RapidPress\Autosave_Control();
 	}
 
 	private function define_admin_hooks() {
