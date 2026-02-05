@@ -2,7 +2,7 @@
 /*
 Plugin Name: RapidPress - Turbocharge Website Performance
 Description: Boost your WordPress site speed by 2x-5x with advanced optimization techniques including minification, asset management, and performance tweaks.
-Version: 1.0.1
+Version: 1.1.0
 Author: Nazim Husain
 Author URI: https://nazimansari.com
 License: GPLv2 or later
@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: rapidpress
 Domain Path: /languages
 Requires at least: 5.0
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.2
 
 RapidPress is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@ require __DIR__ . '/inc/class-rapidpress-options.php';
 
 use RapidPress\RP_Options;
 
-define('RAPIDPRESS_VERSION', '1.0');
+define('RAPIDPRESS_VERSION', '1.1.0');
 define('RAPIDPRESS_PATH', plugin_dir_path(__FILE__));
 define('RAPIDPRESS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('RAPIDPRESS_PLUGIN_FILE', __FILE__);
