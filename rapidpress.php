@@ -53,12 +53,12 @@ if ($rapidpress_version != RAPIDPRESS_VERSION) {
 	update_option('rapidpress_version', RAPIDPRESS_VERSION, false);
 }
 
-// Run the plugin
-function start_rapidpress() {
+// Run the plugin.
+function rapidpress_start_plugin() {
 	$plugin = new RapidPress\RapidPress();
 	$plugin->run();
 }
-start_rapidpress();
+rapidpress_start_plugin();
 
 // Activation hook
 register_activation_hook(__FILE__, 'rapidpress_activate');

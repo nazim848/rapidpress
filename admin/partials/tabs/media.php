@@ -6,7 +6,7 @@ use RapidPress\RP_Options;
 
 ?>
 
-<div id="<?php echo esc_attr($tab_id); ?>" class="tab-pane">
+<div id="<?php echo esc_attr($rapidpress_tab_id); ?>" class="tab-pane">
 	<h2 class="content-title"><span class="dashicons dashicons-images-alt2"></span> <?php esc_html_e('Media', 'rapidpress'); ?></h2>
 
 	<!-- Lazy Loading Section -->

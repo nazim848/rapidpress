@@ -7,7 +7,7 @@ use RapidPress\Cache_Stats;
 
 ?>
 
-<div id="<?php echo esc_attr($tab_id); ?>" class="tab-pane">
+<div id="<?php echo esc_attr($rapidpress_tab_id); ?>" class="tab-pane">
 	<h2 class="content-title"><span class="dashicons dashicons-page"></span> <?php esc_html_e('Cache', 'rapidpress'); ?></h2>
 		<div class="rapidpress-card">
 			<table class="form-table">
@@ -99,20 +99,24 @@ use RapidPress\Cache_Stats;
 				</button>
 			</p>
 			<?php
-			$last_run = get_option(\RapidPress\Cache_Preloader::LAST_RUN_OPTION, RP_Options::get_option('cache_preload_last_run', 0));
-			$last_count = get_option(\RapidPress\Cache_Preloader::LAST_COUNT_OPTION, RP_Options::get_option('cache_preload_last_count', 0));
-			$cache_stats = (new Cache_Stats())->get_summary();
-			if (!empty($last_run)) :
-				$preload_status_text = sprintf(__('Last preload: %s (%d URLs)', 'rapidpress'), wp_date('Y-m-d H:i:s', intval($last_run)), intval($last_count));
-			else :
-				$preload_status_text = __('Last preload: Not run yet', 'rapidpress');
-			endif;
+			$rapidpress_last_run = get_option(\RapidPress\Cache_Preloader::LAST_RUN_OPTION, RP_Options::get_option('cache_preload_last_run', 0));
+				$rapidpress_last_count = get_option(\RapidPress\Cache_Preloader::LAST_COUNT_OPTION, RP_Options::get_option('cache_preload_last_count', 0));
+				$rapidpress_cache_stats = (new Cache_Stats())->get_summary();
+				if (!empty($rapidpress_last_run)) :
+					/* translators: 1: last preload date/time, 2: number of preloaded URLs. */
+					$rapidpress_preload_status_text = sprintf(__('Last preload: %1$s (%2$d URLs)', 'rapidpress'), wp_date('Y-m-d H:i:s', intval($rapidpress_last_run)), intval($rapidpress_last_count));
+				else :
+					$rapidpress_preload_status_text = __('Last preload: Not run yet', 'rapidpress');
+				endif;
 			?>
 				<p id="rapidpress-preload-status">
-					<?php echo esc_html($preload_status_text); ?>
+					<?php echo esc_html($rapidpress_preload_status_text); ?>
 				</p>
-			<p>
-				<?php echo esc_html(sprintf(__('Cache files: %d | Size: %s', 'rapidpress'), intval($cache_stats['file_count']), $cache_stats['total_size_human'])); ?>
-			</p>
+				<p>
+					<?php
+					/* translators: 1: number of cached files, 2: total cache size in human-readable format. */
+					echo esc_html(sprintf(__('Cache files: %1$d | Size: %2$s', 'rapidpress'), intval($rapidpress_cache_stats['file_count']), $rapidpress_cache_stats['total_size_human']));
+					?>
+				</p>
 		</div>
 	</div>

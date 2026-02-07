@@ -2,6 +2,10 @@
 
 namespace RapidPress;
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 class Cache_Preloader {
 	const CRON_HOOK = 'rapidpress_cache_preload_event';
 	const LAST_RUN_OPTION = 'rapidpress_cache_preload_last_run';
@@ -68,7 +72,6 @@ class Cache_Preloader {
 			'orderby' => 'modified',
 			'order' => 'DESC',
 			'fields' => 'ids',
-			'suppress_filters' => true,
 		));
 
 		if (is_array($posts)) {

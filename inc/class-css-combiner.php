@@ -2,6 +2,10 @@
 
 namespace RapidPress;
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 class CSS_Combiner {
 
 	private $combined_css = '';
@@ -600,11 +604,11 @@ class CSS_Combiner {
 		$locations = $this->get_combined_locations();
 		foreach ($locations as $location) {
 			$dir = $location['dir'];
-			if (is_dir($dir) && is_writable($dir)) {
+			if (is_dir($dir) && wp_is_writable($dir)) {
 				return $location;
 			}
 
-			if ($create && wp_mkdir_p($dir) && is_dir($dir) && is_writable($dir)) {
+			if ($create && wp_mkdir_p($dir) && is_dir($dir) && wp_is_writable($dir)) {
 				return $location;
 			}
 		}

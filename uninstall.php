@@ -13,20 +13,20 @@ use RapidPress\RP_Options;
 use RapidPress\Cache_Dropin_Manager;
 use RapidPress\Cache_Preloader;
 
-// Check if clean uninstall is enabled
-$clean_uninstall = RP_Options::get_option('clean_uninstall');
+// Check if clean uninstall is enabled.
+$rapidpress_clean_uninstall = RP_Options::get_option('clean_uninstall');
 
-if ($clean_uninstall == '1') {
+if ($rapidpress_clean_uninstall == '1') {
 	// Delete all plugin options
-	$options_to_delete = [
+	$rapidpress_options_to_delete = [
 		'rapidpress_options',
 		'rapidpress_version',
 		'rapidpress_cache_preload_last_run',
 		'rapidpress_cache_preload_last_count',
 	];
 
-	foreach ($options_to_delete as $option) {
-		delete_option($option);
+	foreach ($rapidpress_options_to_delete as $rapidpress_option) {
+		delete_option($rapidpress_option);
 	}
 
 	// Delete any custom tables if plugin creates any
@@ -37,16 +37,16 @@ if ($clean_uninstall == '1') {
 	delete_transient('rapidpress_activation_notice');
 
 	// Delete any files or directories created by the plugin
-	$upload_dir = wp_upload_dir();
-	$combined_dir = trailingslashit($upload_dir['basedir']) . 'rapidpress';
-	$cache_dir = trailingslashit($upload_dir['basedir']) . 'rapidpress-cache';
+	$rapidpress_upload_dir = wp_upload_dir();
+	$rapidpress_combined_dir = trailingslashit($rapidpress_upload_dir['basedir']) . 'rapidpress';
+	$rapidpress_cache_dir = trailingslashit($rapidpress_upload_dir['basedir']) . 'rapidpress-cache';
 
-	if (is_dir($combined_dir)) {
-		rapidpress_remove_directory($combined_dir);
+	if (is_dir($rapidpress_combined_dir)) {
+		rapidpress_remove_directory($rapidpress_combined_dir);
 	}
 
-	if (is_dir($cache_dir)) {
-		rapidpress_remove_directory($cache_dir);
+	if (is_dir($rapidpress_cache_dir)) {
+		rapidpress_remove_directory($rapidpress_cache_dir);
 	}
 }
 

@@ -2,6 +2,10 @@
 
 namespace RapidPress;
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 /**
  * JS_Delay class for handling JavaScript loading delay
  * 
@@ -34,11 +38,6 @@ class JS_Delay {
 			return;
 		}
 
-		// Debug logging for registered scripts
-		if (defined('WP_DEBUG') && WP_DEBUG && isset($_GET['rapidpress_debug'])) {
-			error_log("RapidPress JS Delay: WP Scripts object at capture time: " . print_r(array_keys($wp_scripts->registered), true));
-		}
-
 		// Capture all registered scripts, not just queued ones
 		foreach ($wp_scripts->registered as $handle => $script) {
 			if (isset($script->src) && !empty($script->src)) {
@@ -60,17 +59,8 @@ class JS_Delay {
 					$this->script_handles[$base_src] = $handle;
 				}
 
-				// Debug logging only when needed
-				if (defined('WP_DEBUG') && WP_DEBUG && isset($_GET['rapidpress_debug'])) {
-					error_log("RapidPress JS Delay: Registered script handle '{$handle}' with src '{$src}'");
 				}
 			}
-		}
-
-		// Dump all registered handles only when detailed debugging is enabled
-		if (defined('WP_DEBUG') && WP_DEBUG && isset($_GET['rapidpress_debug'])) {
-			error_log("RapidPress JS Delay: All registered handles: " . print_r($this->script_handles, true));
-		}
 	}
 
 	/**
@@ -84,25 +74,12 @@ class JS_Delay {
 			return;
 		}
 
-		// Debug logging for script queue
-		if (defined('WP_DEBUG') && WP_DEBUG && isset($_GET['rapidpress_debug'])) {
-			global $wp_scripts;
-			error_log("RapidPress JS Delay: Script queue before processing: " . print_r($wp_scripts->queue, true));
-		}
-
-		$delay_type = RP_Options::get_option('js_delay_type', 'all');
+			$delay_type = RP_Options::get_option('js_delay_type', 'all');
 		$specific_files = $delay_type === 'specific' ? $this->get_specific_files() : array();
 		$exclusions = ($delay_type === 'all' && RP_Options::get_option('enable_js_delay_exclusions')) ? $this->get_exclusions() : array();
 		$delay_duration = RP_Options::get_option('js_delay_duration', '1');
 
-		// Debug the exclusions and specific files only when detailed debugging is enabled
-		if (defined('WP_DEBUG') && WP_DEBUG && isset($_GET['rapidpress_debug'])) {
-			error_log("RapidPress JS Delay: Delay type: {$delay_type}");
-			error_log("RapidPress JS Delay: Exclusions: " . print_r($exclusions, true));
-			error_log("RapidPress JS Delay: Specific files: " . print_r($specific_files, true));
-		}
-
-		global $wp_scripts;
+			global $wp_scripts;
 
 		if (!is_object($wp_scripts)) {
 			return;
@@ -286,29 +263,7 @@ class JS_Delay {
 		// For jQuery, we need to make sure it loads in the head, not the footer
 		wp_register_script($handle, '', array(), RAPIDPRESS_VERSION, !$is_jquery);
 
-		// Add the delay logic as inline script
-		if ($delay_duration === 'interaction') {
-			$inline_script = "document.addEventListener('DOMContentLoaded', function() {\n" .
-				"    var loadScript = function() {\n" .
-				"        var script = document.createElement('script');\n" .
-				"        script.src = '$src';\n" .
-				"        " . ($is_jquery ? "document.head" : "document.body") . ".appendChild(script);\n" .
-				"        ['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {\n" .
-				"            document.removeEventListener(event, loadScript, {passive: true});\n" .
-				"        });\n" .
-				"    };\n" .
-				"    ['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {\n" .
-				"        document.addEventListener(event, loadScript, {passive: true});\n" .
-				"    });\n" .
-				"});";
-		} else {
-			$delay = intval($delay_duration) * 1000;
-			$inline_script = "setTimeout(function() {\n" .
-				"    var script = document.createElement('script');\n" .
-				"    script.src = '$src';\n" .
-				"    " . ($is_jquery ? "document.head" : "document.body") . ".appendChild(script);\n" .
-				"}, $delay);";
-		}
+		$inline_script = $this->build_delayed_loader_script($src, $delay_duration, $is_jquery);
 
 		// Add the inline script
 		wp_add_inline_script($handle, $inline_script);
@@ -360,53 +315,64 @@ class JS_Delay {
 			$should_delay = true;
 		}
 		
-		// If this script should be delayed, replace the tag with our delayed version
+		// If this script should be delayed, replace the tag with our delayed version.
 		if ($should_delay) {
-			// Debug logging
-			if (defined('WP_DEBUG') && WP_DEBUG && isset($_GET['rapidpress_debug'])) {
-				error_log("RapidPress JS Delay: Delaying script via filter_script_loader_tag: {$handle} - {$src}");
-			}
-			
-			// Extract script ID if it exists
 			$id_attr = '';
 			if (preg_match('/id=[\'\"](.*?)[\'\"]/', $tag, $matches)) {
 				$id_attr = $matches[1];
-			} else {
+			}
+			if ('' === $id_attr) {
 				$id_attr = 'rapidpress-script-' . md5($src);
 			}
-			
-			// Create the delayed script
-			if ($delay_duration === 'interaction') {
-				$delayed_tag = "<script id='{$id_attr}' type='text/javascript'>" .
-					"document.addEventListener('DOMContentLoaded', function() {" .
-					"    var loadScript = function() {" .
-					"        var script = document.createElement('script');" .
-					"        script.src = '{$src}';" .
-					"        " . ($is_jquery ? "document.head" : "document.body") . ".appendChild(script);" .
-					"        ['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {" .
-					"            document.removeEventListener(event, loadScript, {passive: true});" .
-					"        });" .
-					"    };" .
-					"    ['keydown', 'mouseover', 'touchmove', 'touchstart', 'wheel'].forEach(function(event) {" .
-					"        document.addEventListener(event, loadScript, {passive: true});" .
-					"    });" .
-					"});" .
-					"</script>";
-			} else {
-				$delay = intval($delay_duration) * 1000;
-				$delayed_tag = "<script id='{$id_attr}' type='text/javascript'>" .
-					"setTimeout(function() {" .
-					"    var script = document.createElement('script');" .
-					"    script.src = '{$src}';" .
-					"    " . ($is_jquery ? "document.head" : "document.body") . ".appendChild(script);" .
-					"}, {$delay});" .
-					"</script>";
+
+			$id_attr = sanitize_html_class($id_attr);
+			if ('' === $id_attr) {
+				$id_attr = 'rapidpress-script-' . md5($src);
 			}
-			
-			return $delayed_tag;
+
+			$delayed_script = $this->build_delayed_loader_script($src, $delay_duration, $is_jquery);
+
+			return '<script id="' . esc_attr($id_attr) . '" type="text/javascript">' . $delayed_script . '</script>';
 		}
 		
 		return $tag;
+	}
+
+	/**
+	 * Build a safe loader script for deferred JS execution.
+	 *
+	 * @param string $src Script URL.
+	 * @param string $delay_duration Delay setting.
+	 * @param bool   $is_jquery Whether this is a jQuery core/migrate script.
+	 * @return string
+	 */
+	private function build_delayed_loader_script($src, $delay_duration, $is_jquery) {
+		$target = $is_jquery ? 'document.head' : 'document.body';
+		$encoded_src = wp_json_encode($src);
+
+		if ('interaction' === $delay_duration) {
+			return "document.addEventListener('DOMContentLoaded', function() {" .
+				'var loadScript = function() {' .
+				'var script = document.createElement("script");' .
+				"script.src = {$encoded_src};" .
+				$target . '.appendChild(script);' .
+				'["keydown","mouseover","touchmove","touchstart","wheel"].forEach(function(event) {' .
+				'document.removeEventListener(event, loadScript, {passive: true});' .
+				'});' .
+				'};' .
+				'["keydown","mouseover","touchmove","touchstart","wheel"].forEach(function(event) {' .
+				'document.addEventListener(event, loadScript, {passive: true});' .
+				'});' .
+				'});';
+		}
+
+		$delay = intval($delay_duration) * 1000;
+
+		return 'setTimeout(function() {' .
+			'var script = document.createElement("script");' .
+			"script.src = {$encoded_src};" .
+			$target . '.appendChild(script);' .
+			'}, ' . $delay . ');';
 	}
 
 	/**
@@ -469,12 +435,7 @@ class JS_Delay {
 			}
 		}
 		
-		// Debug logging for jQuery exclusions
-		if (($is_jquery_handle || $is_jquery_url) && defined('WP_DEBUG') && WP_DEBUG && isset($_GET['rapidpress_debug'])) {
-			error_log("RapidPress JS Delay: jQuery script not excluded: {$handle} - {$src}");
-		}
-		
-		return false;
+			return false;
 	}
 
 	/**
