@@ -54,7 +54,7 @@ class CSS_Combiner {
 			return;
 		}
 
-		$styles_to_combine = array();
+			$styles_to_combine = array();
 		$styles_hash = '';
 
 		foreach ($wp_styles->queue as $handle) {
@@ -78,7 +78,10 @@ class CSS_Combiner {
 				continue;
 			}
 
-			$styles_to_combine[] = $style;
+				$styles_to_combine[] = array(
+					'style' => $style,
+					'src' => $src,
+				);
 			$file_path = $this->url_to_path($src);
 			$last_modified = $this->get_file_last_modified($file_path);
 
@@ -94,8 +97,8 @@ class CSS_Combiner {
 				$combined_file_ready = $this->is_cached_file_valid($styles_hash);
 
 				if (!$combined_file_ready) {
-					foreach ($styles_to_combine as $style) {
-						$this->add_style_to_combined($style);
+					foreach ($styles_to_combine as $style_item) {
+						$this->add_style_to_combined($style_item['style'], $style_item['src']);
 					}
 
 					$this->combined_css = $this->minify_css($this->combined_css);
@@ -220,8 +223,9 @@ class CSS_Combiner {
 		return $src;
 	}
 
-	private function add_style_to_combined($style) {
-		$content = $this->get_file_content($style->src);
+	private function add_style_to_combined($style, $normalized_src = '') {
+		$src = $normalized_src !== '' ? $normalized_src : $this->get_full_url($style->src);
+		$content = $this->get_file_content($src);
 		if ($content !== false) {
 			$this->combined_css .= "/* {$style->handle} */\n";
 			$this->combined_css .= $content . "\n";
@@ -241,8 +245,9 @@ class CSS_Combiner {
 	// }
 
 	private function get_file_content($src) {
-		$src = preg_replace('/\?.*/', '', (string) $src);
-		$file_path = $this->url_to_path($src);
+		$normalized_src = $this->get_full_url((string) $src);
+		$normalized_src = preg_replace('/\?.*/', '', $normalized_src);
+		$file_path = $this->url_to_path($normalized_src);
 		if (file_exists($file_path)) {
 			$contents = @file_get_contents($file_path); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 			if ($contents !== false) {
@@ -260,8 +265,8 @@ class CSS_Combiner {
 			}
 		}
 
-		if (strpos($src, '://') !== false) {
-			$response = wp_remote_get($src);
+		if (strpos($normalized_src, '://') !== false) {
+			$response = wp_remote_get($normalized_src);
 			if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
 				return wp_remote_retrieve_body($response);
 			}
