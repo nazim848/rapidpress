@@ -30,6 +30,49 @@ It is written so implementation can continue later without losing context.
 - M6: Tooling + integrations
 - M7: CSS cache lifecycle alignment
 
+## Execution Status
+
+- [x] Phase 1 - Foundation Refactor
+  - [x] Cache config class
+  - [x] Cache key class
+  - [x] Cache store class
+  - [x] Loader wiring
+  - [x] Page cache refactor
+- [x] Phase 2 - Early Serving
+  - [x] Drop-in manager
+  - [x] Early-serving generated logic
+  - [x] Activation/deactivation/uninstall lifecycle hooks
+  - [x] Admin setting for early serving
+  - [ ] Server rewrite docs update in README
+- [x] Phase 3 - Smart Invalidation
+  - [x] Invalidation planner service
+  - [x] Targeted purge hooks
+  - [ ] Debounce purge queue
+  - [x] Manual full purge action
+- [x] Phase 4 - Preload/Warmup
+  - [x] Preloader service
+  - [x] Scheduler integration
+  - [x] Manual preload action
+  - [x] Settings and status visibility
+- [x] Phase 5 - Variants and Bypass Policy
+  - [x] Query policy controls (bypass/ignore)
+  - [x] Mobile variant cache keys
+  - [x] URL/User-Agent bypass rules
+  - [ ] Query allowlist mode
+  - [ ] Cookie segment allowlist
+- [~] Phase 6 - Tooling, Metrics, Integrations (partial)
+  - [x] WP-CLI cache commands
+  - [x] Cache stats service and admin display
+  - [x] Debug bypass headers (`X-RapidPress-Cache-Reason`)
+  - [ ] Edge purge integration hooks (Cloudflare/Varnish adapter)
+  - [ ] Hit/miss rolling counters persistence
+- [x] Phase 7 - CSS Cache Lifecycle
+  - [x] Expiration-aware validation
+  - [x] Metadata/file existence alignment
+  - [x] Manual CSS cache clear
+  - [x] Reliability fixes for local read/write
+  - [x] Retention policy adjusted to avoid preload-induced 404s
+
 ---
 
 ## Phase 1 - Foundation Refactor (Safe)
@@ -443,6 +486,6 @@ Make CSS combined cache lifecycle consistent and explicit.
 
 ## Immediate Next Actions
 
-1. Start Phase 1 Task 1 and Task 2 (`class-cache-config.php`, `class-cache-key.php`).
-2. Refactor `class-page-cache.php` with no behavior changes.
-3. Add/execute baseline cache behavior tests before Phase 2.
+1. [Done] Start Phase 1 Task 1 and Task 2 (`class-cache-config.php`, `class-cache-key.php`).
+2. [Done] Refactor `class-page-cache.php` with no behavior changes.
+3. [Done] Execute baseline cache behavior checks before/alongside later phases.
