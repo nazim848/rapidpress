@@ -13,7 +13,7 @@ class CSS_Combiner {
 	private $combined_handles = array();
 	private $file_prefix = 'combined-';
 	private $file_extension = '.css';
-	private $max_files_to_keep = 3;
+	private $max_files_to_keep = 100;
 	private $combined_base_url = '';
 
 	public function __construct() {
@@ -148,15 +148,36 @@ class CSS_Combiner {
 			}
 
 			$files = glob($combined_dir . '/' . $this->file_prefix . '*' . $this->file_extension);
-			if (!is_array($files) || count($files) <= $this->max_files_to_keep) {
+			if (!is_array($files) || empty($files)) {
 				continue;
 			}
 
-			usort($files, function ($a, $b) {
+			$now = time();
+			$expiry_cutoff = $now - intval($this->cache_expiration);
+			$existing = array();
+
+			// First pass: remove expired combined files.
+			foreach ($files as $file) {
+				$mtime = @filemtime($file);
+				if ($mtime !== false && $mtime < $expiry_cutoff) {
+					if (is_file($file)) {
+						wp_delete_file($file);
+					}
+					continue;
+				}
+				$existing[] = $file;
+			}
+
+			// Second pass: high-water cap to avoid unlimited accumulation.
+			if (count($existing) <= $this->max_files_to_keep) {
+				continue;
+			}
+
+			usort($existing, function ($a, $b) {
 				return filemtime($b) - filemtime($a);
 			});
 
-			$files_to_delete = array_slice($files, $this->max_files_to_keep);
+			$files_to_delete = array_slice($existing, $this->max_files_to_keep);
 			foreach ($files_to_delete as $file) {
 				if (is_file($file)) {
 					wp_delete_file($file);
