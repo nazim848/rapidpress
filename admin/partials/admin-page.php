@@ -37,14 +37,16 @@ if (!array_key_exists($rapidpress_active_tab, $tabs)) {
 
 <div class="wrap">
 	<!-- Logo -->
-	<div class="rapidpress-logo"></div>
+	<div class="rapidpress-logo">
+		<span class="rapidpress-version">v<?php echo esc_html(RAPIDPRESS_VERSION); ?></span>
+	</div>
 	<div class="rapidpress-admin-content">
 		<h2 class="nav-tab-wrapper">
 			<?php
-				foreach ($tabs as $rapidpress_tab_id => $rapidpress_tab_name) {
-					$rapidpress_tab_class = ($rapidpress_tab_id === $rapidpress_active_tab) ? ' nav-tab-active' : '';
-					echo '<a href="#' . esc_attr($rapidpress_tab_id) . '" class="nav-tab' . esc_attr($rapidpress_tab_class) . '">' . esc_html($rapidpress_tab_name) . '</a>';
-				}
+			foreach ($tabs as $rapidpress_tab_id => $rapidpress_tab_name) {
+				$rapidpress_tab_class = ($rapidpress_tab_id === $rapidpress_active_tab) ? ' nav-tab-active' : '';
+				echo '<a href="#' . esc_attr($rapidpress_tab_id) . '" class="nav-tab' . esc_attr($rapidpress_tab_class) . '">' . esc_html($rapidpress_tab_name) . '</a>';
+			}
 			?>
 		</h2>
 
@@ -52,18 +54,18 @@ if (!array_key_exists($rapidpress_active_tab, $tabs)) {
 			<?php settings_fields('rapidpress_options'); ?>
 			<?php do_settings_sections('rapidpress_options'); ?>
 			<?php wp_nonce_field('rapidpress_options_verify', 'rapidpress_nonce'); ?>
-				<input type="hidden" id="rapidpress_active_tab" name="rapidpress_active_tab" value="<?php echo esc_attr($rapidpress_active_tab); ?>">
+			<input type="hidden" id="rapidpress_active_tab" name="rapidpress_active_tab" value="<?php echo esc_attr($rapidpress_active_tab); ?>">
 
 			<div class="tab-content">
 				<?php
-					foreach ($tabs as $rapidpress_tab_id => $rapidpress_tab_name) {
-						$rapidpress_tab_style = ($rapidpress_tab_id === $rapidpress_active_tab) ? '' : 'style="display:none;"';
-						$rapidpress_tab_file = plugin_dir_path(__FILE__) . 'tabs/' . $rapidpress_tab_id . '.php';
-						if (file_exists($rapidpress_tab_file)) {
-							include $rapidpress_tab_file;
-						} else {
-							echo '<p>' . esc_html__('Tab content not found.', 'rapidpress') . '</p>';
-						}
+				foreach ($tabs as $rapidpress_tab_id => $rapidpress_tab_name) {
+					$rapidpress_tab_style = ($rapidpress_tab_id === $rapidpress_active_tab) ? '' : 'style="display:none;"';
+					$rapidpress_tab_file = plugin_dir_path(__FILE__) . 'tabs/' . $rapidpress_tab_id . '.php';
+					if (file_exists($rapidpress_tab_file)) {
+						include $rapidpress_tab_file;
+					} else {
+						echo '<p>' . esc_html__('Tab content not found.', 'rapidpress') . '</p>';
+					}
 				}
 				?>
 			</div>
