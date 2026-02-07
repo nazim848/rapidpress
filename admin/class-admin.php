@@ -243,6 +243,10 @@ class Admin {
 				'early_cache_serving'                 => 'boolean',
 				'cache_preload_enabled'               => 'boolean',
 				'cache_preload_batch_size'            => 'preload_batch_size',
+				'cache_query_policy'                  => 'cache_query_policy',
+				'cache_mobile_variant'                => 'boolean',
+				'cache_never_cache_urls'              => 'multiline_urls',
+				'cache_never_cache_user_agents'       => 'multiline_text',
 				'clean_uninstall'                      => 'boolean',
 				'clean_deactivate'                      => 'boolean',
 			);
@@ -258,9 +262,13 @@ class Admin {
 						$sanitized_options[$option] = $this->sanitize_multiline_urls($options[$option]);
 						break;
 
-					case 'text_field':
-						$sanitized_options[$option] = sanitize_text_field($options[$option]);
-						break;
+						case 'text_field':
+							$sanitized_options[$option] = sanitize_text_field($options[$option]);
+							break;
+
+						case 'multiline_text':
+							$sanitized_options[$option] = $this->sanitize_multiline_text($options[$option]);
+							break;
 
 					default:
 						$method = "sanitize_{$rule}";
@@ -405,6 +413,35 @@ class Admin {
 	private function sanitize_preload_batch_size($value) {
 		$value = intval($value);
 		return max(1, min(100, $value));
+	}
+
+	private function sanitize_cache_query_policy($value) {
+		$value = sanitize_text_field($value);
+		$valid = array('bypass', 'ignore');
+		return in_array($value, $valid, true) ? $value : 'bypass';
+	}
+
+	private function sanitize_multiline_text($input) {
+		if (empty($input)) {
+			return '';
+		}
+
+		if (is_array($input)) {
+			$input = implode("\n", $input);
+		}
+
+		$lines = preg_split('/\r\n|\r|\n/', (string) $input);
+		if (!is_array($lines)) {
+			return '';
+		}
+
+		$sanitized = array_map('sanitize_text_field', $lines);
+		$sanitized = array_map('trim', $sanitized);
+		$sanitized = array_filter($sanitized, function ($line) {
+			return $line !== '';
+		});
+
+		return implode("\n", array_values($sanitized));
 	}
 
 	private function sanitize_disable_heartbeat($value) {

@@ -112,7 +112,11 @@ class Page_Cache {
 			return false;
 		}
 
-		if (is_admin() || is_user_logged_in() || is_feed() || is_preview() || is_404()) {
+		if (is_admin() || is_feed() || is_preview() || is_404()) {
+			return false;
+		}
+
+		if (is_user_logged_in() && !$this->cache_config->cache_logged_in_users()) {
 			return false;
 		}
 
@@ -125,7 +129,16 @@ class Page_Cache {
 			return false;
 		}
 
-		if (strpos($this->cache_key->get_request_uri(), '?') !== false || !empty($_GET)) {
+		$has_query = (strpos($this->cache_key->get_request_uri(), '?') !== false || !empty($_GET));
+		if ($has_query && $this->cache_config->get_query_policy() !== 'ignore') {
+			return false;
+		}
+
+		if ($this->matches_never_cache_url()) {
+			return false;
+		}
+
+		if ($this->matches_never_cache_user_agent()) {
 			return false;
 		}
 
@@ -138,7 +151,16 @@ class Page_Cache {
 	}
 
 	private function get_cache_key() {
-		return $this->cache_key->from_request();
+		$key = $this->cache_key->from_request();
+		if ($key === '') {
+			return '';
+		}
+
+		if ($this->cache_config->use_mobile_variant()) {
+			$key .= wp_is_mobile() ? '|mobile' : '|desktop';
+		}
+
+		return $key;
 	}
 
 	private function purge_related_urls($urls) {
@@ -148,10 +170,55 @@ class Page_Cache {
 		}
 
 		foreach ($urls as $url) {
-			$key = $this->cache_key->from_url($url);
-			if ($key !== '') {
-				$this->cache_store->delete_by_key($key);
+			$base_key = $this->cache_key->from_url($url);
+			$this->delete_url_cache_by_key($base_key);
+		}
+	}
+
+	private function delete_url_cache_by_key($base_key) {
+		if (!is_string($base_key) || $base_key === '') {
+			return;
+		}
+
+		if ($this->cache_config->use_mobile_variant()) {
+			$this->cache_store->delete_by_key($base_key . '|mobile');
+			$this->cache_store->delete_by_key($base_key . '|desktop');
+			return;
+		}
+
+		$this->cache_store->delete_by_key($base_key);
+	}
+
+	private function matches_never_cache_url() {
+		$patterns = $this->cache_config->get_never_cache_urls();
+		if (empty($patterns)) {
+			return false;
+		}
+
+		$request_uri = $this->cache_key->get_request_uri();
+		$request_url = home_url($request_uri);
+		foreach ($patterns as $pattern) {
+			if (strpos($request_uri, $pattern) !== false || strpos($request_url, $pattern) !== false) {
+				return true;
 			}
 		}
+
+		return false;
+	}
+
+	private function matches_never_cache_user_agent() {
+		$patterns = $this->cache_config->get_never_cache_user_agents();
+		if (empty($patterns) || !isset($_SERVER['HTTP_USER_AGENT'])) {
+			return false;
+		}
+
+		$user_agent = sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT']));
+		foreach ($patterns as $pattern) {
+			if (stripos($user_agent, $pattern) !== false) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

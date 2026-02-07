@@ -49,6 +49,38 @@ use RapidPress\RP_Options;
 						<input type="number" min="1" max="100" name="rapidpress_options[cache_preload_batch_size]" value="<?php echo esc_attr(RP_Options::get_option('cache_preload_batch_size', 20)); ?>" />
 					</td>
 				</tr>
+				<tr valign="top">
+					<th scope="row"><?php esc_html_e('Query String Policy', 'rapidpress'); ?></th>
+					<td>
+						<select name="rapidpress_options[cache_query_policy]">
+							<option value="bypass" <?php selected(RP_Options::get_option('cache_query_policy', 'bypass'), 'bypass'); ?>><?php esc_html_e('Bypass Cache (default)', 'rapidpress'); ?></option>
+							<option value="ignore" <?php selected(RP_Options::get_option('cache_query_policy', 'bypass'), 'ignore'); ?>><?php esc_html_e('Ignore Query Strings', 'rapidpress'); ?></option>
+						</select>
+					</td>
+				</tr>
+				<tr valign="top">
+					<th scope="row"><?php esc_html_e('Mobile Cache Variant', 'rapidpress'); ?></th>
+					<td>
+						<div class="checkbox-radio">
+							<label>
+								<input type="checkbox" name="rapidpress_options[cache_mobile_variant]" value="1" <?php checked(RP_Options::get_option('cache_mobile_variant'), '1'); ?> />
+							</label>
+							<span class="dashicons dashicons-editor-help" data-title="<?php esc_attr_e('Create separate cache keys for mobile and desktop visitors.', 'rapidpress'); ?>"></span>
+						</div>
+					</td>
+				</tr>
+				<tr valign="top">
+					<th scope="row"><?php esc_html_e('Never Cache URLs', 'rapidpress'); ?></th>
+					<td>
+						<textarea cols="63" rows="4" name="rapidpress_options[cache_never_cache_urls]" placeholder="/checkout&#10;/cart&#10;https://example.com/custom-path"><?php echo esc_textarea(RP_Options::get_option('cache_never_cache_urls', '')); ?></textarea>
+					</td>
+				</tr>
+				<tr valign="top">
+					<th scope="row"><?php esc_html_e('Never Cache User Agents', 'rapidpress'); ?></th>
+					<td>
+						<textarea cols="63" rows="4" name="rapidpress_options[cache_never_cache_user_agents]" placeholder="Lighthouse&#10;GTmetrix"><?php echo esc_textarea(RP_Options::get_option('cache_never_cache_user_agents', '')); ?></textarea>
+					</td>
+				</tr>
 			</table>
 			<p>
 				<button type="button" id="rapidpress-purge-page-cache" class="button button-secondary">
