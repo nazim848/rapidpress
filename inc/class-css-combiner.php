@@ -98,6 +98,11 @@ class CSS_Combiner {
 					}
 
 					$this->combined_css = $this->minify_css($this->combined_css);
+					if ($this->combined_css === '') {
+						$this->debug_log[] = "Combined CSS content is empty. Keeping original styles.";
+						$this->combined_handles = array();
+						return;
+					}
 					$combined_file_ready = $this->save_combined_css($styles_hash);
 					if (!$combined_file_ready) {
 						$this->debug_log[] = "Combined CSS write failed. Keeping original styles.";
@@ -218,23 +223,30 @@ class CSS_Combiner {
 	// }
 
 	private function get_file_content($src) {
-		if (strpos($src, '://') !== false) {
-			$response = wp_remote_get($src);
-			if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
-				return wp_remote_retrieve_body($response);
-			}
-			return false;
-		}
-
+		$src = preg_replace('/\?.*/', '', (string) $src);
 		$file_path = $this->url_to_path($src);
 		if (file_exists($file_path)) {
-			// WP_Filesystem for local files
+			$contents = @file_get_contents($file_path); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			if ($contents !== false) {
+				return $contents;
+			}
+
+			// Fallback to WP_Filesystem for local files.
 			global $wp_filesystem;
 			if (empty($wp_filesystem)) {
 				require_once ABSPATH . '/wp-admin/inc/file.php';
 				WP_Filesystem();
 			}
-			return $wp_filesystem->get_contents($file_path);
+			if (!empty($wp_filesystem)) {
+				return $wp_filesystem->get_contents($file_path);
+			}
+		}
+
+		if (strpos($src, '://') !== false) {
+			$response = wp_remote_get($src);
+			if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
+				return wp_remote_retrieve_body($response);
+			}
 		}
 
 		return false;
@@ -304,29 +316,37 @@ class CSS_Combiner {
 	// }
 
 	private function save_combined_css($styles_hash) {
-		global $wp_filesystem;
-
-		if (!function_exists('WP_Filesystem')) {
-			require_once ABSPATH . 'wp-admin/inc/file.php';
-		}
-
-		if (!WP_Filesystem()) {
-			RP_Options::delete_option('css_cache_meta');
-			return false;
-		}
-
 		$upload_dir = wp_upload_dir();
 		$combined_dir = $upload_dir['basedir'] . '/rapidpress';
 		wp_mkdir_p($combined_dir);
 
 		$combined_file = $combined_dir . '/' . $this->combined_filename;
+		$write_ok = false;
 
-		$write_ok = $wp_filesystem->put_contents(
-			$combined_file,
-			$this->combined_css,
-			FS_CHMOD_FILE
-		);
-		if (!$write_ok || !$wp_filesystem->exists($combined_file)) {
+		// Prefer native file writing for frontend reliability.
+		$bytes = @file_put_contents($combined_file, $this->combined_css); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		if ($bytes !== false) {
+			$write_ok = true;
+			@chmod($combined_file, FS_CHMOD_FILE); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
+		}
+
+		// Fallback to WP_Filesystem when native write fails.
+		if (!$write_ok) {
+			global $wp_filesystem;
+			if (!function_exists('WP_Filesystem')) {
+				require_once ABSPATH . 'wp-admin/inc/file.php';
+			}
+
+			if (WP_Filesystem() && !empty($wp_filesystem)) {
+				$write_ok = $wp_filesystem->put_contents(
+					$combined_file,
+					$this->combined_css,
+					FS_CHMOD_FILE
+				);
+			}
+		}
+
+		if (!$write_ok || !file_exists($combined_file)) {
 			RP_Options::delete_option('css_cache_meta');
 			return false;
 		}
