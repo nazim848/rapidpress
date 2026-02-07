@@ -91,11 +91,14 @@ class RapidPressAdmin {
 						if (response.success) {
 							const data = response.data || {};
 							alert(data.message || "Cache preload completed.");
-							if (data.last_run_display) {
-								this.$("#rapidpress-preload-status").text(
-									`Last preload: ${data.last_run_display} (${data.last_count || 0} URLs)`
-								);
-							}
+							const fallbackDisplay = new Date().toLocaleString();
+							const display =
+								data.last_run_display && data.last_run_display !== ""
+									? data.last_run_display
+									: fallbackDisplay;
+							this.$("#rapidpress-preload-status").text(
+								`Last preload: ${display} (${data.last_count || 0} URLs)`
+							);
 						} else {
 							alert("Failed to preload cache. Please try again.");
 						}

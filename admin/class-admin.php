@@ -402,7 +402,15 @@ class Admin {
 		$preloader = new Cache_Preloader();
 		$count = $preloader->run_manual_preload();
 		$last_run = intval(RP_Options::get_option('cache_preload_last_run'));
+		if ($last_run <= 0) {
+			$last_run = time();
+			RP_Options::update_option('cache_preload_last_run', $last_run);
+		}
 		$last_count = intval(RP_Options::get_option('cache_preload_last_count', 0));
+		if ($last_count <= 0 && $count > 0) {
+			$last_count = intval($count);
+			RP_Options::update_option('cache_preload_last_count', $last_count);
+		}
 
 		wp_send_json_success(array(
 			'message' => sprintf('Preloaded %d URLs', intval($count)),
