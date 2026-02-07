@@ -3,10 +3,14 @@
 namespace RapidPress;
 
 class Page_Cache {
-	private $cache_dir;
+	private $cache_config;
+	private $cache_key;
+	private $cache_store;
 
-	public function __construct() {
-		$this->cache_dir = $this->get_cache_dir();
+	public function __construct($cache_config = null, $cache_key = null, $cache_store = null) {
+		$this->cache_config = $cache_config instanceof Cache_Config ? $cache_config : new Cache_Config();
+		$this->cache_key = $cache_key instanceof Cache_Key ? $cache_key : new Cache_Key();
+		$this->cache_store = $cache_store instanceof Cache_Store ? $cache_store : new Cache_Store();
 
 		add_action('template_redirect', array($this, 'maybe_serve_cache'), 0);
 		add_action('template_redirect', array($this, 'start_buffering'), 1);
@@ -24,16 +28,15 @@ class Page_Cache {
 			return;
 		}
 
-		$cache_file = $this->get_cache_file_path();
+		$key = $this->get_cache_key();
+		$cache_file = $this->cache_store->get_cache_file_path($key);
 		if (!$cache_file) {
 			return;
 		}
 
-		$ttl = $this->get_ttl();
 		if (file_exists($cache_file)) {
-			$age = time() - filemtime($cache_file);
-			if ($age <= $ttl) {
-				$contents = $this->read_file($cache_file);
+			if ($this->cache_store->is_fresh($cache_file, $this->cache_config->get_ttl())) {
+				$contents = $this->cache_store->read_file($cache_file);
 				if ($contents !== false) {
 					if (!headers_sent()) {
 						header('X-RapidPress-Cache: HIT');
@@ -42,7 +45,7 @@ class Page_Cache {
 					exit;
 				}
 			} else {
-				$this->delete_file($cache_file);
+				$this->cache_store->delete_file($cache_file);
 			}
 		}
 	}
@@ -56,9 +59,10 @@ class Page_Cache {
 	}
 
 	public function cache_output($html) {
-		$cache_file = $this->get_cache_file_path();
+		$key = $this->get_cache_key();
+		$cache_file = $this->cache_store->get_cache_file_path($key);
 		if ($cache_file && $html !== '') {
-			$this->write_file($cache_file, $html);
+			$this->cache_store->write_file($cache_file, $html);
 			if (!headers_sent()) {
 				header('X-RapidPress-Cache: MISS');
 			}
@@ -68,23 +72,11 @@ class Page_Cache {
 	}
 
 	public function purge_cache() {
-		$cache_dir = $this->get_cache_dir();
-		if (!$cache_dir || !is_dir($cache_dir)) {
-			return;
-		}
-
-		$files = glob(trailingslashit($cache_dir) . '*.html');
-		if (empty($files)) {
-			return;
-		}
-
-		foreach ($files as $file) {
-			$this->delete_file($file);
-		}
+		$this->cache_store->purge_all_html();
 	}
 
 	private function should_cache_request() {
-		if (!RP_Options::get_option('enable_cache')) {
+		if (!$this->cache_config->is_enabled()) {
 			return false;
 		}
 
@@ -105,7 +97,7 @@ class Page_Cache {
 			return false;
 		}
 
-		if (strpos($this->get_request_uri(), '?') !== false || !empty($_GET)) {
+		if (strpos($this->cache_key->get_request_uri(), '?') !== false || !empty($_GET)) {
 			return false;
 		}
 
@@ -117,89 +109,7 @@ class Page_Cache {
 		return true;
 	}
 
-	private function get_request_uri() {
-		$uri = isset($_SERVER['REQUEST_URI']) ? wp_unslash($_SERVER['REQUEST_URI']) : '';
-		return is_string($uri) ? $uri : '';
-	}
-
 	private function get_cache_key() {
-		$host = isset($_SERVER['HTTP_HOST']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST'])) : '';
-		$uri = $this->get_request_uri();
-		$path = strtok($uri, '?');
-		$path = untrailingslashit($path);
-		$scheme = is_ssl() ? 'https' : 'http';
-
-		$key = $scheme . '://' . $host . $path;
-		return apply_filters('rapidpress_cache_key', $key);
-	}
-
-	private function get_cache_file_path() {
-		$cache_dir = $this->get_cache_dir();
-		if (!$cache_dir) {
-			return '';
-		}
-
-		$key = $this->get_cache_key();
-		if ($key === '') {
-			return '';
-		}
-
-		$filename = md5($key) . '.html';
-		return trailingslashit($cache_dir) . $filename;
-	}
-
-	private function get_cache_dir() {
-		$upload_dir = wp_upload_dir();
-		$base_dir = isset($upload_dir['basedir']) ? $upload_dir['basedir'] : '';
-		if ($base_dir === '') {
-			return '';
-		}
-
-		$dir = trailingslashit($base_dir) . 'rapidpress-cache';
-		$dir = apply_filters('rapidpress_cache_path', $dir);
-
-		if (!is_dir($dir)) {
-			wp_mkdir_p($dir);
-		}
-
-		return $dir;
-	}
-
-	private function get_ttl() {
-		$ttl = 3600;
-		$ttl = apply_filters('rapidpress_cache_ttl', $ttl);
-		return max(0, intval($ttl));
-	}
-
-	private function read_file($path) {
-		global $wp_filesystem;
-		if (empty($wp_filesystem)) {
-			require_once ABSPATH . 'wp-admin/inc/file.php';
-			WP_Filesystem();
-		}
-
-		return $wp_filesystem->get_contents($path);
-	}
-
-	private function write_file($path, $contents) {
-		global $wp_filesystem;
-		if (empty($wp_filesystem)) {
-			require_once ABSPATH . 'wp-admin/inc/file.php';
-			WP_Filesystem();
-		}
-
-		$wp_filesystem->put_contents($path, $contents, FS_CHMOD_FILE);
-	}
-
-	private function delete_file($path) {
-		global $wp_filesystem;
-		if (empty($wp_filesystem)) {
-			require_once ABSPATH . 'wp-admin/inc/file.php';
-			WP_Filesystem();
-		}
-
-		if ($wp_filesystem->exists($path)) {
-			$wp_filesystem->delete($path);
-		}
+		return $this->cache_key->from_request();
 	}
 }
