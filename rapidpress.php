@@ -72,13 +72,17 @@ function rapidpress_activate() {
 	set_transient('rapidpress_activation_notice', true, 5);
 
 	require_once RAPIDPRESS_PATH . 'inc/class-cache-dropin-manager.php';
+	require_once RAPIDPRESS_PATH . 'inc/class-cache-preloader.php';
 	\RapidPress\Cache_Dropin_Manager::sync_from_options();
+	\RapidPress\Cache_Preloader::sync_schedule_from_options();
 }
 
 // Deactivation code
 function rapidpress_deactivate() {
 	require_once RAPIDPRESS_PATH . 'inc/class-cache-dropin-manager.php';
+	require_once RAPIDPRESS_PATH . 'inc/class-cache-preloader.php';
 	\RapidPress\Cache_Dropin_Manager::remove_dropin();
+	\RapidPress\Cache_Preloader::clear_schedule();
 
 	// Check if clean deactivate is enabled
 	$clean_deactivate = RP_Options::get_option('clean_deactivate');

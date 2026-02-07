@@ -11,6 +11,7 @@ class RapidPressAdmin {
 		this.initializeRuleManagement();
 		this.setupResetSettings();
 		this.setupPurgePageCache();
+		this.setupPreloadPageCache();
 	}
 
 	setupResetSettings() {
@@ -69,6 +70,31 @@ class RapidPressAdmin {
 				},
 				error: () => {
 					alert("An error occurred while purging page cache.");
+				}
+			});
+		});
+	}
+
+	setupPreloadPageCache() {
+		this.$("#rapidpress-preload-page-cache").on("click", e => {
+			e.preventDefault();
+
+			this.$.ajax({
+				url: rapidpress_admin.ajax_url,
+				type: "POST",
+				data: {
+					action: "rapidpress_preload_page_cache",
+					nonce: rapidpress_admin.nonce
+				},
+				success: response => {
+					if (response.success) {
+						alert(response.data || "Cache preload completed.");
+					} else {
+						alert("Failed to preload cache. Please try again.");
+					}
+				},
+				error: () => {
+					alert("An error occurred while preloading cache.");
 				}
 			});
 		});

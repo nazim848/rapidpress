@@ -34,6 +34,7 @@ class RapidPress {
 		require_once RAPIDPRESS_PATH . 'inc/class-cache-store.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-cache-invalidation.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-cache-dropin-manager.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-cache-preloader.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-page-cache.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-heartbeat-control.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-autosave-control.php';
@@ -59,6 +60,7 @@ class RapidPress {
 		new \RapidPress\Image_Lazy_Loading();
 		new \RapidPress\Image_Dimensions();
 		new \RapidPress\Page_Cache();
+		new \RapidPress\Cache_Preloader();
 		new \RapidPress\Heartbeat_Control();
 		new \RapidPress\Autosave_Control();
 	}

@@ -21,6 +21,7 @@ class Admin {
 			add_filter('plugin_action_links_' . plugin_basename(RAPIDPRESS_PLUGIN_FILE), array($this, 'add_action_links'));
 			add_action('wp_ajax_rapidpress_reset_settings', array($this, 'reset_settings'));
 			add_action('wp_ajax_rapidpress_purge_page_cache', array($this, 'purge_page_cache'));
+			add_action('wp_ajax_rapidpress_preload_page_cache', array($this, 'preload_page_cache'));
 			add_action('update_option_rapidpress_options', array($this, 'save_settings_with_tab'), 10, 3);
 		}
 
@@ -240,6 +241,8 @@ class Admin {
 				'add_missing_dimensions'               => 'boolean',
 				'enable_cache'                         => 'boolean',
 				'early_cache_serving'                 => 'boolean',
+				'cache_preload_enabled'               => 'boolean',
+				'cache_preload_batch_size'            => 'preload_batch_size',
 				'clean_uninstall'                      => 'boolean',
 				'clean_deactivate'                      => 'boolean',
 			);
@@ -373,6 +376,19 @@ class Admin {
 		wp_send_json_success('Page cache purged successfully');
 	}
 
+	public function preload_page_cache() {
+		check_ajax_referer('rapidpress_options_verify', 'nonce');
+
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error('Insufficient permissions');
+		}
+
+		$preloader = new Cache_Preloader();
+		$count = $preloader->run_manual_preload();
+
+		wp_send_json_success(sprintf('Preloaded %d URLs', intval($count)));
+	}
+
 	private function sanitize_limit_post_revisions($value) {
 
 		if (empty($value)) {
@@ -384,6 +400,11 @@ class Admin {
 		}
 
 		return intval($value);
+	}
+
+	private function sanitize_preload_batch_size($value) {
+		$value = intval($value);
+		return max(1, min(100, $value));
 	}
 
 	private function sanitize_disable_heartbeat($value) {
@@ -520,6 +541,7 @@ class Admin {
 		// Clear the CSS cache after saving settings
 		$this->clear_css_cache();
 		Cache_Dropin_Manager::sync_from_options();
+		Cache_Preloader::sync_schedule_from_options();
 
 		if (
 			isset($_POST['rapidpress_active_tab'], $_POST['rapidpress_nonce']) &&
