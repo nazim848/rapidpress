@@ -608,6 +608,16 @@ class Admin {
 	}
 
 	public function save_settings_with_tab($value, $old_value, $option) {
+		$is_settings_save = (
+			isset($_POST['action'], $_POST['rapidpress_nonce']) &&
+			'rapidpress_save_settings' === sanitize_text_field(wp_unslash($_POST['action'])) &&
+			wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['rapidpress_nonce'])), 'rapidpress_options_verify')
+		);
+
+		if (!$is_settings_save) {
+			return $value;
+		}
+
 		// Clear the CSS cache after saving settings
 		$this->clear_css_cache();
 		Cache_Dropin_Manager::sync_from_options();
@@ -615,7 +625,7 @@ class Admin {
 
 		if (
 			isset($_POST['rapidpress_active_tab'], $_POST['rapidpress_nonce']) &&
-			wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['rapidpress_nonce'])), 'rapidpress_settings')
+			wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['rapidpress_nonce'])), 'rapidpress_options_verify')
 		) {
 			$tab = sanitize_key(ltrim(sanitize_text_field(wp_unslash($_POST['rapidpress_active_tab'])), '#'));
 			add_filter('wp_redirect', function ($location) use ($tab) {
