@@ -8,8 +8,8 @@ use RapidPress\RP_Options;
 
 <div id="<?php echo esc_attr($tab_id); ?>" class="tab-pane">
 	<h2 class="content-title"><span class="dashicons dashicons-page"></span> <?php esc_html_e('Cache', 'rapidpress'); ?></h2>
-	<div class="rapidpress-card">
-		<table class="form-table">
+		<div class="rapidpress-card">
+			<table class="form-table">
 				<tr valign="top">
 					<th scope="row"><?php esc_html_e('Enable Cache', 'rapidpress'); ?></th>
 					<td>
@@ -33,5 +33,10 @@ use RapidPress\RP_Options;
 					</td>
 				</tr>
 			</table>
+			<p>
+				<button type="button" id="rapidpress-purge-page-cache" class="button button-secondary">
+					<?php esc_html_e('Purge All Page Cache', 'rapidpress'); ?>
+				</button>
+			</p>
 		</div>
 	</div>

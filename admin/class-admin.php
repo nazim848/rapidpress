@@ -20,6 +20,7 @@ class Admin {
 			add_action('admin_bar_menu', array($this, 'add_toolbar_items'), 100);
 			add_filter('plugin_action_links_' . plugin_basename(RAPIDPRESS_PLUGIN_FILE), array($this, 'add_action_links'));
 			add_action('wp_ajax_rapidpress_reset_settings', array($this, 'reset_settings'));
+			add_action('wp_ajax_rapidpress_purge_page_cache', array($this, 'purge_page_cache'));
 			add_action('update_option_rapidpress_options', array($this, 'save_settings_with_tab'), 10, 3);
 		}
 
@@ -354,9 +355,22 @@ class Admin {
 			// 'js_delay_specific_files' => '',
 			// 'js_disable_rules' => [],
 			// 'css_disable_rules' => []
-		];
-		update_option('rapidpress_options', $default_options);
-		wp_send_json_success('Settings reset successfully');
+			];
+			update_option('rapidpress_options', $default_options);
+			wp_send_json_success('Settings reset successfully');
+		}
+
+	public function purge_page_cache() {
+		check_ajax_referer('rapidpress_options_verify', 'nonce');
+
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error('Insufficient permissions');
+		}
+
+		$cache_store = new Cache_Store();
+		$cache_store->purge_all_html();
+
+		wp_send_json_success('Page cache purged successfully');
 	}
 
 	private function sanitize_limit_post_revisions($value) {

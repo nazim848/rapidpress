@@ -6,19 +6,21 @@ class Page_Cache {
 	private $cache_config;
 	private $cache_key;
 	private $cache_store;
+	private $cache_invalidation;
 
-	public function __construct($cache_config = null, $cache_key = null, $cache_store = null) {
+	public function __construct($cache_config = null, $cache_key = null, $cache_store = null, $cache_invalidation = null) {
 		$this->cache_config = $cache_config instanceof Cache_Config ? $cache_config : new Cache_Config();
 		$this->cache_key = $cache_key instanceof Cache_Key ? $cache_key : new Cache_Key();
 		$this->cache_store = $cache_store instanceof Cache_Store ? $cache_store : new Cache_Store();
+		$this->cache_invalidation = $cache_invalidation instanceof Cache_Invalidation ? $cache_invalidation : new Cache_Invalidation();
 
 		add_action('template_redirect', array($this, 'maybe_serve_cache'), 0);
 		add_action('template_redirect', array($this, 'start_buffering'), 1);
 
-		add_action('save_post', array($this, 'purge_cache'));
+		add_action('save_post', array($this, 'purge_post_related_cache'));
 		add_action('deleted_post', array($this, 'purge_cache'));
-		add_action('transition_post_status', array($this, 'purge_cache'));
-		add_action('comment_post', array($this, 'purge_cache'));
+		add_action('transition_post_status', array($this, 'purge_transition_related_cache'), 10, 3);
+		add_action('comment_post', array($this, 'purge_comment_related_cache'));
 		add_action('wp_update_nav_menu', array($this, 'purge_cache'));
 		add_action('customize_save_after', array($this, 'purge_cache'));
 	}
@@ -75,6 +77,32 @@ class Page_Cache {
 		$this->cache_store->purge_all_html();
 	}
 
+	public function purge_post_related_cache($post_id) {
+		$post = get_post($post_id);
+		if ($post instanceof \WP_Post && wp_is_post_revision($post_id)) {
+			return;
+		}
+
+		$this->purge_related_urls($this->cache_invalidation->get_urls_for_post($post_id));
+	}
+
+	public function purge_transition_related_cache($new_status, $old_status, $post) {
+		if (!$post instanceof \WP_Post) {
+			$this->purge_cache();
+			return;
+		}
+
+		if ($new_status === $old_status) {
+			return;
+		}
+
+		$this->purge_related_urls($this->cache_invalidation->get_urls_for_post($post->ID));
+	}
+
+	public function purge_comment_related_cache($comment_id) {
+		$this->purge_related_urls($this->cache_invalidation->get_urls_for_comment($comment_id));
+	}
+
 	private function should_cache_request() {
 		if (!$this->cache_config->is_enabled()) {
 			return false;
@@ -111,5 +139,19 @@ class Page_Cache {
 
 	private function get_cache_key() {
 		return $this->cache_key->from_request();
+	}
+
+	private function purge_related_urls($urls) {
+		if (!is_array($urls) || empty($urls)) {
+			$this->purge_cache();
+			return;
+		}
+
+		foreach ($urls as $url) {
+			$key = $this->cache_key->from_url($url);
+			if ($key !== '') {
+				$this->cache_store->delete_by_key($key);
+			}
+		}
 	}
 }

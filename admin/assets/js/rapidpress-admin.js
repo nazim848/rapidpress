@@ -10,6 +10,7 @@ class RapidPressAdmin {
 		this.restoreAccordionState();
 		this.initializeRuleManagement();
 		this.setupResetSettings();
+		this.setupPurgePageCache();
 	}
 
 	setupResetSettings() {
@@ -42,6 +43,34 @@ class RapidPressAdmin {
 					}
 				});
 			}
+		});
+	}
+
+	setupPurgePageCache() {
+		this.$("#rapidpress-purge-page-cache").on("click", e => {
+			e.preventDefault();
+			if (!confirm("Purge all cached HTML pages now?")) {
+				return;
+			}
+
+			this.$.ajax({
+				url: rapidpress_admin.ajax_url,
+				type: "POST",
+				data: {
+					action: "rapidpress_purge_page_cache",
+					nonce: rapidpress_admin.nonce
+				},
+				success: response => {
+					if (response.success) {
+						alert("Page cache purged successfully.");
+					} else {
+						alert("Failed to purge page cache. Please try again.");
+					}
+				},
+				error: () => {
+					alert("An error occurred while purging page cache.");
+				}
+			});
 		});
 	}
 

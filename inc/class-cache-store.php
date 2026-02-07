@@ -59,6 +59,15 @@ class Cache_Store {
 		}
 	}
 
+	public function delete_by_key($key) {
+		$path = $this->get_cache_file_path($key);
+		if ($path === '') {
+			return;
+		}
+
+		$this->delete_file($path);
+	}
+
 	public function read_file($path) {
 		global $wp_filesystem;
 		if (empty($wp_filesystem)) {
