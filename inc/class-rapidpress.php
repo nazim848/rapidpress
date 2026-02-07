@@ -32,6 +32,7 @@ class RapidPress {
 		require_once RAPIDPRESS_PATH . 'inc/class-cache-config.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-cache-key.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-cache-store.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-cache-dropin-manager.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-page-cache.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-heartbeat-control.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-autosave-control.php';

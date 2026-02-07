@@ -6,8 +6,10 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
 }
 
 require __DIR__ . '/inc/class-rapidpress-options.php';
+require __DIR__ . '/inc/class-cache-dropin-manager.php';
 
 use RapidPress\RP_Options;
+use RapidPress\Cache_Dropin_Manager;
 
 // Check if clean uninstall is enabled
 $clean_uninstall = RP_Options::get_option('clean_uninstall');
@@ -43,6 +45,8 @@ if ($clean_uninstall == '1') {
 		rapidpress_remove_directory($cache_dir);
 	}
 }
+
+Cache_Dropin_Manager::remove_dropin();
 
 /**
  * Recursively remove a directory and its contents

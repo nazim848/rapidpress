@@ -70,10 +70,16 @@ register_deactivation_hook(__FILE__, 'rapidpress_deactivate');
 function rapidpress_activate() {
 	// Activation code here
 	set_transient('rapidpress_activation_notice', true, 5);
+
+	require_once RAPIDPRESS_PATH . 'inc/class-cache-dropin-manager.php';
+	\RapidPress\Cache_Dropin_Manager::sync_from_options();
 }
 
 // Deactivation code
 function rapidpress_deactivate() {
+	require_once RAPIDPRESS_PATH . 'inc/class-cache-dropin-manager.php';
+	\RapidPress\Cache_Dropin_Manager::remove_dropin();
+
 	// Check if clean deactivate is enabled
 	$clean_deactivate = RP_Options::get_option('clean_deactivate');
 

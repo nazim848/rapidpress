@@ -17,10 +17,11 @@ class Admin {
 		add_action('admin_init', array($this, 'register_settings'));
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_styles'));
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
-		add_action('admin_bar_menu', array($this, 'add_toolbar_items'), 100);
-		add_filter('plugin_action_links_' . plugin_basename(RAPIDPRESS_PLUGIN_FILE), array($this, 'add_action_links'));
-		add_action('wp_ajax_rapidpress_reset_settings', array($this, 'reset_settings'));
-	}
+			add_action('admin_bar_menu', array($this, 'add_toolbar_items'), 100);
+			add_filter('plugin_action_links_' . plugin_basename(RAPIDPRESS_PLUGIN_FILE), array($this, 'add_action_links'));
+			add_action('wp_ajax_rapidpress_reset_settings', array($this, 'reset_settings'));
+			add_action('update_option_rapidpress_options', array($this, 'save_settings_with_tab'), 10, 3);
+		}
 
 	public function enqueue_styles($hook) {
 		if ('settings_page_rapidpress' !== $hook) {
@@ -235,11 +236,12 @@ class Admin {
 			'lazy_load_threshold'                  => 'lazy_load_threshold',
 			'lazy_load_placeholder'                => 'lazy_load_placeholder',
 			'lazy_load_exclusions'                 => 'multiline_urls',
-			'add_missing_dimensions'               => 'boolean',
-			'enable_cache'                         => 'boolean',
-			'clean_uninstall'                      => 'boolean',
-			'clean_deactivate'                      => 'boolean',
-		);
+				'add_missing_dimensions'               => 'boolean',
+				'enable_cache'                         => 'boolean',
+				'early_cache_serving'                 => 'boolean',
+				'clean_uninstall'                      => 'boolean',
+				'clean_deactivate'                      => 'boolean',
+			);
 
 		foreach ($sanitization_rules as $option => $rule) {
 			if (isset($options[$option])) {
@@ -503,6 +505,7 @@ class Admin {
 	public function save_settings_with_tab($value, $old_value, $option) {
 		// Clear the CSS cache after saving settings
 		$this->clear_css_cache();
+		Cache_Dropin_Manager::sync_from_options();
 
 		if (
 			isset($_POST['rapidpress_active_tab'], $_POST['rapidpress_nonce']) &&
