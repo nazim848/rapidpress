@@ -428,6 +428,8 @@ class Admin {
 		}
 
 		$this->clear_css_cache();
+		$cache_store = new Cache_Store();
+		$cache_store->purge_all_html();
 		wp_send_json_success('CSS cache cleared successfully');
 	}
 
@@ -628,6 +630,8 @@ class Admin {
 
 		// Clear the CSS cache after saving settings
 		$this->clear_css_cache();
+		$cache_store = new Cache_Store();
+		$cache_store->purge_all_html();
 		Cache_Dropin_Manager::sync_from_options();
 		Cache_Preloader::sync_schedule_from_options();
 
