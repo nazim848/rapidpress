@@ -87,12 +87,18 @@ class RapidPressAdmin {
 					action: "rapidpress_preload_page_cache",
 					nonce: rapidpress_admin.nonce
 				},
-				success: response => {
-					if (response.success) {
-						alert(response.data || "Cache preload completed.");
-					} else {
-						alert("Failed to preload cache. Please try again.");
-					}
+					success: response => {
+						if (response.success) {
+							const data = response.data || {};
+							alert(data.message || "Cache preload completed.");
+							if (data.last_run_display) {
+								this.$("#rapidpress-preload-status").text(
+									`Last preload: ${data.last_run_display} (${data.last_count || 0} URLs)`
+								);
+							}
+						} else {
+							alert("Failed to preload cache. Please try again.");
+						}
 				},
 				error: () => {
 					alert("An error occurred while preloading cache.");

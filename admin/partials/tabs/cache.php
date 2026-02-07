@@ -103,11 +103,14 @@ use RapidPress\Cache_Stats;
 			$last_count = RP_Options::get_option('cache_preload_last_count', 0);
 			$cache_stats = (new Cache_Stats())->get_summary();
 			if (!empty($last_run)) :
+				$preload_status_text = sprintf(__('Last preload: %s (%d URLs)', 'rapidpress'), wp_date('Y-m-d H:i:s', intval($last_run)), intval($last_count));
+			else :
+				$preload_status_text = __('Last preload: Not run yet', 'rapidpress');
+			endif;
 			?>
-				<p>
-					<?php echo esc_html(sprintf(__('Last preload: %s (%d URLs)', 'rapidpress'), wp_date('Y-m-d H:i:s', intval($last_run)), intval($last_count))); ?>
+				<p id="rapidpress-preload-status">
+					<?php echo esc_html($preload_status_text); ?>
 				</p>
-			<?php endif; ?>
 			<p>
 				<?php echo esc_html(sprintf(__('Cache files: %d | Size: %s', 'rapidpress'), intval($cache_stats['file_count']), $cache_stats['total_size_human'])); ?>
 			</p>

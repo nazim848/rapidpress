@@ -87,19 +87,26 @@ class CSS_Combiner {
 			$this->last_modified = max($this->last_modified, $last_modified);
 		}
 
-		if (!empty($styles_to_combine)) {
-			$styles_hash = md5($styles_hash);
-			$this->combined_filename = "{$this->file_prefix}{$styles_hash}{$this->file_extension}";
+			if (!empty($styles_to_combine)) {
+				$styles_hash = md5($styles_hash);
+				$this->combined_filename = "{$this->file_prefix}{$styles_hash}{$this->file_extension}";
+				$combined_file_ready = $this->is_cached_file_valid($styles_hash);
 
-			if (!$this->is_cached_file_valid($styles_hash)) {
-				foreach ($styles_to_combine as $style) {
-					$this->add_style_to_combined($style);
+				if (!$combined_file_ready) {
+					foreach ($styles_to_combine as $style) {
+						$this->add_style_to_combined($style);
+					}
+
+					$this->combined_css = $this->minify_css($this->combined_css);
+					$combined_file_ready = $this->save_combined_css($styles_hash);
+					if (!$combined_file_ready) {
+						$this->debug_log[] = "Combined CSS write failed. Keeping original styles.";
+						$this->combined_css = '';
+						$this->combined_handles = array();
+						return;
+					}
+					$this->cleanup_old_files();
 				}
-
-				$this->combined_css = $this->minify_css($this->combined_css);
-				$this->save_combined_css($styles_hash);
-				$this->cleanup_old_files();
-			}
 
 			// Dequeue and deregister original styles
 			foreach ($this->combined_handles as $handle) {
@@ -303,7 +310,10 @@ class CSS_Combiner {
 			require_once ABSPATH . 'wp-admin/inc/file.php';
 		}
 
-		WP_Filesystem();
+		if (!WP_Filesystem()) {
+			RP_Options::delete_option('css_cache_meta');
+			return false;
+		}
 
 		$upload_dir = wp_upload_dir();
 		$combined_dir = $upload_dir['basedir'] . '/rapidpress';
@@ -311,11 +321,15 @@ class CSS_Combiner {
 
 		$combined_file = $combined_dir . '/' . $this->combined_filename;
 
-		$wp_filesystem->put_contents(
+		$write_ok = $wp_filesystem->put_contents(
 			$combined_file,
 			$this->combined_css,
 			FS_CHMOD_FILE
 		);
+		if (!$write_ok || !$wp_filesystem->exists($combined_file)) {
+			RP_Options::delete_option('css_cache_meta');
+			return false;
+		}
 
 		$cache_meta = array(
 			'hash' => $styles_hash,
@@ -324,6 +338,7 @@ class CSS_Combiner {
 		);
 
 		RP_Options::update_option('css_cache_meta', $cache_meta);
+		return true;
 	}
 
 	private function is_cached_file_valid($styles_hash) {

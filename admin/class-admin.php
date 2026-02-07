@@ -59,13 +59,20 @@ class Admin {
 		$new_options = isset($_POST['rapidpress_options']) ? $this->sanitize_options(map_deep(wp_unslash($_POST['rapidpress_options']), 'sanitize_text_field')) : array();
 		$old_options = get_option('rapidpress_options', array());
 
-		// Handle JS and CSS disable rules
-		if (!isset($new_options['js_disable_rules'])) {
-			$new_options['js_disable_rules'] = array();
-		}
-		if (!isset($new_options['css_disable_rules'])) {
-			$new_options['css_disable_rules'] = array();
-		}
+			// Handle JS and CSS disable rules
+			if (!isset($new_options['js_disable_rules'])) {
+				$new_options['js_disable_rules'] = array();
+			}
+			if (!isset($new_options['css_disable_rules'])) {
+				$new_options['css_disable_rules'] = array();
+			}
+
+			// Preserve runtime cache state keys that are not part of settings form fields.
+			foreach ($this->get_runtime_option_keys() as $runtime_key) {
+				if (isset($old_options[$runtime_key]) && !isset($new_options[$runtime_key])) {
+					$new_options[$runtime_key] = $old_options[$runtime_key];
+				}
+			}
 
 		// Compare new options with old options
 		$changed = false;
@@ -394,8 +401,15 @@ class Admin {
 
 		$preloader = new Cache_Preloader();
 		$count = $preloader->run_manual_preload();
+		$last_run = intval(RP_Options::get_option('cache_preload_last_run'));
+		$last_count = intval(RP_Options::get_option('cache_preload_last_count', 0));
 
-		wp_send_json_success(sprintf('Preloaded %d URLs', intval($count)));
+		wp_send_json_success(array(
+			'message' => sprintf('Preloaded %d URLs', intval($count)),
+			'last_run' => $last_run,
+			'last_count' => $last_count,
+			'last_run_display' => $last_run > 0 ? wp_date('Y-m-d H:i:s', $last_run) : '',
+		));
 	}
 
 	public function clear_css_cache_ajax() {
@@ -425,6 +439,13 @@ class Admin {
 	private function sanitize_preload_batch_size($value) {
 		$value = intval($value);
 		return max(1, min(100, $value));
+	}
+
+	private function get_runtime_option_keys() {
+		return array(
+			'cache_preload_last_run',
+			'cache_preload_last_count',
+		);
 	}
 
 	private function sanitize_cache_query_policy($value) {
