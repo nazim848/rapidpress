@@ -4,6 +4,8 @@ namespace RapidPress;
 
 class Cache_Preloader {
 	const CRON_HOOK = 'rapidpress_cache_preload_event';
+	const LAST_RUN_OPTION = 'rapidpress_cache_preload_last_run';
+	const LAST_COUNT_OPTION = 'rapidpress_cache_preload_last_count';
 
 	public function __construct() {
 		add_action('init', array($this, 'maybe_sync_schedule'));
@@ -46,8 +48,8 @@ class Cache_Preloader {
 	public function run_manual_preload() {
 		$urls = $this->collect_urls();
 		$count = $this->preload_urls($urls);
-		RP_Options::update_option('cache_preload_last_run', time());
-		RP_Options::update_option('cache_preload_last_count', $count);
+		update_option(self::LAST_RUN_OPTION, time(), false);
+		update_option(self::LAST_COUNT_OPTION, intval($count), false);
 
 		return $count;
 	}

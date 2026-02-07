@@ -99,8 +99,8 @@ use RapidPress\Cache_Stats;
 				</button>
 			</p>
 			<?php
-			$last_run = RP_Options::get_option('cache_preload_last_run');
-			$last_count = RP_Options::get_option('cache_preload_last_count', 0);
+			$last_run = get_option(\RapidPress\Cache_Preloader::LAST_RUN_OPTION, RP_Options::get_option('cache_preload_last_run', 0));
+			$last_count = get_option(\RapidPress\Cache_Preloader::LAST_COUNT_OPTION, RP_Options::get_option('cache_preload_last_count', 0));
 			$cache_stats = (new Cache_Stats())->get_summary();
 			if (!empty($last_run)) :
 				$preload_status_text = sprintf(__('Last preload: %s (%d URLs)', 'rapidpress'), wp_date('Y-m-d H:i:s', intval($last_run)), intval($last_count));

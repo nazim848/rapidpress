@@ -92,6 +92,8 @@ function rapidpress_deactivate() {
 		$options_to_delete = [
 			'rapidpress_options',
 			'rapidpress_version',
+			'rapidpress_cache_preload_last_run',
+			'rapidpress_cache_preload_last_count',
 		];
 
 		foreach ($options_to_delete as $option) {
