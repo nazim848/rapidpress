@@ -2,6 +2,10 @@
 
 namespace RapidPress;
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 class Autosave_Control {
 	public function __construct() {
 		add_action('init', array($this, 'apply_autosave_interval'), 1);

@@ -2,6 +2,10 @@
 
 namespace RapidPress;
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 class Heartbeat_Control {
 	public function __construct() {
 		add_action('admin_enqueue_scripts', array($this, 'handle_admin_heartbeat'), 1);

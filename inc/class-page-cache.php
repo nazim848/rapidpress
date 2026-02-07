@@ -2,6 +2,10 @@
 
 namespace RapidPress;
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 class Page_Cache {
 	private $cache_config;
 	private $cache_key;
@@ -137,7 +141,7 @@ class Page_Cache {
 			return false;
 		}
 
-		$has_query = (strpos($this->cache_key->get_request_uri(), '?') !== false || !empty($_GET));
+		$has_query = (strpos($this->cache_key->get_request_uri(), '?') !== false);
 		if ($has_query && $this->cache_config->get_query_policy() !== 'ignore') {
 			$this->skip_reason = 'query_string';
 			return false;

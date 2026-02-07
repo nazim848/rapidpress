@@ -2,6 +2,10 @@
 
 namespace RapidPress;
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 class Image_Dimensions {
 	public function __construct() {
 		if (is_admin()) {
