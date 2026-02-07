@@ -22,6 +22,7 @@ class Admin {
 			add_action('wp_ajax_rapidpress_reset_settings', array($this, 'reset_settings'));
 			add_action('wp_ajax_rapidpress_purge_page_cache', array($this, 'purge_page_cache'));
 			add_action('wp_ajax_rapidpress_preload_page_cache', array($this, 'preload_page_cache'));
+			add_action('wp_ajax_rapidpress_clear_css_cache', array($this, 'clear_css_cache_ajax'));
 			add_action('update_option_rapidpress_options', array($this, 'save_settings_with_tab'), 10, 3);
 		}
 
@@ -395,6 +396,17 @@ class Admin {
 		$count = $preloader->run_manual_preload();
 
 		wp_send_json_success(sprintf('Preloaded %d URLs', intval($count)));
+	}
+
+	public function clear_css_cache_ajax() {
+		check_ajax_referer('rapidpress_options_verify', 'nonce');
+
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error('Insufficient permissions');
+		}
+
+		$this->clear_css_cache();
+		wp_send_json_success('CSS cache cleared successfully');
 	}
 
 	private function sanitize_limit_post_revisions($value) {

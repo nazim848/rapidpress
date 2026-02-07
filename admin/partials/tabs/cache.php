@@ -93,6 +93,11 @@ use RapidPress\Cache_Stats;
 					<?php esc_html_e('Preload Cache Now', 'rapidpress'); ?>
 				</button>
 			</p>
+			<p>
+				<button type="button" id="rapidpress-clear-css-cache" class="button button-secondary">
+					<?php esc_html_e('Clear CSS Cache', 'rapidpress'); ?>
+				</button>
+			</p>
 			<?php
 			$last_run = RP_Options::get_option('cache_preload_last_run');
 			$last_count = RP_Options::get_option('cache_preload_last_count', 0);

@@ -328,12 +328,25 @@ class CSS_Combiner {
 
 	private function is_cached_file_valid($styles_hash) {
 		$cache_meta = RP_Options::get_option('css_cache_meta', array());
-		if (isset($cache_meta['hash']) && $cache_meta['hash'] === $styles_hash) {
-			if (isset($cache_meta['last_modified']) && $cache_meta['last_modified'] >= $this->last_modified) {
-				return true;
-			}
+		if (!isset($cache_meta['hash']) || $cache_meta['hash'] !== $styles_hash) {
+			return false;
 		}
-		return false;
+
+		if (!isset($cache_meta['expires']) || intval($cache_meta['expires']) < time()) {
+			return false;
+		}
+
+		if (!isset($cache_meta['last_modified']) || intval($cache_meta['last_modified']) < $this->last_modified) {
+			return false;
+		}
+
+		$upload_dir = wp_upload_dir();
+		$combined_file = trailingslashit($upload_dir['basedir']) . 'rapidpress/' . $this->combined_filename;
+		if (!file_exists($combined_file)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	private function get_combined_css_url() {

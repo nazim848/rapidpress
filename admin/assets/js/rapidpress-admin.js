@@ -12,6 +12,7 @@ class RapidPressAdmin {
 		this.setupResetSettings();
 		this.setupPurgePageCache();
 		this.setupPreloadPageCache();
+		this.setupClearCssCache();
 	}
 
 	setupResetSettings() {
@@ -95,6 +96,30 @@ class RapidPressAdmin {
 				},
 				error: () => {
 					alert("An error occurred while preloading cache.");
+				}
+			});
+		});
+	}
+
+	setupClearCssCache() {
+		this.$("#rapidpress-clear-css-cache").on("click", e => {
+			e.preventDefault();
+			this.$.ajax({
+				url: rapidpress_admin.ajax_url,
+				type: "POST",
+				data: {
+					action: "rapidpress_clear_css_cache",
+					nonce: rapidpress_admin.nonce
+				},
+				success: response => {
+					if (response.success) {
+						alert("CSS cache cleared successfully.");
+					} else {
+						alert("Failed to clear CSS cache. Please try again.");
+					}
+				},
+				error: () => {
+					alert("An error occurred while clearing CSS cache.");
 				}
 			});
 		});
