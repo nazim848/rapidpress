@@ -102,7 +102,6 @@ use RapidPress\Cache_Stats;
 			$last_run = RP_Options::get_option('cache_preload_last_run');
 			$last_count = RP_Options::get_option('cache_preload_last_count', 0);
 			$cache_stats = (new Cache_Stats())->get_summary();
-			$css_combine_debug = RP_Options::get_option('css_combine_debug', array());
 			if (!empty($last_run)) :
 				$preload_status_text = sprintf(__('Last preload: %s (%d URLs)', 'rapidpress'), wp_date('Y-m-d H:i:s', intval($last_run)), intval($last_count));
 			else :
@@ -115,9 +114,5 @@ use RapidPress\Cache_Stats;
 			<p>
 				<?php echo esc_html(sprintf(__('Cache files: %d | Size: %s', 'rapidpress'), intval($cache_stats['file_count']), $cache_stats['total_size_human'])); ?>
 			</p>
-			<?php if (is_array($css_combine_debug) && !empty($css_combine_debug)) : ?>
-				<p><strong><?php esc_html_e('CSS Combine Debug', 'rapidpress'); ?></strong></p>
-				<pre style="max-height:200px;overflow:auto;"><?php echo esc_html(wp_json_encode($css_combine_debug, JSON_PRETTY_PRINT)); ?></pre>
-			<?php endif; ?>
 		</div>
 	</div>

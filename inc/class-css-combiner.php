@@ -15,7 +15,6 @@ class CSS_Combiner {
 	private $file_extension = '.css';
 	private $max_files_to_keep = 3;
 	private $combined_base_url = '';
-	private $debug_state = array();
 
 	public function __construct() {
 		add_action('wp_print_styles', array($this, 'combine_css'), 100);
@@ -41,26 +40,9 @@ class CSS_Combiner {
 	}
 
 	public function combine_css() {
-		$this->debug_state = array(
-			'time' => time(),
-			'combine_css_option' => RP_Options::get_option('combine_css'),
-			'should_optimize' => \RapidPress\Optimization_Scope::should_optimize(),
-			'is_admin' => is_admin(),
-			'queue_count' => 0,
-			'candidate_count' => 0,
-			'content_reads_ok' => 0,
-			'content_reads_failed' => 0,
-			'combined_css_length' => 0,
-			'combined_filename' => '',
-			'combined_base_url' => '',
-			'last_reason' => '',
-		);
-
 		// Exclude admin, POST requests, and pages not in the optimization scope
 		if (!RP_Options::get_option('combine_css') || is_admin() || !\RapidPress\Optimization_Scope::should_optimize()) {
 			$this->debug_log[] = "CSS combination is disabled, is admin page, or not in optimization scope.";
-			$this->debug_state['last_reason'] = 'disabled_or_scope_or_admin';
-			$this->persist_debug_state();
 			return;
 		}
 
@@ -68,11 +50,8 @@ class CSS_Combiner {
 
 		if (!is_object($wp_styles)) {
 			$this->debug_log[] = "wp_styles is not an object.";
-			$this->debug_state['last_reason'] = 'wp_styles_not_object';
-			$this->persist_debug_state();
 			return;
 		}
-		$this->debug_state['queue_count'] = is_array($wp_styles->queue) ? count($wp_styles->queue) : 0;
 
 			$styles_to_combine = array();
 		$styles_hash = '';
@@ -102,7 +81,6 @@ class CSS_Combiner {
 					'style' => $style,
 					'src' => $src,
 				);
-				$this->debug_state['candidate_count']++;
 				$file_path = $this->url_to_path($src);
 				$last_modified = $this->get_file_last_modified($file_path);
 
@@ -121,16 +99,11 @@ class CSS_Combiner {
 						foreach ($styles_to_combine as $style_item) {
 							$this->add_style_to_combined($style_item['style'], $style_item['src']);
 						}
-						$this->debug_state['content_reads_ok'] = substr_count($this->combined_css, '/* ');
-						$this->debug_state['content_reads_failed'] = max(0, $this->debug_state['candidate_count'] - $this->debug_state['content_reads_ok']);
 
 						$this->combined_css = $this->minify_css($this->combined_css);
-						$this->debug_state['combined_css_length'] = strlen($this->combined_css);
 						if ($this->combined_css === '') {
 							$this->debug_log[] = "Combined CSS content is empty. Keeping original styles.";
 							$this->combined_handles = array();
-							$this->debug_state['last_reason'] = 'combined_css_empty';
-							$this->persist_debug_state();
 							return;
 						}
 						$combined_file_ready = $this->save_combined_css($styles_hash);
@@ -138,16 +111,10 @@ class CSS_Combiner {
 							$this->debug_log[] = "Combined CSS write failed. Keeping original styles.";
 							$this->combined_css = '';
 							$this->combined_handles = array();
-							$this->debug_state['last_reason'] = 'write_failed';
-							$this->persist_debug_state();
 							return;
 						}
 						$this->cleanup_old_files();
 					}
-				$this->debug_state['combined_filename'] = $this->combined_filename;
-				$this->debug_state['combined_base_url'] = $this->combined_base_url;
-				$this->debug_state['last_reason'] = 'success';
-				$this->persist_debug_state();
 
 			// Dequeue and deregister original styles
 			foreach ($this->combined_handles as $handle) {
@@ -165,8 +132,6 @@ class CSS_Combiner {
 				}
 			} else {
 				$this->debug_log[] = "No styles to combine.";
-				$this->debug_state['last_reason'] = 'no_styles_to_combine';
-				$this->persist_debug_state();
 			}
 	}
 
