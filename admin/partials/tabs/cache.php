@@ -3,6 +3,7 @@
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 use RapidPress\RP_Options;
+use RapidPress\Cache_Stats;
 
 ?>
 
@@ -95,11 +96,15 @@ use RapidPress\RP_Options;
 			<?php
 			$last_run = RP_Options::get_option('cache_preload_last_run');
 			$last_count = RP_Options::get_option('cache_preload_last_count', 0);
+			$cache_stats = (new Cache_Stats())->get_summary();
 			if (!empty($last_run)) :
 			?>
 				<p>
 					<?php echo esc_html(sprintf(__('Last preload: %s (%d URLs)', 'rapidpress'), wp_date('Y-m-d H:i:s', intval($last_run)), intval($last_count))); ?>
 				</p>
 			<?php endif; ?>
+			<p>
+				<?php echo esc_html(sprintf(__('Cache files: %d | Size: %s', 'rapidpress'), intval($cache_stats['file_count']), $cache_stats['total_size_human'])); ?>
+			</p>
 		</div>
 	</div>

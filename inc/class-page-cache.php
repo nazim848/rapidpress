@@ -7,6 +7,7 @@ class Page_Cache {
 	private $cache_key;
 	private $cache_store;
 	private $cache_invalidation;
+	private $skip_reason = '';
 
 	public function __construct($cache_config = null, $cache_key = null, $cache_store = null, $cache_invalidation = null) {
 		$this->cache_config = $cache_config instanceof Cache_Config ? $cache_config : new Cache_Config();
@@ -27,6 +28,7 @@ class Page_Cache {
 
 	public function maybe_serve_cache() {
 		if (!$this->should_cache_request()) {
+			$this->send_bypass_headers();
 			return;
 		}
 
@@ -105,48 +107,59 @@ class Page_Cache {
 
 	private function should_cache_request() {
 		if (!$this->cache_config->is_enabled()) {
+			$this->skip_reason = 'cache_disabled';
 			return false;
 		}
 
 		if (defined('DONOTCACHEPAGE') && DONOTCACHEPAGE) {
+			$this->skip_reason = 'donotcachepage';
 			return false;
 		}
 
 		if (is_admin() || is_feed() || is_preview() || is_404()) {
+			$this->skip_reason = 'request_type';
 			return false;
 		}
 
 		if (is_user_logged_in() && !$this->cache_config->cache_logged_in_users()) {
+			$this->skip_reason = 'logged_in';
 			return false;
 		}
 
 		if (!isset($_SERVER['REQUEST_METHOD'])) {
+			$this->skip_reason = 'missing_method';
 			return false;
 		}
 
 		$method = strtoupper(sanitize_text_field(wp_unslash($_SERVER['REQUEST_METHOD'])));
 		if (!in_array($method, array('GET', 'HEAD'), true)) {
+			$this->skip_reason = 'method_not_cacheable';
 			return false;
 		}
 
 		$has_query = (strpos($this->cache_key->get_request_uri(), '?') !== false || !empty($_GET));
 		if ($has_query && $this->cache_config->get_query_policy() !== 'ignore') {
+			$this->skip_reason = 'query_string';
 			return false;
 		}
 
 		if ($this->matches_never_cache_url()) {
+			$this->skip_reason = 'url_rule';
 			return false;
 		}
 
 		if ($this->matches_never_cache_user_agent()) {
+			$this->skip_reason = 'user_agent_rule';
 			return false;
 		}
 
 		$skip = apply_filters('rapidpress_cache_skip', false);
 		if ($skip) {
+			$this->skip_reason = 'custom_filter';
 			return false;
 		}
 
+		$this->skip_reason = '';
 		return true;
 	}
 
@@ -220,5 +233,16 @@ class Page_Cache {
 		}
 
 		return false;
+	}
+
+	private function send_bypass_headers() {
+		if (headers_sent()) {
+			return;
+		}
+
+		header('X-RapidPress-Cache: BYPASS');
+		if ($this->skip_reason !== '') {
+			header('X-RapidPress-Cache-Reason: ' . $this->skip_reason);
+		}
 	}
 }
