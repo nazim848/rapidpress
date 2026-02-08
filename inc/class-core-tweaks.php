@@ -43,6 +43,8 @@ class Core_Tweaks {
 
 	// Disable Comments
 	private function disable_comments() {
+		add_action('admin_menu', [$this, 'disable_comments_admin_menu'], 999);
+		add_action('admin_init', [$this, 'disable_comments_admin_redirect']);
 		add_action('admin_init', [$this, 'disable_comments_admin_actions']);
 		add_action('admin_bar_menu', [$this, 'disable_comments_admin_bar'], 999);
 		add_filter('comments_open', '__return_false', 20, 0);
@@ -51,17 +53,22 @@ class Core_Tweaks {
 		add_action('init', [$this, 'disable_comments_post_types_support'], 100);
 	}
 
-	public function disable_comments_admin_actions() {
-		// Remove comments menu and redirect
+	public function disable_comments_admin_menu() {
+		// Remove comments menu entries after the admin menu is built.
 		remove_menu_page('edit-comments.php');
 		remove_submenu_page('options-general.php', 'options-discussion.php');
+	}
 
+	public function disable_comments_admin_redirect() {
+		// Keep direct URL access to comments/discussion screens blocked.
 		global $pagenow;
 		if ($pagenow === 'edit-comments.php' || $pagenow === 'options-discussion.php') {
 			wp_safe_redirect(admin_url());
 			exit;
 		}
+	}
 
+	public function disable_comments_admin_actions() {
 		// Remove dashboard widgets
 		remove_meta_box('dashboard_recent_comments', 'dashboard', 'normal');
 		remove_action('dashboard_activity_widget_content', 'wp_dashboard_recent_comments');

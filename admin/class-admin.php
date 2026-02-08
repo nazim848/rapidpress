@@ -60,7 +60,12 @@ class Admin {
 			wp_send_json_error('Invalid nonce');
 		}
 
-		$new_options = isset($_POST['rapidpress_options']) ? $this->sanitize_options(wp_unslash($_POST['rapidpress_options'])) : array();
+		$raw_options = array();
+		if (isset($_POST['rapidpress_options']) && is_array($_POST['rapidpress_options'])) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in sanitize_options().
+			$raw_options = wp_unslash($_POST['rapidpress_options']);
+		}
+		$new_options = $this->sanitize_options($raw_options);
 		$old_options = get_option('rapidpress_options', array());
 
 			// Handle JS and CSS disable rules
