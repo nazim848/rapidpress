@@ -60,7 +60,7 @@ class Admin {
 			wp_send_json_error('Invalid nonce');
 		}
 
-		$new_options = isset($_POST['rapidpress_options']) ? $this->sanitize_options(map_deep(wp_unslash($_POST['rapidpress_options']), 'sanitize_text_field')) : array();
+		$new_options = isset($_POST['rapidpress_options']) ? $this->sanitize_options(wp_unslash($_POST['rapidpress_options'])) : array();
 		$old_options = get_option('rapidpress_options', array());
 
 			// Handle JS and CSS disable rules
