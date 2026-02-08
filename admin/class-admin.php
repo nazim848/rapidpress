@@ -242,14 +242,13 @@ class Admin {
 			'js_delay_specific_files'              => 'multiline_urls',
 			'enable_js_delay_exclusions'           => 'boolean',
 			'js_delay_exclusions'                  => 'multiline_urls',
-			'js_disable_rules'                     => 'js_disable_rules',
-			'css_disable_rules'                    => 'css_disable_rules',
-			'lazy_load_images'                     => 'boolean',
-			'lazy_load_skip_first'                 => 'lazy_load_skip_first',
-			'lazy_load_fallback'                   => 'boolean',
-			'lazy_load_threshold'                  => 'lazy_load_threshold',
-			'lazy_load_placeholder'                => 'lazy_load_placeholder',
-			'lazy_load_exclusions'                 => 'multiline_urls',
+				'js_disable_rules'                     => 'js_disable_rules',
+				'css_disable_rules'                    => 'css_disable_rules',
+				'lazy_load_images'                     => 'boolean',
+				'lazy_load_fallback'                   => 'boolean',
+				'lazy_load_threshold'                  => 'lazy_load_threshold',
+				'lazy_load_placeholder'                => 'lazy_load_placeholder',
+					'lazy_load_exclusions'                 => 'lazy_load_exclusions',
 				'add_missing_dimensions'               => 'boolean',
 				'enable_cache'                         => 'boolean',
 				'early_cache_serving'                 => 'boolean',
@@ -589,17 +588,6 @@ class Admin {
 	}
 
 	/**
-	 * Sanitize lazy load skip first setting
-	 *
-	 * @param mixed $input The input value
-	 * @return int Sanitized value between 0 and 10
-	 */
-	public function sanitize_lazy_load_skip_first($input) {
-		$value = intval($input);
-		return max(0, min(10, $value));
-	}
-
-	/**
 	 * Sanitize lazy load threshold setting
 	 *
 	 * @param mixed $input The input value
@@ -619,6 +607,35 @@ class Admin {
 	public function sanitize_lazy_load_placeholder($input) {
 		$valid_options = array('transparent', 'blur');
 		return in_array($input, $valid_options) ? $input : 'transparent';
+	}
+
+	/**
+	 * Sanitize lazy load exclusions without URL normalization.
+	 *
+	 * @param mixed $input The raw exclusions input.
+	 * @return string
+	 */
+	public function sanitize_lazy_load_exclusions($input) {
+		if (empty($input)) {
+			return '';
+		}
+
+		if (is_array($input)) {
+			$input = implode("\n", $input);
+		}
+
+		$lines = preg_split('/\r\n|\r|\n/', (string) $input);
+		if (!is_array($lines)) {
+			return '';
+		}
+
+		$sanitized = array_map('sanitize_text_field', $lines);
+		$sanitized = array_map('trim', $sanitized);
+		$sanitized = array_filter($sanitized, function ($line) {
+			return $line !== '';
+		});
+
+		return implode("\n", array_values($sanitized));
 	}
 
 	public function save_settings_with_tab($value, $old_value, $option) {

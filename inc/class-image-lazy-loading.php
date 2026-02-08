@@ -22,6 +22,8 @@ class Image_Lazy_Loading {
 	public function __construct() {
 		// Only run on frontend and if lazy loading is enabled
 		if (!is_admin() && RP_Options::get_option('lazy_load_images')) {
+			// Disable native WP lazy loading so RapidPress rules (skip-first/exclusions) stay authoritative.
+			add_filter('wp_lazy_loading_enabled', array($this, 'disable_native_lazy_loading'), 10, 3);
 			add_action('wp_enqueue_scripts', array($this, 'enqueue_lazy_loading_script'));
 			add_filter('the_content', array($this, 'add_lazy_loading_to_content'), 999);
 			add_filter('post_thumbnail_html', array($this, 'add_lazy_loading_to_post_thumbnail'), 999);
@@ -30,6 +32,18 @@ class Image_Lazy_Loading {
 			// Use output buffering for complete HTML processing
 			add_action('template_redirect', array($this, 'start_output_buffering'));
 		}
+	}
+
+	/**
+	 * Disable native WordPress lazy loading while RapidPress lazy loading is active.
+	 *
+	 * @param bool   $default  Default WP behavior.
+	 * @param string $tag_name Tag name.
+	 * @param string $context  Current context.
+	 * @return bool
+	 */
+	public function disable_native_lazy_loading($default, $tag_name = '', $context = '') {
+		return false;
 	}
 
 	/**
@@ -77,13 +91,18 @@ class Image_Lazy_Loading {
 		$img_tag = $matches[0];
 		$attributes = $matches[1];
 
-		// Skip if image already has loading attribute
-		if (preg_match('/loading\s*=\s*["\']([^"\']*)["\']/', $attributes)) {
-			return $img_tag;
+		// Enforce explicit exclusion rules before honoring existing loading attributes.
+		if ($this->should_exclude_image($attributes)) {
+			if (preg_match('/loading\s*=\s*["\']([^"\']*)["\']/', $attributes)) {
+				$attributes = preg_replace('/loading\s*=\s*["\']([^"\']*)["\']/', 'loading="eager"', $attributes);
+			} else {
+				$attributes .= ' loading="eager"';
+			}
+			return '<img' . $attributes . '>';
 		}
 
-		// Skip if image should be excluded
-		if ($this->should_exclude_image($attributes)) {
+		// Respect images that already define a loading strategy.
+		if (preg_match('/loading\s*=\s*["\']([^"\']*)["\']/', $attributes)) {
 			return $img_tag;
 		}
 
@@ -103,42 +122,45 @@ class Image_Lazy_Loading {
 	 * @return bool True if image should be excluded
 	 */
 	private function should_exclude_image($attributes) {
-		// Get exclusion settings
-		$skip_first = (int) RP_Options::get_option('lazy_load_skip_first', 2);
 		$exclusions = RP_Options::get_option('lazy_load_exclusions', '');
 
-		// Skip first N images (above the fold)
-		static $image_count = 0;
-		$image_count++;
-
-		if ($image_count <= $skip_first) {
+		// Check exclusion patterns
+		if (!empty($exclusions) && $this->matches_exclusion_patterns($attributes, $exclusions)) {
 			return true;
 		}
 
-		// Check exclusion patterns
-		if (!empty($exclusions)) {
-			$exclusion_patterns = array_filter(array_map('trim', explode("\n", $exclusions)));
+		return false;
+	}
 
-			foreach ($exclusion_patterns as $pattern) {
-				// Check class exclusions
-				if (strpos($pattern, '.') === 0) {
-					$class = substr($pattern, 1);
-					if (preg_match('/class\s*=\s*["\'][^"\']*\b' . preg_quote($class, '/') . '\b[^"\']*["\']/', $attributes)) {
-						return true;
-					}
+	/**
+	 * Match exclusion patterns against image attributes.
+	 *
+	 * @param string $attributes Image attributes.
+	 * @param string $exclusions Exclusion patterns, one per line.
+	 * @return bool
+	 */
+	private function matches_exclusion_patterns($attributes, $exclusions) {
+		$exclusion_patterns = array_filter(array_map('trim', explode("\n", $exclusions)));
+
+		foreach ($exclusion_patterns as $pattern) {
+			// Check class exclusions
+			if (strpos($pattern, '.') === 0) {
+				$class = substr($pattern, 1);
+				if (preg_match('/class\s*=\s*["\'][^"\']*\b' . preg_quote($class, '/') . '\b[^"\']*["\']/', $attributes)) {
+					return true;
 				}
-				// Check ID exclusions
-				elseif (strpos($pattern, '#') === 0) {
-					$id = substr($pattern, 1);
-					if (preg_match('/id\s*=\s*["\']' . preg_quote($id, '/') . '["\']/', $attributes)) {
-						return true;
-					}
+			}
+			// Check ID exclusions
+			elseif (strpos($pattern, '#') === 0) {
+				$id = substr($pattern, 1);
+				if (preg_match('/id\s*=\s*["\']' . preg_quote($id, '/') . '["\']/', $attributes)) {
+					return true;
 				}
-				// Check src pattern exclusions
-				else {
-					if (preg_match('/src\s*=\s*["\'][^"\']*' . preg_quote($pattern, '/') . '[^"\']*["\']/', $attributes)) {
-						return true;
-					}
+			}
+			// Check src pattern exclusions
+			else {
+				if (preg_match('/src\s*=\s*["\'][^"\']*' . preg_quote($pattern, '/') . '[^"\']*["\']/', $attributes)) {
+					return true;
 				}
 			}
 		}
@@ -238,15 +260,52 @@ class Image_Lazy_Loading {
 			return $attr;
 		}
 
-		// Skip if loading attribute already exists
-		if (isset($attr['loading'])) {
+		$attribute_string = $this->build_attributes_string($attr);
+
+		// Apply explicit exclusions for attachment images.
+		if ($this->should_exclude_image($attribute_string)) {
+			$attr['loading'] = 'eager';
 			return $attr;
 		}
 
-		// Add loading="lazy" attribute
 		$attr['loading'] = 'lazy';
 
+		// Apply fallback attributes consistently for attachment images.
+		if (RP_Options::get_option('lazy_load_fallback', '1') && !empty($attr['src'])) {
+			if (empty($attr['data-src'])) {
+				$attr['data-src'] = $attr['src'];
+			}
+			$attr['src'] = $this->get_placeholder_src();
+
+			$existing_class = isset($attr['class']) ? (string) $attr['class'] : '';
+			if (strpos(' ' . $existing_class . ' ', ' rapidpress-lazy ') === false) {
+				$attr['class'] = trim($existing_class . ' rapidpress-lazy');
+			}
+		}
+
 		return $attr;
+	}
+
+	/**
+	 * Build an attribute string from image attributes for shared exclusion checks.
+	 *
+	 * @param array $attr Image attributes.
+	 * @return string
+	 */
+	private function build_attributes_string($attr) {
+		if (!is_array($attr) || empty($attr)) {
+			return '';
+		}
+
+		$parts = array();
+		foreach ($attr as $key => $value) {
+			if ($value === '' || $value === null) {
+				continue;
+			}
+			$parts[] = sanitize_key($key) . '="' . sanitize_text_field((string) $value) . '"';
+		}
+
+		return implode(' ', $parts);
 	}
 
 	/**
