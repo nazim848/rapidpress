@@ -10,6 +10,11 @@ class RapidPressAdmin {
 		this.restoreAccordionState();
 		this.initializeRuleManagement();
 		this.setupResetSettings();
+		this.setupPurgePageCache();
+		this.setupPreloadPageCache();
+		this.setupClearCssCache();
+		this.setupCacheTabVisibility();
+		this.setupLazyLoadTabVisibility();
 	}
 
 	setupResetSettings() {
@@ -43,6 +48,130 @@ class RapidPressAdmin {
 				});
 			}
 		});
+	}
+
+	setupPurgePageCache() {
+		this.$("#rapidpress-purge-page-cache").on("click", e => {
+			e.preventDefault();
+			if (!confirm("Purge all cached HTML pages now?")) {
+				return;
+			}
+
+			this.$.ajax({
+				url: rapidpress_admin.ajax_url,
+				type: "POST",
+				data: {
+					action: "rapidpress_purge_page_cache",
+					nonce: rapidpress_admin.nonce
+				},
+				success: response => {
+					if (response.success) {
+						alert("Page cache purged successfully.");
+					} else {
+						alert("Failed to purge page cache. Please try again.");
+					}
+				},
+				error: () => {
+					alert("An error occurred while purging page cache.");
+				}
+			});
+		});
+	}
+
+	setupPreloadPageCache() {
+		this.$("#rapidpress-preload-page-cache").on("click", e => {
+			e.preventDefault();
+
+			this.$.ajax({
+				url: rapidpress_admin.ajax_url,
+				type: "POST",
+				data: {
+					action: "rapidpress_preload_page_cache",
+					nonce: rapidpress_admin.nonce
+				},
+					success: response => {
+						if (response.success) {
+							const data = response.data || {};
+							alert(data.message || "Cache preload completed.");
+							const fallbackDisplay = new Date().toLocaleString();
+							const display =
+								data.last_run_display && data.last_run_display !== ""
+									? data.last_run_display
+									: fallbackDisplay;
+							this.$("#rapidpress-preload-status").text(
+								`Last preload: ${display} (${data.last_count || 0} URLs)`
+							);
+						} else {
+							alert("Failed to preload cache. Please try again.");
+						}
+				},
+				error: () => {
+					alert("An error occurred while preloading cache.");
+				}
+			});
+		});
+	}
+
+	setupClearCssCache() {
+		this.$("#rapidpress-clear-css-cache").on("click", e => {
+			e.preventDefault();
+			this.$.ajax({
+				url: rapidpress_admin.ajax_url,
+				type: "POST",
+				data: {
+					action: "rapidpress_clear_css_cache",
+					nonce: rapidpress_admin.nonce
+				},
+				success: response => {
+					if (response.success) {
+						alert("CSS cache cleared successfully.");
+					} else {
+						alert("Failed to clear CSS cache. Please try again.");
+					}
+				},
+				error: () => {
+					alert("An error occurred while clearing CSS cache.");
+				}
+			});
+		});
+	}
+
+	setupCacheTabVisibility() {
+		const $enableCache = this.$(
+			'input[name="rapidpress_options[enable_cache]"]'
+		);
+		const $cacheSettingsWrapper = this.$("#rapidpress-cache-settings-wrapper");
+
+		if (!$enableCache.length || !$cacheSettingsWrapper.length) {
+			return;
+		}
+
+		const updateCacheSettingsVisibility = () => {
+			$cacheSettingsWrapper.toggle($enableCache.is(":checked"));
+		};
+
+		$enableCache.on("change", updateCacheSettingsVisibility);
+		updateCacheSettingsVisibility();
+	}
+
+	setupLazyLoadTabVisibility() {
+		const $enableLazyLoading = this.$(
+			'input[name="rapidpress_options[lazy_load_images]"]'
+		);
+		const $lazyLoadSettingsWrapper = this.$(
+			"#rapidpress-lazy-load-settings-wrapper"
+		);
+
+		if (!$enableLazyLoading.length || !$lazyLoadSettingsWrapper.length) {
+			return;
+		}
+
+		const updateLazyLoadSettingsVisibility = () => {
+			$lazyLoadSettingsWrapper.toggle($enableLazyLoading.is(":checked"));
+		};
+
+		$enableLazyLoading.on("change", updateLazyLoadSettingsVisibility);
+		updateLazyLoadSettingsVisibility();
 	}
 
 	// Helper methods

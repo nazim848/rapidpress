@@ -2,6 +2,10 @@
 
 namespace RapidPress;
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 class CSS_Combiner {
 
 	private $combined_css = '';
@@ -13,7 +17,8 @@ class CSS_Combiner {
 	private $combined_handles = array();
 	private $file_prefix = 'combined-';
 	private $file_extension = '.css';
-	private $max_files_to_keep = 3;
+	private $max_files_to_keep = 100;
+	private $combined_base_url = '';
 
 	public function __construct() {
 		add_action('wp_print_styles', array($this, 'combine_css'), 100);
@@ -39,7 +44,6 @@ class CSS_Combiner {
 	}
 
 	public function combine_css() {
-
 		// Exclude admin, POST requests, and pages not in the optimization scope
 		if (!RP_Options::get_option('combine_css') || is_admin() || !\RapidPress\Optimization_Scope::should_optimize()) {
 			$this->debug_log[] = "CSS combination is disabled, is admin page, or not in optimization scope.";
@@ -53,7 +57,7 @@ class CSS_Combiner {
 			return;
 		}
 
-		$styles_to_combine = array();
+			$styles_to_combine = array();
 		$styles_hash = '';
 
 		foreach ($wp_styles->queue as $handle) {
@@ -77,9 +81,12 @@ class CSS_Combiner {
 				continue;
 			}
 
-			$styles_to_combine[] = $style;
-			$file_path = $this->url_to_path($src);
-			$last_modified = $this->get_file_last_modified($file_path);
+				$styles_to_combine[] = array(
+					'style' => $style,
+					'src' => $src,
+				);
+				$file_path = $this->url_to_path($src);
+				$last_modified = $this->get_file_last_modified($file_path);
 
 			// Include original src with query string in hash calculation
 			$styles_hash .= $original_src . $last_modified;
@@ -87,19 +94,31 @@ class CSS_Combiner {
 			$this->last_modified = max($this->last_modified, $last_modified);
 		}
 
-		if (!empty($styles_to_combine)) {
-			$styles_hash = md5($styles_hash);
-			$this->combined_filename = "{$this->file_prefix}{$styles_hash}{$this->file_extension}";
+			if (!empty($styles_to_combine)) {
+				$styles_hash = md5($styles_hash);
+				$this->combined_filename = "{$this->file_prefix}{$styles_hash}{$this->file_extension}";
+				$combined_file_ready = $this->is_cached_file_valid($styles_hash);
 
-			if (!$this->is_cached_file_valid($styles_hash)) {
-				foreach ($styles_to_combine as $style) {
-					$this->add_style_to_combined($style);
-				}
+					if (!$combined_file_ready) {
+						foreach ($styles_to_combine as $style_item) {
+							$this->add_style_to_combined($style_item['style'], $style_item['src']);
+						}
 
-				$this->combined_css = $this->minify_css($this->combined_css);
-				$this->save_combined_css($styles_hash);
-				$this->cleanup_old_files();
-			}
+						$this->combined_css = $this->minify_css($this->combined_css);
+						if ($this->combined_css === '') {
+							$this->debug_log[] = "Combined CSS content is empty. Keeping original styles.";
+							$this->combined_handles = array();
+							return;
+						}
+						$combined_file_ready = $this->save_combined_css($styles_hash);
+						if (!$combined_file_ready) {
+							$this->debug_log[] = "Combined CSS write failed. Keeping original styles.";
+							$this->combined_css = '';
+							$this->combined_handles = array();
+							return;
+						}
+						$this->cleanup_old_files();
+					}
 
 			// Dequeue and deregister original styles
 			foreach ($this->combined_handles as $handle) {
@@ -107,14 +126,17 @@ class CSS_Combiner {
 				wp_deregister_style($handle);
 			}
 
-			// Add filter to remove any style tags that might be directly output
-			add_filter('style_loader_tag', array($this, 'remove_combined_style_tags'), 10, 2);
+				// Add filter to remove any style tags that might be directly output
+				add_filter('style_loader_tag', array($this, 'remove_combined_style_tags'), 10, 2);
 
-			// Enqueue combined style with versioning
-			wp_enqueue_style('rapidpress-combined-css', $this->get_combined_css_url(), array(), $this->last_modified);
-		} else {
-			$this->debug_log[] = "No styles to combine.";
-		}
+				// Enqueue combined style with versioning
+				$combined_url = $this->get_combined_css_url();
+				if ($combined_url !== '') {
+					wp_enqueue_style('rapidpress-combined-css', $combined_url, array(), $this->last_modified);
+				}
+			} else {
+				$this->debug_log[] = "No styles to combine.";
+			}
 	}
 
 	private function get_file_last_modified($file_path) {
@@ -122,25 +144,43 @@ class CSS_Combiner {
 	}
 
 	private function cleanup_old_files() {
-		$upload_dir = wp_upload_dir();
-		$combined_dir = trailingslashit($upload_dir['basedir']) . 'rapidpress';
-
-		if (!is_dir($combined_dir)) {
+		$location = $this->get_writable_combined_location();
+		if (empty($location['dir']) || !is_dir($location['dir'])) {
 			return;
 		}
 
+		$combined_dir = $location['dir'];
 		$files = glob($combined_dir . '/' . $this->file_prefix . '*' . $this->file_extension);
-
-		if (count($files) <= $this->max_files_to_keep) {
+		if (!is_array($files) || empty($files)) {
 			return;
 		}
 
-		usort($files, function ($a, $b) {
+		$now = time();
+		$expiry_cutoff = $now - intval($this->cache_expiration);
+		$existing = array();
+
+		// First pass: remove expired combined files.
+		foreach ($files as $file) {
+			$mtime = @filemtime($file);
+			if ($mtime !== false && $mtime < $expiry_cutoff) {
+				if (is_file($file)) {
+					wp_delete_file($file);
+				}
+				continue;
+			}
+			$existing[] = $file;
+		}
+
+		// Second pass: high-water cap to avoid unlimited accumulation.
+		if (count($existing) <= $this->max_files_to_keep) {
+			return;
+		}
+
+		usort($existing, function ($a, $b) {
 			return filemtime($b) - filemtime($a);
 		});
 
-		$files_to_delete = array_slice($files, $this->max_files_to_keep);
-
+		$files_to_delete = array_slice($existing, $this->max_files_to_keep);
 		foreach ($files_to_delete as $file) {
 			if (is_file($file)) {
 				wp_delete_file($file);
@@ -149,8 +189,23 @@ class CSS_Combiner {
 	}
 
 	private function is_external_file($src) {
-		$wp_base_url = get_bloginfo('wpurl');
-		return strpos($src, $wp_base_url) === false && preg_match('/^(https?:)?\/\//i', $src);
+		if (!preg_match('/^(https?:)?\/\//i', $src)) {
+			return false;
+		}
+
+		$src_host = wp_parse_url($src, PHP_URL_HOST);
+		$home_host = wp_parse_url(home_url('/'), PHP_URL_HOST);
+		$site_host = wp_parse_url(site_url('/'), PHP_URL_HOST);
+
+		$src_host = is_string($src_host) ? strtolower($src_host) : '';
+		$home_host = is_string($home_host) ? strtolower($home_host) : '';
+		$site_host = is_string($site_host) ? strtolower($site_host) : '';
+
+		if ($src_host === '' || $src_host === $home_host || $src_host === $site_host) {
+			return false;
+		}
+
+		return true;
 	}
 
 	private function is_excluded_file($src, $handle = '') {
@@ -190,8 +245,9 @@ class CSS_Combiner {
 		return $src;
 	}
 
-	private function add_style_to_combined($style) {
-		$content = $this->get_file_content($style->src);
+	private function add_style_to_combined($style, $normalized_src = '') {
+		$src = $normalized_src !== '' ? $normalized_src : $this->get_full_url($style->src);
+		$content = $this->get_file_content($src);
 		if ($content !== false) {
 			$this->combined_css .= "/* {$style->handle} */\n";
 			$this->combined_css .= $content . "\n";
@@ -211,23 +267,31 @@ class CSS_Combiner {
 	// }
 
 	private function get_file_content($src) {
-		if (strpos($src, '://') !== false) {
-			$response = wp_remote_get($src);
-			if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
-				return wp_remote_retrieve_body($response);
-			}
-			return false;
-		}
-
-		$file_path = $this->url_to_path($src);
+		$normalized_src = $this->get_full_url((string) $src);
+		$normalized_src = preg_replace('/\?.*/', '', $normalized_src);
+		$file_path = $this->url_to_path($normalized_src);
 		if (file_exists($file_path)) {
-			// WP_Filesystem for local files
+			$contents = @file_get_contents($file_path); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			if ($contents !== false) {
+				return $contents;
+			}
+
+			// Fallback to WP_Filesystem for local files.
 			global $wp_filesystem;
 			if (empty($wp_filesystem)) {
 				require_once ABSPATH . '/wp-admin/inc/file.php';
 				WP_Filesystem();
 			}
-			return $wp_filesystem->get_contents($file_path);
+			if (!empty($wp_filesystem)) {
+				return $wp_filesystem->get_contents($file_path);
+			}
+		}
+
+		if (strpos($normalized_src, '://') !== false) {
+			$response = wp_remote_get($normalized_src);
+			if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
+				return wp_remote_retrieve_body($response);
+			}
 		}
 
 		return false;
@@ -267,6 +331,23 @@ class CSS_Combiner {
 			return str_replace($site_url . $content_path, ABSPATH . $content_path, $url);
 		}
 
+		$path = wp_parse_url($url, PHP_URL_PATH);
+		if (is_string($path) && $path !== '') {
+			$candidate = ABSPATH . ltrim($path, '/');
+			if (file_exists($candidate)) {
+				return $candidate;
+			}
+
+			if (strpos($path, '/wp-content/') !== false) {
+				$wp_content_pos = strpos($path, '/wp-content/');
+				$relative = substr($path, $wp_content_pos + 1);
+				$candidate = ABSPATH . $relative;
+				if (file_exists($candidate)) {
+					return $candidate;
+				}
+			}
+		}
+
 		// Fallback for other URLs
 		return $url;
 	}
@@ -297,48 +378,97 @@ class CSS_Combiner {
 	// }
 
 	private function save_combined_css($styles_hash) {
-		global $wp_filesystem;
-
-		if (!function_exists('WP_Filesystem')) {
-			require_once ABSPATH . 'wp-admin/inc/file.php';
+		$location = $this->get_writable_combined_location();
+		if (empty($location) || empty($location['dir']) || empty($location['url'])) {
+			RP_Options::delete_option('css_cache_meta');
+			return false;
 		}
 
-		WP_Filesystem();
-
-		$upload_dir = wp_upload_dir();
-		$combined_dir = $upload_dir['basedir'] . '/rapidpress';
-		wp_mkdir_p($combined_dir);
+		$combined_dir = $location['dir'];
+		$this->combined_base_url = untrailingslashit($location['url']);
 
 		$combined_file = $combined_dir . '/' . $this->combined_filename;
+		$write_ok = false;
 
-		$wp_filesystem->put_contents(
-			$combined_file,
-			$this->combined_css,
-			FS_CHMOD_FILE
-		);
+		// Prefer native file writing for frontend reliability.
+		$bytes = @file_put_contents($combined_file, $this->combined_css); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		if ($bytes !== false) {
+			$write_ok = true;
+			@chmod($combined_file, FS_CHMOD_FILE); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
+		}
+
+		// Fallback to WP_Filesystem when native write fails.
+		if (!$write_ok) {
+			global $wp_filesystem;
+			if (!function_exists('WP_Filesystem')) {
+				require_once ABSPATH . 'wp-admin/inc/file.php';
+			}
+
+			if (WP_Filesystem() && !empty($wp_filesystem)) {
+				$write_ok = $wp_filesystem->put_contents(
+					$combined_file,
+					$this->combined_css,
+					FS_CHMOD_FILE
+				);
+			}
+		}
+
+		if (!$write_ok || !file_exists($combined_file)) {
+			RP_Options::delete_option('css_cache_meta');
+			return false;
+		}
 
 		$cache_meta = array(
 			'hash' => $styles_hash,
 			'expires' => time() + $this->cache_expiration,
 			'last_modified' => $this->last_modified,
+			'base_url' => $this->combined_base_url,
 		);
 
 		RP_Options::update_option('css_cache_meta', $cache_meta);
+		return true;
 	}
 
 	private function is_cached_file_valid($styles_hash) {
 		$cache_meta = RP_Options::get_option('css_cache_meta', array());
-		if (isset($cache_meta['hash']) && $cache_meta['hash'] === $styles_hash) {
-			if (isset($cache_meta['last_modified']) && $cache_meta['last_modified'] >= $this->last_modified) {
-				return true;
-			}
+		if (!isset($cache_meta['hash']) || $cache_meta['hash'] !== $styles_hash) {
+			return false;
 		}
-		return false;
+
+		if (!isset($cache_meta['expires']) || intval($cache_meta['expires']) < time()) {
+			return false;
+		}
+
+		if (!isset($cache_meta['last_modified']) || intval($cache_meta['last_modified']) < $this->last_modified) {
+			return false;
+		}
+
+		$combined_file = $this->find_existing_combined_file($this->combined_filename);
+		if ($combined_file === '') {
+			return false;
+		}
+
+		$stored_base_url = isset($cache_meta['base_url']) ? sanitize_text_field($cache_meta['base_url']) : '';
+		if ($stored_base_url !== '') {
+			$this->combined_base_url = untrailingslashit($stored_base_url);
+		}
+
+		return true;
 	}
 
 	private function get_combined_css_url() {
-		$upload_dir = wp_upload_dir();
-		return $upload_dir['baseurl'] . '/rapidpress/' . $this->combined_filename;
+		if ($this->combined_base_url === '') {
+			$location = $this->get_writable_combined_location();
+			if (!empty($location['url'])) {
+				$this->combined_base_url = untrailingslashit($location['url']);
+			}
+		}
+
+		if ($this->combined_base_url === '') {
+			return '';
+		}
+
+		return trailingslashit($this->combined_base_url) . $this->combined_filename;
 	}
 
 	public function print_combined_css() {
@@ -429,6 +559,40 @@ class CSS_Combiner {
 		// Remove query string
 		$url = preg_replace('/\?.*/', '', $url);
 		return $url;
+	}
+
+	private function get_writable_combined_location() {
+		$cache_store = new Cache_Store();
+		$dir = $cache_store->get_css_cache_dir();
+		$url = $cache_store->get_css_cache_url();
+		if ($dir === '' || $url === '' || !is_dir($dir) || !wp_is_writable($dir)) {
+			return array();
+		}
+
+		return array(
+			'dir' => $dir,
+			'url' => $url,
+		);
+	}
+
+	private function find_existing_combined_file($filename) {
+		$location = $this->get_writable_combined_location();
+		if (empty($location['dir']) || empty($location['url'])) {
+			return '';
+		}
+
+		$file = trailingslashit($location['dir']) . $filename;
+		if (file_exists($file)) {
+			$this->combined_base_url = untrailingslashit($location['url']);
+			return $file;
+		}
+
+		return '';
+	}
+
+	private function persist_debug_state() {
+		$this->debug_state['log_tail'] = array_slice($this->debug_log, -20);
+		RP_Options::update_option('css_combine_debug', $this->debug_state);
 	}
 
 	/**

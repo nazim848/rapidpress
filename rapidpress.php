@@ -2,7 +2,7 @@
 /*
 Plugin Name: RapidPress - Turbocharge Website Performance
 Description: Boost your WordPress site speed by 2x-5x with advanced optimization techniques including minification, asset management, and performance tweaks.
-Version: 1.0.1
+Version: 1.1.0
 Author: Nazim Husain
 Author URI: https://nazimansari.com
 License: GPLv2 or later
@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: rapidpress
 Domain Path: /languages
 Requires at least: 5.0
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.2
 
 RapidPress is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@ require __DIR__ . '/inc/class-rapidpress-options.php';
 
 use RapidPress\RP_Options;
 
-define('RAPIDPRESS_VERSION', '1.0');
+define('RAPIDPRESS_VERSION', '1.1.0');
 define('RAPIDPRESS_PATH', plugin_dir_path(__FILE__));
 define('RAPIDPRESS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('RAPIDPRESS_PLUGIN_FILE', __FILE__);
@@ -53,12 +53,12 @@ if ($rapidpress_version != RAPIDPRESS_VERSION) {
 	update_option('rapidpress_version', RAPIDPRESS_VERSION, false);
 }
 
-// Run the plugin
-function start_rapidpress() {
+// Run the plugin.
+function rapidpress_start_plugin() {
 	$plugin = new RapidPress\RapidPress();
 	$plugin->run();
 }
-start_rapidpress();
+rapidpress_start_plugin();
 
 // Activation hook
 register_activation_hook(__FILE__, 'rapidpress_activate');
@@ -70,10 +70,20 @@ register_deactivation_hook(__FILE__, 'rapidpress_deactivate');
 function rapidpress_activate() {
 	// Activation code here
 	set_transient('rapidpress_activation_notice', true, 5);
+
+	require_once RAPIDPRESS_PATH . 'inc/class-cache-dropin-manager.php';
+	require_once RAPIDPRESS_PATH . 'inc/class-cache-preloader.php';
+	\RapidPress\Cache_Dropin_Manager::sync_from_options();
+	\RapidPress\Cache_Preloader::sync_schedule_from_options();
 }
 
 // Deactivation code
 function rapidpress_deactivate() {
+	require_once RAPIDPRESS_PATH . 'inc/class-cache-dropin-manager.php';
+	require_once RAPIDPRESS_PATH . 'inc/class-cache-preloader.php';
+	\RapidPress\Cache_Dropin_Manager::remove_dropin();
+	\RapidPress\Cache_Preloader::clear_schedule();
+
 	// Check if clean deactivate is enabled
 	$clean_deactivate = RP_Options::get_option('clean_deactivate');
 
@@ -82,6 +92,8 @@ function rapidpress_deactivate() {
 		$options_to_delete = [
 			'rapidpress_options',
 			'rapidpress_version',
+			'rapidpress_cache_preload_last_run',
+			'rapidpress_cache_preload_last_count',
 		];
 
 		foreach ($options_to_delete as $option) {

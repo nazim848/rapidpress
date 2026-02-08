@@ -6,7 +6,7 @@ use RapidPress\RP_Options;
 
 ?>
 
-<div id="<?php echo esc_attr($tab_id); ?>" class="tab-pane">
+<div id="<?php echo esc_attr($rapidpress_tab_id); ?>" class="tab-pane">
 	<h2 class="content-title"><span class="dashicons dashicons-hidden"></span> <?php esc_html_e('Disable Assets', 'rapidpress'); ?></h2>
 	<p class="desc"><?php esc_html_e('Disable specific assets (CSS and JS) from loading on your site. This can help improve page load times and reduce server load by disabling assets that are not needed for that page.', 'rapidpress'); ?></p>
 	<div class="accordion-item">
@@ -20,21 +20,21 @@ use RapidPress\RP_Options;
 						<th style="width: 12%;"><?php esc_html_e('Actions', 'rapidpress'); ?> <span class="dashicons dashicons-editor-help" data-title="<?php esc_attr_e('Enable, disable, or remove a script disable rule.', 'rapidpress'); ?>"></span></th>
 					</tr>
 					<?php
-					$js_rules = RP_Options::get_option('js_disable_rules', array());
-					foreach ($js_rules as $index => $rule) {
-						$scripts = isset($rule['scripts']) ? $rule['scripts'] : array();
-						$scripts_text = is_array($scripts) ? implode("\n", $scripts) : $scripts;
-						$is_active = isset($rule['is_active']) ? $rule['is_active'] : true;
-						$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site';
+						$rapidpress_js_rules = RP_Options::get_option('js_disable_rules', array());
+						foreach ($rapidpress_js_rules as $rapidpress_index => $rapidpress_rule) {
+							$rapidpress_scripts = isset($rapidpress_rule['scripts']) ? $rapidpress_rule['scripts'] : array();
+							$rapidpress_scripts_text = is_array($rapidpress_scripts) ? implode("\n", $rapidpress_scripts) : $rapidpress_scripts;
+							$rapidpress_is_active = isset($rapidpress_rule['is_active']) ? $rapidpress_rule['is_active'] : true;
+							$rapidpress_scope = isset($rapidpress_rule['scope']) ? $rapidpress_rule['scope'] : 'entire_site';
 
-						$exclude_enabled = isset($rule['exclude_enabled']) ? $rule['exclude_enabled'] : false;
+							$rapidpress_exclude_enabled = isset($rapidpress_rule['exclude_enabled']) ? $rapidpress_rule['exclude_enabled'] : false;
 
-						$show_exclude_pages = ($scope === 'entire_site' && $exclude_enabled) ? 'block' : 'none';
+							$rapidpress_show_exclude_pages = ($rapidpress_scope === 'entire_site' && $rapidpress_exclude_enabled) ? 'block' : 'none';
 
-						$exclude_pages = isset($rule['exclude_pages']) ? $rule['exclude_pages'] : '';
-						$exclude_pages_text = is_array($exclude_pages) ? implode("\n", $exclude_pages) : $exclude_pages;
-						$pages = isset($rule['pages']) ? $rule['pages'] : array();
-						$pages_text = is_array($pages) ? implode("\n", $pages) : $pages;
+							$rapidpress_exclude_pages = isset($rapidpress_rule['exclude_pages']) ? $rapidpress_rule['exclude_pages'] : '';
+							$rapidpress_exclude_pages_text = is_array($rapidpress_exclude_pages) ? implode("\n", $rapidpress_exclude_pages) : $rapidpress_exclude_pages;
+							$rapidpress_pages = isset($rapidpress_rule['pages']) ? $rapidpress_rule['pages'] : array();
+							$rapidpress_pages_text = is_array($rapidpress_pages) ? implode("\n", $rapidpress_pages) : $rapidpress_pages;
 
 						printf(
 							'<tr>
@@ -65,29 +65,29 @@ use RapidPress\RP_Options;
 										<button type="button" class="button remove-js-rule">%20$s</button>
 								  </td>
 							 </tr>',
-							esc_attr($index),
-							esc_attr__('Script URL or Handle (one per line)', 'rapidpress'),
-							esc_textarea($scripts_text),
-							selected($scope, 'entire_site', false),
-							esc_html__('Entire Site', 'rapidpress'),
-							selected($scope, 'front_page', false),
-							esc_html__('Front Page', 'rapidpress'),
-							selected($scope, 'specific_pages', false),
-							esc_html__('Specific Pages', 'rapidpress'),
-							esc_attr($scope === 'entire_site' ? 'inline-block' : 'none'),
-							checked($exclude_enabled, true, false),
-							esc_html__('Exclude pages?', 'rapidpress'),
-							esc_attr('https://example.com/page1/\nhttps://example.com/page2/'),
-							esc_attr($show_exclude_pages),
-							// esc_attr($exclude_enabled ? 'block' : 'none'),
-							esc_textarea($exclude_pages_text),
-							esc_attr($scope === 'specific_pages' ? 'block' : 'none'),
-							esc_textarea($pages_text),
-							checked($is_active, true, false),
-							esc_html__('Active', 'rapidpress'),
-							esc_html__('Remove', 'rapidpress')
-						);
-					}
+								esc_attr($rapidpress_index),
+								esc_attr__('Script URL or Handle (one per line)', 'rapidpress'),
+								esc_textarea($rapidpress_scripts_text),
+								selected($rapidpress_scope, 'entire_site', false),
+								esc_html__('Entire Site', 'rapidpress'),
+								selected($rapidpress_scope, 'front_page', false),
+								esc_html__('Front Page', 'rapidpress'),
+								selected($rapidpress_scope, 'specific_pages', false),
+								esc_html__('Specific Pages', 'rapidpress'),
+								esc_attr($rapidpress_scope === 'entire_site' ? 'inline-block' : 'none'),
+								checked($rapidpress_exclude_enabled, true, false),
+								esc_html__('Exclude pages?', 'rapidpress'),
+								esc_attr('https://example.com/page1/\nhttps://example.com/page2/'),
+								esc_attr($rapidpress_show_exclude_pages),
+								// esc_attr($exclude_enabled ? 'block' : 'none'),
+								esc_textarea($rapidpress_exclude_pages_text),
+								esc_attr($rapidpress_scope === 'specific_pages' ? 'block' : 'none'),
+								esc_textarea($rapidpress_pages_text),
+								checked($rapidpress_is_active, true, false),
+								esc_html__('Active', 'rapidpress'),
+								esc_html__('Remove', 'rapidpress')
+							);
+						}
 
 					?>
 				</table>
@@ -107,21 +107,21 @@ use RapidPress\RP_Options;
 						<th style="width: 12%;"><?php esc_html_e('Actions', 'rapidpress'); ?> <span class="dashicons dashicons-editor-help" data-title="<?php esc_attr_e('Enable, disable, or remove a CSS disable rule.', 'rapidpress'); ?>"></span></th>
 					</tr>
 					<?php
-					$css_rules = RP_Options::get_option('css_disable_rules', array());
-					foreach ($css_rules as $index => $rule) {
-						$scope = isset($rule['scope']) ? $rule['scope'] : 'entire_site';
-						$styles = isset($rule['styles']) ? $rule['styles'] : array();
-						$styles_text = is_array($styles) ? implode("\n", $styles) : $styles;
-						$is_active = isset($rule['is_active']) ? $rule['is_active'] : true;
-						$exclude_enabled = isset($rule['exclude_enabled']) ? $rule['exclude_enabled'] : false;
+						$rapidpress_css_rules = RP_Options::get_option('css_disable_rules', array());
+						foreach ($rapidpress_css_rules as $rapidpress_index => $rapidpress_rule) {
+							$rapidpress_scope = isset($rapidpress_rule['scope']) ? $rapidpress_rule['scope'] : 'entire_site';
+							$rapidpress_styles = isset($rapidpress_rule['styles']) ? $rapidpress_rule['styles'] : array();
+							$rapidpress_styles_text = is_array($rapidpress_styles) ? implode("\n", $rapidpress_styles) : $rapidpress_styles;
+							$rapidpress_is_active = isset($rapidpress_rule['is_active']) ? $rapidpress_rule['is_active'] : true;
+							$rapidpress_exclude_enabled = isset($rapidpress_rule['exclude_enabled']) ? $rapidpress_rule['exclude_enabled'] : false;
 
-						$show_exclude_pages = ($scope === 'entire_site' && $exclude_enabled) ? 'block' : 'none';
+							$rapidpress_show_exclude_pages = ($rapidpress_scope === 'entire_site' && $rapidpress_exclude_enabled) ? 'block' : 'none';
 
-						$exclude_pages = isset($rule['exclude_pages']) ? $rule['exclude_pages'] : '';
-						$exclude_pages_text = is_array($exclude_pages) ? implode("\n", $exclude_pages) : $exclude_pages;
-						$pages = isset($rule['pages']) ? $rule['pages'] : array();
+							$rapidpress_exclude_pages = isset($rapidpress_rule['exclude_pages']) ? $rapidpress_rule['exclude_pages'] : '';
+							$rapidpress_exclude_pages_text = is_array($rapidpress_exclude_pages) ? implode("\n", $rapidpress_exclude_pages) : $rapidpress_exclude_pages;
+							$rapidpress_pages = isset($rapidpress_rule['pages']) ? $rapidpress_rule['pages'] : array();
 
-						$pages_text = is_array($pages) ? implode("\n", $pages) : $pages;
+							$rapidpress_pages_text = is_array($rapidpress_pages) ? implode("\n", $rapidpress_pages) : $rapidpress_pages;
 
 						printf(
 							'<tr>
@@ -152,28 +152,28 @@ use RapidPress\RP_Options;
 										<button type="button" class="button remove-css-rule">%20$s</button>
 								  </td>
 							 </tr>',
-							esc_attr($index),
-							esc_attr__('CSS URL or Handle (one per line)', 'rapidpress'),
-							esc_textarea($styles_text),
-							selected($scope, 'entire_site', false),
-							esc_html__('Entire Site', 'rapidpress'),
-							selected($scope, 'front_page', false),
-							esc_html__('Front Page', 'rapidpress'),
-							selected($scope, 'specific_pages', false),
-							esc_html__('Specific Pages', 'rapidpress'),
-							esc_attr($scope === 'entire_site' ? 'inline-block' : 'none'),
-							checked($exclude_enabled, true, false),
-							esc_html__('Exclude pages?', 'rapidpress'),
-							esc_attr('https://example.com/page1/\nhttps://example.com/page2/'),
-							// esc_attr($exclude_enabled ? 'block' : 'none'),
-							esc_attr($show_exclude_pages),
-							esc_textarea($exclude_pages_text),
-							esc_attr($scope === 'specific_pages' ? 'block' : 'none'),
-							esc_textarea($pages_text),
-							checked($is_active, true, false),
-							esc_html__('Active', 'rapidpress'),
-							esc_html__('Remove', 'rapidpress')
-						);
+								esc_attr($rapidpress_index),
+								esc_attr__('CSS URL or Handle (one per line)', 'rapidpress'),
+								esc_textarea($rapidpress_styles_text),
+								selected($rapidpress_scope, 'entire_site', false),
+								esc_html__('Entire Site', 'rapidpress'),
+								selected($rapidpress_scope, 'front_page', false),
+								esc_html__('Front Page', 'rapidpress'),
+								selected($rapidpress_scope, 'specific_pages', false),
+								esc_html__('Specific Pages', 'rapidpress'),
+								esc_attr($rapidpress_scope === 'entire_site' ? 'inline-block' : 'none'),
+								checked($rapidpress_exclude_enabled, true, false),
+								esc_html__('Exclude pages?', 'rapidpress'),
+								esc_attr('https://example.com/page1/\nhttps://example.com/page2/'),
+								// esc_attr($exclude_enabled ? 'block' : 'none'),
+								esc_attr($rapidpress_show_exclude_pages),
+								esc_textarea($rapidpress_exclude_pages_text),
+								esc_attr($rapidpress_scope === 'specific_pages' ? 'block' : 'none'),
+								esc_textarea($rapidpress_pages_text),
+								checked($rapidpress_is_active, true, false),
+								esc_html__('Active', 'rapidpress'),
+								esc_html__('Remove', 'rapidpress')
+							);
 					}
 
 					?>

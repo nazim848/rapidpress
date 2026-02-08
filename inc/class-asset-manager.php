@@ -2,14 +2,19 @@
 
 namespace RapidPress;
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 class Asset_Manager {
 
 	public function __construct() {
 		add_action('wp_enqueue_scripts', array($this, 'manage_js_assets'), 9999);
 		add_action('wp_enqueue_scripts', array($this, 'manage_css_assets'), 9999);
 		add_action('wp_print_scripts', array($this, 'final_js_cleanup'), 9999);
+		add_action('wp_print_footer_scripts', array($this, 'final_js_cleanup'), 9999);
 		add_action('wp_print_styles', array($this, 'final_css_cleanup'), 9999);
-		add_filter('script_loader_tag', array($this, 'remove_script_tag'), 10, 2);
+		add_filter('script_loader_tag', array($this, 'remove_script_tag'), 10, 3);
 		add_filter('style_loader_tag', array($this, 'remove_style_tag'), 10, 2);
 	}
 
@@ -176,6 +181,22 @@ class Asset_Manager {
 		if (wp_script_is($script, 'registered')) {
 			wp_deregister_script($script);
 		}
+
+		// Also match by source URL/partial URL and dequeue matching handles.
+		global $wp_scripts;
+		if (is_object($wp_scripts) && !empty($wp_scripts->registered)) {
+			foreach ($wp_scripts->registered as $handle => $registered_script) {
+				if (!is_string($handle) || !is_object($registered_script) || !isset($registered_script->src)) {
+					continue;
+				}
+				$src = (string) $registered_script->src;
+				if ($src !== '' && strpos($src, (string) $script) !== false) {
+					wp_dequeue_script($handle);
+					wp_deregister_script($handle);
+				}
+			}
+		}
+
 		add_filter('script_loader_tag', function ($tag, $handle) use ($script) {
 			if (strpos($tag, $script) !== false) {
 				return '';
@@ -184,7 +205,7 @@ class Asset_Manager {
 		}, 10, 2);
 	}
 
-	public function remove_script_tag($tag, $handle) {
+	public function remove_script_tag($tag, $handle, $src = '') {
 		$js_rules = RP_Options::get_option('js_disable_rules', array());
 
 		if (empty($js_rules)) {
@@ -203,7 +224,7 @@ class Asset_Manager {
 
 			if ($should_disable) {
 				foreach ($scripts as $script) {
-					if ($handle === $script || strpos($tag, $script) !== false) {
+					if ($handle === $script || strpos((string) $src, $script) !== false || strpos($tag, $script) !== false) {
 						return '';
 					}
 				}
@@ -218,6 +239,10 @@ class Asset_Manager {
 	}
 
 	private function get_scripts_from_rule($rule) {
+		if (!isset($rule['scripts'])) {
+			return array();
+		}
+
 		if (is_array($rule['scripts'])) {
 			return array_filter(array_map('trim', $rule['scripts']));
 		} elseif (is_string($rule['scripts'])) {

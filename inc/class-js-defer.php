@@ -2,6 +2,10 @@
 
 namespace RapidPress;
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 class JS_Defer {
 
 	public function __construct() {

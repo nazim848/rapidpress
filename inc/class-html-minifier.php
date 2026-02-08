@@ -2,6 +2,10 @@
 
 namespace RapidPress;
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 class HTML_Minifier {
 
 	private $css_minifier;
@@ -55,14 +59,9 @@ class HTML_Minifier {
 		// Remove comments (not containing IE conditional statements)
 		$html = preg_replace('/<!--(?!\s*(?:\[if [^\]]+]|<!|>))(?:(?!-->).)*-->/s', '', $html);
 
-		// Remove whitespace
-		$html = preg_replace('/\s+/', ' ', $html);
-
-		// Remove whitespace around HTML tags
-		$html = preg_replace('/\s*(<\/?[^>]+>)\s*/', '$1', $html);
-
-		// Remove extra spaces
-		$html = preg_replace('/ +/', ' ', $html);
+		// Only collapse whitespace between tags.
+		// Do not normalize all whitespace globally, because that can break inline JS/CSS.
+		$html = preg_replace('/>\s+</', '><', $html);
 
 		return trim($html);
 	}

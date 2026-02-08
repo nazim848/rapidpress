@@ -2,6 +2,10 @@
 
 namespace RapidPress;
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 class Admin {
 	private $plugin_name;
 	private $version;
@@ -17,10 +21,14 @@ class Admin {
 		add_action('admin_init', array($this, 'register_settings'));
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_styles'));
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
-		add_action('admin_bar_menu', array($this, 'add_toolbar_items'), 100);
-		add_filter('plugin_action_links_' . plugin_basename(RAPIDPRESS_PLUGIN_FILE), array($this, 'add_action_links'));
-		add_action('wp_ajax_rapidpress_reset_settings', array($this, 'reset_settings'));
-	}
+			add_action('admin_bar_menu', array($this, 'add_toolbar_items'), 100);
+			add_filter('plugin_action_links_' . plugin_basename(RAPIDPRESS_PLUGIN_FILE), array($this, 'add_action_links'));
+			add_action('wp_ajax_rapidpress_reset_settings', array($this, 'reset_settings'));
+			add_action('wp_ajax_rapidpress_purge_page_cache', array($this, 'purge_page_cache'));
+			add_action('wp_ajax_rapidpress_preload_page_cache', array($this, 'preload_page_cache'));
+			add_action('wp_ajax_rapidpress_clear_css_cache', array($this, 'clear_css_cache_ajax'));
+			add_action('update_option_rapidpress_options', array($this, 'save_settings_with_tab'), 10, 3);
+		}
 
 	public function enqueue_styles($hook) {
 		if ('settings_page_rapidpress' !== $hook) {
@@ -52,16 +60,28 @@ class Admin {
 			wp_send_json_error('Invalid nonce');
 		}
 
-		$new_options = isset($_POST['rapidpress_options']) ? $this->sanitize_options(map_deep(wp_unslash($_POST['rapidpress_options']), 'sanitize_text_field')) : array();
+		$raw_options = array();
+		if (isset($_POST['rapidpress_options']) && is_array($_POST['rapidpress_options'])) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in sanitize_options().
+			$raw_options = wp_unslash($_POST['rapidpress_options']);
+		}
+		$new_options = $this->sanitize_options($raw_options);
 		$old_options = get_option('rapidpress_options', array());
 
-		// Handle JS and CSS disable rules
-		if (!isset($new_options['js_disable_rules'])) {
-			$new_options['js_disable_rules'] = array();
-		}
-		if (!isset($new_options['css_disable_rules'])) {
-			$new_options['css_disable_rules'] = array();
-		}
+			// Handle JS and CSS disable rules
+			if (!isset($new_options['js_disable_rules'])) {
+				$new_options['js_disable_rules'] = array();
+			}
+			if (!isset($new_options['css_disable_rules'])) {
+				$new_options['css_disable_rules'] = array();
+			}
+
+			// Preserve runtime cache state keys that are not part of settings form fields.
+			foreach ($this->get_runtime_option_keys() as $runtime_key) {
+				if (isset($old_options[$runtime_key]) && !isset($new_options[$runtime_key])) {
+					$new_options[$runtime_key] = $old_options[$runtime_key];
+				}
+			}
 
 		// Compare new options with old options
 		$changed = false;
@@ -204,7 +224,10 @@ class Admin {
 			'remove_shortlink'                    	=> 'boolean',
 			'disable_rest_api'							=> 'text_field',
 			'remove_rest_api_links'                => 'boolean',
+			'disable_heartbeat'                    => 'disable_heartbeat',
+			'heartbeat_frequency'                  => 'heartbeat_frequency',
 			'limit_post_revisions'                 => 'limit_post_revisions',
+			'autosave_interval'                    => 'autosave_interval',
 			'optimization_scope'                   => 'text_field',
 			'optimized_pages'                      => 'multiline_urls',
 			'enable_optimization_scope_exclusions' => 'boolean',
@@ -224,18 +247,25 @@ class Admin {
 			'js_delay_specific_files'              => 'multiline_urls',
 			'enable_js_delay_exclusions'           => 'boolean',
 			'js_delay_exclusions'                  => 'multiline_urls',
-			'js_disable_rules'                     => 'js_disable_rules',
-			'css_disable_rules'                    => 'css_disable_rules',
-			'lazy_load_images'                     => 'boolean',
-			'lazy_load_skip_first'                 => 'lazy_load_skip_first',
-			'lazy_load_fallback'                   => 'boolean',
-			'lazy_load_threshold'                  => 'lazy_load_threshold',
-			'lazy_load_placeholder'                => 'lazy_load_placeholder',
-			'lazy_load_exclusions'                 => 'multiline_urls',
-			'add_missing_dimensions'               => 'boolean',
-			'clean_uninstall'                      => 'boolean',
-			'clean_deactivate'                      => 'boolean',
-		);
+				'js_disable_rules'                     => 'js_disable_rules',
+				'css_disable_rules'                    => 'css_disable_rules',
+				'lazy_load_images'                     => 'boolean',
+				'lazy_load_fallback'                   => 'boolean',
+				'lazy_load_threshold'                  => 'lazy_load_threshold',
+				'lazy_load_placeholder'                => 'lazy_load_placeholder',
+					'lazy_load_exclusions'                 => 'lazy_load_exclusions',
+				'add_missing_dimensions'               => 'boolean',
+				'enable_cache'                         => 'boolean',
+				'early_cache_serving'                 => 'boolean',
+				'cache_preload_enabled'               => 'boolean',
+				'cache_preload_batch_size'            => 'preload_batch_size',
+				'cache_query_policy'                  => 'cache_query_policy',
+				'cache_mobile_variant'                => 'boolean',
+				'cache_never_cache_urls'              => 'multiline_urls',
+				'cache_never_cache_user_agents'       => 'multiline_text',
+				'clean_uninstall'                      => 'boolean',
+				'clean_deactivate'                      => 'boolean',
+			);
 
 		foreach ($sanitization_rules as $option => $rule) {
 			if (isset($options[$option])) {
@@ -248,9 +278,13 @@ class Admin {
 						$sanitized_options[$option] = $this->sanitize_multiline_urls($options[$option]);
 						break;
 
-					case 'text_field':
-						$sanitized_options[$option] = sanitize_text_field($options[$option]);
-						break;
+						case 'text_field':
+							$sanitized_options[$option] = sanitize_text_field($options[$option]);
+							break;
+
+						case 'multiline_text':
+							$sanitized_options[$option] = $this->sanitize_multiline_text($options[$option]);
+							break;
 
 					default:
 						$method = "sanitize_{$rule}";
@@ -348,9 +382,63 @@ class Admin {
 			// 'js_delay_specific_files' => '',
 			// 'js_disable_rules' => [],
 			// 'css_disable_rules' => []
-		];
-		update_option('rapidpress_options', $default_options);
-		wp_send_json_success('Settings reset successfully');
+			];
+			update_option('rapidpress_options', $default_options);
+			wp_send_json_success('Settings reset successfully');
+		}
+
+	public function purge_page_cache() {
+		check_ajax_referer('rapidpress_options_verify', 'nonce');
+
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error('Insufficient permissions');
+		}
+
+		$cache_store = new Cache_Store();
+		$cache_store->purge_all_html();
+
+		wp_send_json_success('Page cache purged successfully');
+	}
+
+	public function preload_page_cache() {
+		check_ajax_referer('rapidpress_options_verify', 'nonce');
+
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error('Insufficient permissions');
+		}
+
+		$preloader = new Cache_Preloader();
+		$count = $preloader->run_manual_preload();
+		$last_run = intval(get_option(Cache_Preloader::LAST_RUN_OPTION, RP_Options::get_option('cache_preload_last_run', 0)));
+		if ($last_run <= 0) {
+			$last_run = time();
+			update_option(Cache_Preloader::LAST_RUN_OPTION, $last_run, false);
+		}
+		$last_count = intval(get_option(Cache_Preloader::LAST_COUNT_OPTION, RP_Options::get_option('cache_preload_last_count', 0)));
+		if ($last_count <= 0 && $count > 0) {
+			$last_count = intval($count);
+			update_option(Cache_Preloader::LAST_COUNT_OPTION, $last_count, false);
+		}
+
+		wp_send_json_success(array(
+			'message' => sprintf('Preloaded %d URLs', intval($count)),
+			'last_run' => $last_run,
+			'last_count' => $last_count,
+			'last_run_display' => $last_run > 0 ? wp_date('Y-m-d H:i:s', $last_run) : '',
+		));
+	}
+
+	public function clear_css_cache_ajax() {
+		check_ajax_referer('rapidpress_options_verify', 'nonce');
+
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error('Insufficient permissions');
+		}
+
+		$this->clear_css_cache();
+		$cache_store = new Cache_Store();
+		$cache_store->purge_all_html();
+		wp_send_json_success('CSS cache cleared successfully');
 	}
 
 	private function sanitize_limit_post_revisions($value) {
@@ -365,6 +453,72 @@ class Admin {
 
 		return intval($value);
 	}
+
+	private function sanitize_preload_batch_size($value) {
+		$value = intval($value);
+		return max(1, min(100, $value));
+	}
+
+	private function get_runtime_option_keys() {
+		return array(
+			'cache_preload_last_run',
+			'cache_preload_last_count',
+		);
+	}
+
+	private function sanitize_cache_query_policy($value) {
+		$value = sanitize_text_field($value);
+		$valid = array('bypass', 'ignore');
+		return in_array($value, $valid, true) ? $value : 'bypass';
+	}
+
+	private function sanitize_multiline_text($input) {
+		if (empty($input)) {
+			return '';
+		}
+
+		if (is_array($input)) {
+			$input = implode("\n", $input);
+		}
+
+		$lines = preg_split('/\r\n|\r|\n/', (string) $input);
+		if (!is_array($lines)) {
+			return '';
+		}
+
+		$sanitized = array_map('sanitize_text_field', $lines);
+		$sanitized = array_map('trim', $sanitized);
+		$sanitized = array_filter($sanitized, function ($line) {
+			return $line !== '';
+		});
+
+		return implode("\n", array_values($sanitized));
+	}
+
+	private function sanitize_disable_heartbeat($value) {
+		$valid = array('disable_everywhere', 'allow_posts');
+		return in_array($value, $valid, true) ? $value : '';
+	}
+
+	private function sanitize_heartbeat_frequency($value) {
+		$valid = array('30', '45', '60');
+		return in_array((string) $value, $valid, true) ? (string) $value : '';
+	}
+
+	private function sanitize_autosave_interval($value) {
+		if ($value === '' || $value === null) {
+			return '';
+		}
+
+		$value = intval($value);
+		if ($value === 172800) {
+			return $value;
+		}
+
+		$valid = array(2, 3, 4, 5, 10, 15, 20);
+		return in_array($value, $valid, true) ? $value : '';
+	}
+
 
 	public function sanitize_css_disable_rules($input) {
 		$sanitized_rules = array();
@@ -439,17 +593,6 @@ class Admin {
 	}
 
 	/**
-	 * Sanitize lazy load skip first setting
-	 *
-	 * @param mixed $input The input value
-	 * @return int Sanitized value between 0 and 10
-	 */
-	public function sanitize_lazy_load_skip_first($input) {
-		$value = intval($input);
-		return max(0, min(10, $value));
-	}
-
-	/**
 	 * Sanitize lazy load threshold setting
 	 *
 	 * @param mixed $input The input value
@@ -471,13 +614,56 @@ class Admin {
 		return in_array($input, $valid_options) ? $input : 'transparent';
 	}
 
+	/**
+	 * Sanitize lazy load exclusions without URL normalization.
+	 *
+	 * @param mixed $input The raw exclusions input.
+	 * @return string
+	 */
+	public function sanitize_lazy_load_exclusions($input) {
+		if (empty($input)) {
+			return '';
+		}
+
+		if (is_array($input)) {
+			$input = implode("\n", $input);
+		}
+
+		$lines = preg_split('/\r\n|\r|\n/', (string) $input);
+		if (!is_array($lines)) {
+			return '';
+		}
+
+		$sanitized = array_map('sanitize_text_field', $lines);
+		$sanitized = array_map('trim', $sanitized);
+		$sanitized = array_filter($sanitized, function ($line) {
+			return $line !== '';
+		});
+
+		return implode("\n", array_values($sanitized));
+	}
+
 	public function save_settings_with_tab($value, $old_value, $option) {
+		$is_settings_save = (
+			isset($_POST['action'], $_POST['rapidpress_nonce']) &&
+			'rapidpress_save_settings' === sanitize_text_field(wp_unslash($_POST['action'])) &&
+			wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['rapidpress_nonce'])), 'rapidpress_options_verify')
+		);
+
+		if (!$is_settings_save) {
+			return $value;
+		}
+
 		// Clear the CSS cache after saving settings
 		$this->clear_css_cache();
+		$cache_store = new Cache_Store();
+		$cache_store->purge_all_html();
+		Cache_Dropin_Manager::sync_from_options();
+		Cache_Preloader::sync_schedule_from_options();
 
 		if (
 			isset($_POST['rapidpress_active_tab'], $_POST['rapidpress_nonce']) &&
-			wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['rapidpress_nonce'])), 'rapidpress_settings')
+			wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['rapidpress_nonce'])), 'rapidpress_options_verify')
 		) {
 			$tab = sanitize_key(ltrim(sanitize_text_field(wp_unslash($_POST['rapidpress_active_tab'])), '#'));
 			add_filter('wp_redirect', function ($location) use ($tab) {
@@ -490,11 +676,14 @@ class Admin {
 	}
 
 	public function clear_css_cache() {
-		$upload_dir = wp_upload_dir();
-		$combined_dir = trailingslashit($upload_dir['basedir']) . 'rapidpress';
+		$cache_store = new Cache_Store();
+		$combined_dir = $cache_store->get_css_cache_dir();
 
-		if (is_dir($combined_dir)) {
-			array_map('unlink', glob("$combined_dir/*.*"));
+		if ($combined_dir !== '' && is_dir($combined_dir)) {
+			$files = glob($combined_dir . '/*.*');
+			if (is_array($files)) {
+				array_map('unlink', $files);
+			}
 		}
 
 		RP_Options::delete_option('css_cache_meta');

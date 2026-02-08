@@ -6,7 +6,7 @@ use RapidPress\RP_Options;
 
 ?>
 
-<div id="<?php echo esc_attr($tab_id); ?>" class="tab-pane">
+<div id="<?php echo esc_attr($rapidpress_tab_id); ?>" class="tab-pane">
 	<h2 class="content-title"><span class="dashicons dashicons-images-alt2"></span> <?php esc_html_e('Media', 'rapidpress'); ?></h2>
 
 	<!-- Lazy Loading Section -->
@@ -24,16 +24,12 @@ use RapidPress\RP_Options;
 					</div>
 				</td>
 			</tr>
-			<tr valign="top">
-				<th scope="row"><?php esc_html_e('Skip First Images', 'rapidpress'); ?></th>
-				<td>
-					<input type="number" name="rapidpress_options[lazy_load_skip_first]" value="<?php echo esc_attr(RP_Options::get_option('lazy_load_skip_first', '2')); ?>" min="0" max="10" style="width: 80px;" />
-					<p class="description"><?php esc_html_e('Number of images to skip lazy loading (above-the-fold images). Default: 2', 'rapidpress'); ?></p>
-				</td>
-			</tr>
-			<tr valign="top">
-				<th scope="row"><?php esc_html_e('JavaScript Fallback', 'rapidpress'); ?></th>
-				<td>
+		</table>
+			<div id="rapidpress-lazy-load-settings-wrapper">
+				<table class="form-table">
+				<tr valign="top">
+					<th scope="row"><?php esc_html_e('JavaScript Fallback', 'rapidpress'); ?></th>
+					<td>
 					<div class="checkbox-radio">
 						<label>
 							<input type="checkbox" name="rapidpress_options[lazy_load_fallback]" value="1" <?php checked(RP_Options::get_option('lazy_load_fallback', '1'), '1'); ?> />
@@ -75,7 +71,8 @@ use RapidPress\RP_Options;
 					</p>
 				</td>
 			</tr>
-		</table>
+			</table>
+		</div>
 	</div>
 
 	<!-- Image Optimization Section -->

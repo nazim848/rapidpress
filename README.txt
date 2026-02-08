@@ -3,8 +3,8 @@ Contributors: nazim848
 Donate link: https://buymeacoffee.com/nazim848
 Tags: pagespeed, performance, optimization, speed, minification
 Requires at least: 5.0
-Tested up to: 6.8
-Stable tag: 1.0.1
+Tested up to: 6.9
+Stable tag: 1.1.0
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -21,9 +21,13 @@ RapidPress is a lightweight yet powerful WordPress speed optimization plugin des
 * **CSS Minification** - Optimize both inline and external CSS files
 * **CSS Combination** - Merge multiple CSS files to reduce HTTP requests
 * **JavaScript Optimization** - Defer and delay JavaScript execution for faster page rendering
-* **Core WordPress Tweaks** - Optimize WordPress core for better performance
 * **Asset Management** - Control how and when assets are loaded
 * **Optimization Scoping** - Apply optimizations selectively to specific pages or post types
+* **Page Caching** - Serve cached HTML pages to reduce server processing and improve response times
+* **Cache Management** - Purge and preload cache directly from the plugin settings
+* **Media Lazy Loading** - Lazy load offscreen images for faster initial page rendering
+* **Missing Image Dimensions** - Automatically add missing width and height attributes to help reduce layout shifts
+* **Core WordPress Tweaks** - Optimize WordPress core for better performance
 
 == Why Choose RapidPress? ==
 
@@ -77,6 +81,12 @@ Yes, RapidPress is fully internationalized and ready for translation. The plugin
 
 == Changelog ==
 
+= 1.1.0 =
+* Added page cache feature to serve cached HTML for faster page loads.
+* Added cache tools to purge and preload cached pages.
+* Added media lazy loading controls to improve image loading performance.
+* Added automatic missing image dimension support to help reduce layout shifts.
+
 = 1.0.0 =
 * Initial release
 * HTML minification feature
@@ -88,6 +98,9 @@ Yes, RapidPress is fully internationalized and ready for translation. The plugin
 * Full internationalization support
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Introduces page caching and new media optimizations, including lazy loading controls and automatic missing image dimensions.
 
 = 1.0.0 =
 Initial release of RapidPress. Start optimizing your WordPress site for better performance!

@@ -2,6 +2,10 @@
 
 namespace RapidPress;
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 class RapidPress {
 
 	protected $loader;
@@ -28,6 +32,18 @@ class RapidPress {
 		require_once RAPIDPRESS_PATH . 'inc/class-js-delay.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-optimization-scope.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-image-lazy-loading.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-image-dimensions.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-cache-config.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-cache-key.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-cache-store.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-cache-invalidation.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-cache-dropin-manager.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-cache-preloader.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-cache-stats.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-cache-cli.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-page-cache.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-heartbeat-control.php';
+		require_once RAPIDPRESS_PATH . 'inc/class-autosave-control.php';
 		require_once RAPIDPRESS_PATH . 'admin/class-admin.php';
 		require_once RAPIDPRESS_PATH . 'public/class-public.php';
 		require_once RAPIDPRESS_PATH . 'inc/class-asset-manager.php';
@@ -48,6 +64,12 @@ class RapidPress {
 		new \RapidPress\JS_Defer();
 		new \RapidPress\Asset_Manager();
 		new \RapidPress\Image_Lazy_Loading();
+		new \RapidPress\Image_Dimensions();
+		new \RapidPress\Page_Cache();
+		new \RapidPress\Cache_Preloader();
+		new \RapidPress\Cache_CLI();
+		new \RapidPress\Heartbeat_Control();
+		new \RapidPress\Autosave_Control();
 	}
 
 	private function define_admin_hooks() {

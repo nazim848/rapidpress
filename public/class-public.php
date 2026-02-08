@@ -26,12 +26,20 @@ class Public_Core {
 	private function add_lazy_loading_styles() {
 		$css = "
 		.rapidpress-lazy {
-			opacity: 0;
-			transition: opacity 0.3s ease-in-out;
+			opacity: 1;
+			transition: opacity 0.35s ease-in-out, filter 0.45s ease-in-out, transform 0.45s ease-in-out;
 		}
 		.rapidpress-lazy.loaded,
 		img:not(.rapidpress-lazy) {
 			opacity: 1;
+		}
+		.rapidpress-lazy.rapidpress-lazy-blur {
+			filter: blur(14px);
+			transform: scale(1.02);
+		}
+		.rapidpress-lazy.loaded {
+			filter: blur(0);
+			transform: none;
 		}
 		/* Prevent layout shift during loading */
 		.rapidpress-lazy {
