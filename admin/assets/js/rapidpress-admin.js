@@ -13,6 +13,8 @@ class RapidPressAdmin {
 		this.setupPurgePageCache();
 		this.setupPreloadPageCache();
 		this.setupClearCssCache();
+		this.setupCacheTabVisibility();
+		this.setupLazyLoadTabVisibility();
 	}
 
 	setupResetSettings() {
@@ -132,6 +134,44 @@ class RapidPressAdmin {
 				}
 			});
 		});
+	}
+
+	setupCacheTabVisibility() {
+		const $enableCache = this.$(
+			'input[name="rapidpress_options[enable_cache]"]'
+		);
+		const $cacheSettingsWrapper = this.$("#rapidpress-cache-settings-wrapper");
+
+		if (!$enableCache.length || !$cacheSettingsWrapper.length) {
+			return;
+		}
+
+		const updateCacheSettingsVisibility = () => {
+			$cacheSettingsWrapper.toggle($enableCache.is(":checked"));
+		};
+
+		$enableCache.on("change", updateCacheSettingsVisibility);
+		updateCacheSettingsVisibility();
+	}
+
+	setupLazyLoadTabVisibility() {
+		const $enableLazyLoading = this.$(
+			'input[name="rapidpress_options[lazy_load_images]"]'
+		);
+		const $lazyLoadSettingsWrapper = this.$(
+			"#rapidpress-lazy-load-settings-wrapper"
+		);
+
+		if (!$enableLazyLoading.length || !$lazyLoadSettingsWrapper.length) {
+			return;
+		}
+
+		const updateLazyLoadSettingsVisibility = () => {
+			$lazyLoadSettingsWrapper.toggle($enableLazyLoading.is(":checked"));
+		};
+
+		$enableLazyLoading.on("change", updateLazyLoadSettingsVisibility);
+		updateLazyLoadSettingsVisibility();
 	}
 
 	// Helper methods

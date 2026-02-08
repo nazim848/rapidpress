@@ -24,6 +24,9 @@ use RapidPress\RP_Options;
 					</div>
 				</td>
 			</tr>
+		</table>
+		<div id="rapidpress-lazy-load-settings-wrapper">
+			<table class="form-table">
 			<tr valign="top">
 				<th scope="row"><?php esc_html_e('Skip First Images', 'rapidpress'); ?></th>
 				<td>
@@ -75,7 +78,8 @@ use RapidPress\RP_Options;
 					</p>
 				</td>
 			</tr>
-		</table>
+			</table>
+		</div>
 	</div>
 
 	<!-- Image Optimization Section -->
