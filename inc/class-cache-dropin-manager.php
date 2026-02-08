@@ -35,8 +35,8 @@ class Cache_Dropin_Manager {
 			return false;
 		}
 
-		$uploads_dir = wp_upload_dir();
-		$cache_dir = isset($uploads_dir['basedir']) ? trailingslashit($uploads_dir['basedir']) . 'rapidpress-cache' : '';
+		$cache_store = new Cache_Store();
+		$cache_dir = $cache_store->get_html_cache_dir();
 		if ($cache_dir === '') {
 			return false;
 		}

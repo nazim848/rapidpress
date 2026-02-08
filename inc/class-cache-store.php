@@ -3,21 +3,71 @@
 namespace RapidPress;
 
 class Cache_Store {
-	public function get_cache_dir() {
+	public function get_cache_base_dir() {
 		$upload_dir = wp_upload_dir();
 		$base_dir = isset($upload_dir['basedir']) ? $upload_dir['basedir'] : '';
+		if (!is_string($base_dir) || $base_dir === '') {
+			return '';
+		}
+
+		$dir = trailingslashit($base_dir) . 'rapidpress';
+		return apply_filters('rapidpress_cache_base_dir', $dir);
+	}
+
+	public function get_html_cache_dir() {
+		$base_dir = $this->get_cache_base_dir();
 		if ($base_dir === '') {
 			return '';
 		}
 
-		$dir = trailingslashit($base_dir) . 'rapidpress-cache';
+		$dir = trailingslashit($base_dir) . 'cache';
 		$dir = apply_filters('rapidpress_cache_path', $dir);
+		$dir = apply_filters('rapidpress_html_cache_path', $dir);
 
 		if (!is_dir($dir)) {
 			wp_mkdir_p($dir);
 		}
 
+		if (!is_dir($dir)) {
+			return '';
+		}
+
 		return $dir;
+	}
+
+	public function get_css_cache_dir() {
+		$base_dir = $this->get_cache_base_dir();
+		if ($base_dir === '') {
+			return '';
+		}
+
+		$dir = trailingslashit($base_dir) . 'css';
+		$dir = apply_filters('rapidpress_css_cache_path', $dir);
+
+		if (!is_dir($dir)) {
+			wp_mkdir_p($dir);
+		}
+
+		if (!is_dir($dir)) {
+			return '';
+		}
+
+		return $dir;
+	}
+
+	public function get_css_cache_url() {
+		$upload_dir = wp_upload_dir();
+		$base_url = isset($upload_dir['baseurl']) ? $upload_dir['baseurl'] : '';
+		if (!is_string($base_url) || $base_url === '') {
+			return '';
+		}
+
+		$url = trailingslashit($base_url) . 'rapidpress/css';
+		return apply_filters('rapidpress_css_cache_url', $url);
+	}
+
+	public function get_cache_dir() {
+		return $this->get_html_cache_dir();
 	}
 
 	public function get_cache_file_path($key) {

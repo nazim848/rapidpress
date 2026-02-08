@@ -8,10 +8,12 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
 require __DIR__ . '/inc/class-rapidpress-options.php';
 require __DIR__ . '/inc/class-cache-dropin-manager.php';
 require __DIR__ . '/inc/class-cache-preloader.php';
+require __DIR__ . '/inc/class-cache-store.php';
 
 use RapidPress\RP_Options;
 use RapidPress\Cache_Dropin_Manager;
 use RapidPress\Cache_Preloader;
+use RapidPress\Cache_Store;
 
 // Check if clean uninstall is enabled.
 $rapidpress_clean_uninstall = RP_Options::get_option('clean_uninstall');
@@ -37,16 +39,11 @@ if ($rapidpress_clean_uninstall == '1') {
 	delete_transient('rapidpress_activation_notice');
 
 	// Delete any files or directories created by the plugin
-	$rapidpress_upload_dir = wp_upload_dir();
-	$rapidpress_combined_dir = trailingslashit($rapidpress_upload_dir['basedir']) . 'rapidpress';
-	$rapidpress_cache_dir = trailingslashit($rapidpress_upload_dir['basedir']) . 'rapidpress-cache';
+	$rapidpress_cache_store = new Cache_Store();
+	$rapidpress_base_dir = $rapidpress_cache_store->get_cache_base_dir();
 
-	if (is_dir($rapidpress_combined_dir)) {
-		rapidpress_remove_directory($rapidpress_combined_dir);
-	}
-
-	if (is_dir($rapidpress_cache_dir)) {
-		rapidpress_remove_directory($rapidpress_cache_dir);
+	if ($rapidpress_base_dir !== '' && is_dir($rapidpress_base_dir)) {
+		rapidpress_remove_directory($rapidpress_base_dir);
 	}
 }
 
@@ -60,7 +57,7 @@ Cache_Preloader::clear_schedule();
  * @return bool True on success, false on failure
  */
 function rapidpress_remove_directory($dir) {
-	require_once(ABSPATH . 'wp-admin/inc/file.php');
+	require_once ABSPATH . 'wp-admin/includes/file.php';
 	WP_Filesystem();
 	global $wp_filesystem;
 

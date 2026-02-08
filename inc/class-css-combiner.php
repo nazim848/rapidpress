@@ -144,48 +144,46 @@ class CSS_Combiner {
 	}
 
 	private function cleanup_old_files() {
-		$locations = $this->get_combined_locations();
-		foreach ($locations as $location) {
-			$combined_dir = $location['dir'];
-			if (!is_dir($combined_dir)) {
-				continue;
-			}
+		$location = $this->get_writable_combined_location();
+		if (empty($location['dir']) || !is_dir($location['dir'])) {
+			return;
+		}
 
-			$files = glob($combined_dir . '/' . $this->file_prefix . '*' . $this->file_extension);
-			if (!is_array($files) || empty($files)) {
-				continue;
-			}
+		$combined_dir = $location['dir'];
+		$files = glob($combined_dir . '/' . $this->file_prefix . '*' . $this->file_extension);
+		if (!is_array($files) || empty($files)) {
+			return;
+		}
 
-			$now = time();
-			$expiry_cutoff = $now - intval($this->cache_expiration);
-			$existing = array();
+		$now = time();
+		$expiry_cutoff = $now - intval($this->cache_expiration);
+		$existing = array();
 
-			// First pass: remove expired combined files.
-			foreach ($files as $file) {
-				$mtime = @filemtime($file);
-				if ($mtime !== false && $mtime < $expiry_cutoff) {
-					if (is_file($file)) {
-						wp_delete_file($file);
-					}
-					continue;
-				}
-				$existing[] = $file;
-			}
-
-			// Second pass: high-water cap to avoid unlimited accumulation.
-			if (count($existing) <= $this->max_files_to_keep) {
-				continue;
-			}
-
-			usort($existing, function ($a, $b) {
-				return filemtime($b) - filemtime($a);
-			});
-
-			$files_to_delete = array_slice($existing, $this->max_files_to_keep);
-			foreach ($files_to_delete as $file) {
+		// First pass: remove expired combined files.
+		foreach ($files as $file) {
+			$mtime = @filemtime($file);
+			if ($mtime !== false && $mtime < $expiry_cutoff) {
 				if (is_file($file)) {
 					wp_delete_file($file);
 				}
+				continue;
+			}
+			$existing[] = $file;
+		}
+
+		// Second pass: high-water cap to avoid unlimited accumulation.
+		if (count($existing) <= $this->max_files_to_keep) {
+			return;
+		}
+
+		usort($existing, function ($a, $b) {
+			return filemtime($b) - filemtime($a);
+		});
+
+		$files_to_delete = array_slice($existing, $this->max_files_to_keep);
+		foreach ($files_to_delete as $file) {
+			if (is_file($file)) {
+				wp_delete_file($file);
 			}
 		}
 	}
@@ -380,7 +378,7 @@ class CSS_Combiner {
 	// }
 
 	private function save_combined_css($styles_hash) {
-		$location = $this->get_writable_combined_location(true);
+		$location = $this->get_writable_combined_location();
 		if (empty($location) || empty($location['dir']) || empty($location['url'])) {
 			RP_Options::delete_option('css_cache_meta');
 			return false;
@@ -460,7 +458,7 @@ class CSS_Combiner {
 
 	private function get_combined_css_url() {
 		if ($this->combined_base_url === '') {
-			$location = $this->get_writable_combined_location(false);
+			$location = $this->get_writable_combined_location();
 			if (!empty($location['url'])) {
 				$this->combined_base_url = untrailingslashit($location['url']);
 			}
@@ -563,67 +561,30 @@ class CSS_Combiner {
 		return $url;
 	}
 
-	private function get_combined_locations() {
-		$upload_dir = wp_upload_dir();
-		$locations = array();
-
-		if (!empty($upload_dir['basedir']) && !empty($upload_dir['baseurl'])) {
-			$locations[] = array(
-				'dir' => trailingslashit($upload_dir['basedir']) . 'rapidpress',
-				'url' => trailingslashit($upload_dir['baseurl']) . 'rapidpress',
-			);
+	private function get_writable_combined_location() {
+		$cache_store = new Cache_Store();
+		$dir = $cache_store->get_css_cache_dir();
+		$url = $cache_store->get_css_cache_url();
+		if ($dir === '' || $url === '' || !is_dir($dir) || !wp_is_writable($dir)) {
+			return array();
 		}
 
-		if (!empty($upload_dir['path']) && !empty($upload_dir['url'])) {
-			$path_dir = trailingslashit($upload_dir['path']) . 'rapidpress';
-			$path_url = trailingslashit($upload_dir['url']) . 'rapidpress';
-			$exists = false;
-			foreach ($locations as $location) {
-				if ($location['dir'] === $path_dir) {
-					$exists = true;
-					break;
-				}
-			}
-			if (!$exists) {
-				$locations[] = array(
-					'dir' => $path_dir,
-					'url' => $path_url,
-				);
-			}
-		}
-
-		$locations[] = array(
-			'dir' => trailingslashit(WP_CONTENT_DIR) . 'cache/rapidpress',
-			'url' => trailingslashit(content_url('cache')) . 'rapidpress',
+		return array(
+			'dir' => $dir,
+			'url' => $url,
 		);
-
-		return $locations;
-	}
-
-	private function get_writable_combined_location($create = false) {
-		$locations = $this->get_combined_locations();
-		foreach ($locations as $location) {
-			$dir = $location['dir'];
-			if (is_dir($dir) && wp_is_writable($dir)) {
-				return $location;
-			}
-
-			if ($create && wp_mkdir_p($dir) && is_dir($dir) && wp_is_writable($dir)) {
-				return $location;
-			}
-		}
-
-		return array();
 	}
 
 	private function find_existing_combined_file($filename) {
-		$locations = $this->get_combined_locations();
-		foreach ($locations as $location) {
-			$file = trailingslashit($location['dir']) . $filename;
-			if (file_exists($file)) {
-				$this->combined_base_url = untrailingslashit($location['url']);
-				return $file;
-			}
+		$location = $this->get_writable_combined_location();
+		if (empty($location['dir']) || empty($location['url'])) {
+			return '';
+		}
+
+		$file = trailingslashit($location['dir']) . $filename;
+		if (file_exists($file)) {
+			$this->combined_base_url = untrailingslashit($location['url']);
+			return $file;
 		}
 
 		return '';

@@ -654,24 +654,13 @@ class Admin {
 	}
 
 	public function clear_css_cache() {
-		$upload_dir = wp_upload_dir();
-		$dirs = array();
+		$cache_store = new Cache_Store();
+		$combined_dir = $cache_store->get_css_cache_dir();
 
-		if (!empty($upload_dir['basedir'])) {
-			$dirs[] = trailingslashit($upload_dir['basedir']) . 'rapidpress';
-		}
-		if (!empty($upload_dir['path'])) {
-			$dirs[] = trailingslashit($upload_dir['path']) . 'rapidpress';
-		}
-		$dirs[] = trailingslashit(WP_CONTENT_DIR) . 'cache/rapidpress';
-		$dirs = array_unique($dirs);
-
-		foreach ($dirs as $combined_dir) {
-			if (is_dir($combined_dir)) {
-				$files = glob("$combined_dir/*.*");
-				if (is_array($files)) {
-					array_map('unlink', $files);
-				}
+		if ($combined_dir !== '' && is_dir($combined_dir)) {
+			$files = glob($combined_dir . '/*.*');
+			if (is_array($files)) {
+				array_map('unlink', $files);
 			}
 		}
 
