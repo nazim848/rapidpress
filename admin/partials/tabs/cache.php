@@ -9,22 +9,22 @@ use RapidPress\Cache_Stats;
 
 <div id="<?php echo esc_attr($rapidpress_tab_id); ?>" class="tab-pane">
 	<h2 class="content-title"><span class="dashicons dashicons-page"></span> <?php esc_html_e('Cache', 'rapidpress'); ?></h2>
-		<div class="rapidpress-card">
+	<div class="rapidpress-card">
+		<table class="form-table">
+			<tr valign="top">
+				<th scope="row"><?php esc_html_e('Enable Cache', 'rapidpress'); ?></th>
+				<td>
+					<div class="checkbox-radio">
+						<label>
+							<input type="checkbox" name="rapidpress_options[enable_cache]" value="1" <?php checked(RP_Options::get_option('enable_cache'), '1'); ?> />
+						</label>
+						<span class="dashicons dashicons-editor-help" data-title="<?php esc_attr_e('When enabled, all pages will be cached.', 'rapidpress'); ?>"></span>
+					</div>
+				</td>
+			</tr>
+		</table>
+		<div id="rapidpress-cache-settings-wrapper">
 			<table class="form-table">
-				<tr valign="top">
-					<th scope="row"><?php esc_html_e('Enable Cache', 'rapidpress'); ?></th>
-					<td>
-						<div class="checkbox-radio">
-							<label>
-								<input type="checkbox" name="rapidpress_options[enable_cache]" value="1" <?php checked(RP_Options::get_option('enable_cache'), '1'); ?> />
-							</label>
-							<span class="dashicons dashicons-editor-help" data-title="<?php esc_attr_e('When enabled, all pages will be cached.', 'rapidpress'); ?>"></span>
-						</div>
-					</td>
-				</tr>
-			</table>
-			<div id="rapidpress-cache-settings-wrapper">
-				<table class="form-table">
 				<tr valign="top">
 					<th scope="row"><?php esc_html_e('Early Cache Serving', 'rapidpress'); ?></th>
 					<td>
@@ -85,42 +85,41 @@ use RapidPress\Cache_Stats;
 						<textarea cols="63" rows="4" name="rapidpress_options[cache_never_cache_user_agents]" placeholder="Lighthouse&#10;GTmetrix"><?php echo esc_textarea(RP_Options::get_option('cache_never_cache_user_agents', '')); ?></textarea>
 					</td>
 				</tr>
-				</table>
-				<p>
-					<button type="button" id="rapidpress-purge-page-cache" class="button button-secondary">
-						<?php esc_html_e('Purge All Page Cache', 'rapidpress'); ?>
-					</button>
-				</p>
-				<p>
-					<button type="button" id="rapidpress-preload-page-cache" class="button button-secondary">
-						<?php esc_html_e('Preload Cache Now', 'rapidpress'); ?>
-					</button>
-				</p>
-				<p>
-					<button type="button" id="rapidpress-clear-css-cache" class="button button-secondary">
-						<?php esc_html_e('Clear CSS Cache', 'rapidpress'); ?>
-					</button>
-				</p>
+			</table>
+			<p>
+				<button type="button" id="rapidpress-purge-page-cache" class="button button-secondary">
+					<?php esc_html_e('Purge All Page Cache', 'rapidpress'); ?>
+				</button>
+			</p>
+			<p>
+				<button type="button" id="rapidpress-preload-page-cache" class="button button-secondary">
+					<?php esc_html_e('Preload Cache Now', 'rapidpress'); ?>
+				</button>
+			</p>
+			<p>
+				<button type="button" id="rapidpress-clear-css-cache" class="button button-secondary">
+					<?php esc_html_e('Clear CSS Cache', 'rapidpress'); ?>
+				</button>
+			</p>
+			<?php
+			$rapidpress_last_run = get_option(\RapidPress\Cache_Preloader::LAST_RUN_OPTION, RP_Options::get_option('cache_preload_last_run', 0));
+			$rapidpress_last_count = get_option(\RapidPress\Cache_Preloader::LAST_COUNT_OPTION, RP_Options::get_option('cache_preload_last_count', 0));
+			$rapidpress_cache_stats = (new Cache_Stats())->get_summary();
+			if (!empty($rapidpress_last_run)) :
+				/* translators: 1: last preload date/time, 2: number of preloaded URLs. */
+				$rapidpress_preload_status_text = sprintf(__('Last preload: %1$s (%2$d URLs)', 'rapidpress'), wp_date('Y-m-d H:i:s', intval($rapidpress_last_run)), intval($rapidpress_last_count));
+			else :
+				$rapidpress_preload_status_text = __('Last preload: Not run yet', 'rapidpress');
+			endif;
+			?>
+			<p id="rapidpress-preload-status">
+				<?php echo esc_html($rapidpress_preload_status_text); ?>
+			</p>
+			<p>
 				<?php
-				$rapidpress_last_run = get_option(\RapidPress\Cache_Preloader::LAST_RUN_OPTION, RP_Options::get_option('cache_preload_last_run', 0));
-					$rapidpress_last_count = get_option(\RapidPress\Cache_Preloader::LAST_COUNT_OPTION, RP_Options::get_option('cache_preload_last_count', 0));
-					$rapidpress_cache_stats = (new Cache_Stats())->get_summary();
-					if (!empty($rapidpress_last_run)) :
-						/* translators: 1: last preload date/time, 2: number of preloaded URLs. */
-						$rapidpress_preload_status_text = sprintf(__('Last preload: %1$s (%2$d URLs)', 'rapidpress'), wp_date('Y-m-d H:i:s', intval($rapidpress_last_run)), intval($rapidpress_last_count));
-					else :
-						$rapidpress_preload_status_text = __('Last preload: Not run yet', 'rapidpress');
-					endif;
+				/* translators: 1: number of cached files, 2: total cache size in human-readable format. */
+				echo esc_html(sprintf(__('Cache files: %1$d | Size: %2$s', 'rapidpress'), intval($rapidpress_cache_stats['file_count']), $rapidpress_cache_stats['total_size_human']));
 				?>
-				<p id="rapidpress-preload-status">
-					<?php echo esc_html($rapidpress_preload_status_text); ?>
-				</p>
-				<p>
-					<?php
-					/* translators: 1: number of cached files, 2: total cache size in human-readable format. */
-					echo esc_html(sprintf(__('Cache files: %1$d | Size: %2$s', 'rapidpress'), intval($rapidpress_cache_stats['file_count']), $rapidpress_cache_stats['total_size_human']));
-					?>
-				</p>
-			</div>
+			</p>
 		</div>
 	</div>

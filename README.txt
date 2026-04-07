@@ -4,9 +4,9 @@ Donate link: https://buymeacoffee.com/nazim848
 Tags: pagespeed, performance, optimization, speed, minification
 Requires at least: 5.0
 Tested up to: 6.9
-Stable tag: 1.1.0
+Stable tag: 1.1.6
 Requires PHP: 7.2
-License: GPLv2 or later
+License: GPLv2 or later 
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 Boost your WordPress site speed by 2x-5x with advanced optimization techniques including minification, asset management, and performance tweaks.
@@ -80,6 +80,9 @@ We recommend using tools like Google PageSpeed Insights, GTmetrix, or WebPageTes
 Yes, RapidPress is fully internationalized and ready for translation. The plugin includes a POT file in the languages directory that you can use as a template for translations. We welcome contributions of new translations!
 
 == Changelog ==
+
+= 1.1.2 =
+* Fixed some permission issues
 
 = 1.1.0 =
 * Added page cache feature to serve cached HTML for faster page loads.
