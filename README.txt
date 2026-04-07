@@ -6,7 +6,7 @@ Requires at least: 5.0
 Tested up to: 6.9
 Stable tag: 1.1.6
 Requires PHP: 7.2
-License: GPLv2 or later
+License: GPLv2 or later 
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 Boost your WordPress site speed by 2x-5x with advanced optimization techniques including minification, asset management, and performance tweaks.
