@@ -81,6 +81,9 @@ Yes, RapidPress is fully internationalized and ready for translation. The plugin
 
 == Changelog ==
 
+= 1.1.6 =
+* Few minor enhancements 
+
 = 1.1.2 =
 * Fixed some permission issues
 
