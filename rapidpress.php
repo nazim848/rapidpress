@@ -2,7 +2,7 @@
 /*
 Plugin Name: RapidPress - Turbocharge Website Performance
 Description: Boost your WordPress site speed by 2x-5x with advanced optimization techniques including minification, asset management, and performance tweaks.
-Version: 1.0.1
+Version: 1.1.6
 Author: Nazim Husain
 Author URI: https://nazimansari.com
 License: GPLv2 or later
